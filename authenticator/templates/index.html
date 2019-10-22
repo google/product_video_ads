@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PVA Auth</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <style>
+      .container {
+        max-width: 1000px;
+      }
+      .done {
+        color: green;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+        <h1>Upload OAuth2 Credentials</h1>
+        <form role="form" method='POST' action='/' enctype=multipart/form-data>
+          <div class="form-group">
+            <input type="file" name="auth" accept=".json">
+          </div>
+          <button type="submit" class="btn btn-default">Authenticate!</button>
+        </form>
+        <br>
+
+      <h4>{{error}}</h4>
+
+      {% if success %}
+         <a href="/download">Download token!</a>
+      {% endif %}
+      
+    </div>
+    <script src="//code.jquery.com/jquery-2.2.1.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  </body>
+</html>
