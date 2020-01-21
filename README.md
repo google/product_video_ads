@@ -1,4 +1,4 @@
-# Product Video Ads
+# -lProduct Video Ads
 
 ## About
 
@@ -11,7 +11,7 @@ content will be placed). It **uploads generated video to Youtube and also create
 video ad on Google Ads, keeping track of price changes automatically**!
 
 That's Product Video Ads - and remember `This is not an officially supported
-Google product`
+Google product.`
 
 ## Resources
 
