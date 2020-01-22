@@ -11,6 +11,10 @@ export class CachedConfigurationRepository extends ConfigurationRepository {
             .forEach(key => localStorage.removeItem(key))
     }
 
+    async load_fonts(): Promise<object> {
+        return (await this.load_data<object>(environment.local_storage_keys.fonts, super.load_fonts.bind(this)))
+    }
+
     async load_products() : Promise<Product[]> {
         return (await this.load_data<Product[]>(environment.local_storage_keys.products, super.load_products.bind(this)))
     }    

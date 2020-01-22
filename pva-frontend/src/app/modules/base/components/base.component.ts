@@ -1,7 +1,8 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
-import { Base, BaseConfigs, Product } from 'app/models/entities';
+import { Component, OnInit } from '@angular/core';
+import { Base, BaseConfigs } from 'app/models/entities';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BaseFacade } from '../base.facade';
+import * as WebFont from 'webfontloader'
 
 @Component({
   selector: 'app-base',
@@ -15,11 +16,13 @@ export class BaseComponent implements OnInit {
   elements = []
   text_elements = []
   image_elements = []
+  loaded_fonts : Set<string> = new Set()
 
   // Chosen base
   base : Base
 
   focused_element : any
+  fonts : object = {}
   added_items : Map<string, Array<number>> = new Map()
 
   seconds : any = 0.0
@@ -36,7 +39,9 @@ export class BaseComponent implements OnInit {
 
   constructor(public facade : BaseFacade, private _snackBar: MatSnackBar) {}
   
-  ngOnInit() {}
+  ngOnInit() {
+    this.facade.fonts$.subscribe(fonts => this.fonts = fonts)
+  }
 
   load() {
     
@@ -180,21 +185,36 @@ export class BaseComponent implements OnInit {
     return element
   }
 
-  private clear_temporary_product(product) {
-    //delete product['field']
-    //delete product['product']
-    //delete product['content']
-  }
-  
   // Bind from view
   create_text(product?) {
     
     const current_product = product ? product : this.current_product
     const element = this.create_element(current_product)
-    
-    // Load font for this text
-    //var font_face = new FontFace(current_product.font, 'url(https://drive.google.com/uc?export=download&id=' + this.fonts[current_product.font] + ')')
 
+    // Load font for this text, if not loaded yet
+    const font_name = current_product.font.split('.')[0]
+
+    if (!this.loaded_fonts.has(font_name)) {
+
+      const font_content = this.fonts[current_product.font]
+
+      const styles = `
+      @font-face {
+        font-family: ${font_name};
+        src: url(data:font/truetype;charset=utf-8;base64,${btoa(font_content)}) format('truetype');
+      }`
+
+      const node = document.createElement('style');
+      node.innerHTML = styles;
+      document.head.appendChild(node); 
+
+      this.loaded_fonts.add(font_name)
+    }
+
+    // Add this font to the element
+    element.font_family = font_name
+
+    // Wrap text to break into lines
     element.content = this.wrap_text(
       current_product['content'],
       current_product['width'])
@@ -286,7 +306,17 @@ export class BaseComponent implements OnInit {
       
       // Element saved
       const element = this.elements.filter(e => e.id == id)[0]
-      element.x = ((event.clientX - this.video_pos.x - (element.align == 'left' ? dm.offsetWidth/2 : 0)) * this.video_pos.x_ratio).toFixed(0)
+    
+      // Adjust on align
+      let align_adjust = 0
+      
+      if (element.align == 'left')
+        align_adjust = dm.offsetWidth/2
+
+      if (element.align == 'right')
+        align_adjust = -dm.offsetWidth/2
+
+      element.x = ((event.clientX - this.video_pos.x - align_adjust) * this.video_pos.x_ratio).toFixed(0)
       element.y = ((event.clientY - dm.offsetHeight/2 - this.video_pos.y) * this.video_pos.y_ratio).toFixed(0)
       
       this.focused_element = element
@@ -306,11 +336,29 @@ export class BaseComponent implements OnInit {
 
       element.size /= this.video_pos.x_ratio
 
-      dm.style.left = ((parseInt(element.x) - (element.align == 'left' ? 0 : dm.offsetWidth/2)) / this.video_pos.x_ratio) + this.video_pos.x + 'px'
+      // Adjust on align
+      let align_adjust = 0
+      
+      if (element.align == 'center')
+        align_adjust = dm.offsetWidth/2
+
+      if (element.align == 'right')
+        align_adjust = dm.offsetWidth
+
+      dm.style.left = ((parseInt(element.x) - align_adjust) / this.video_pos.x_ratio) + this.video_pos.x + 'px'
       dm.style.top =  (parseInt(element.y) / this.video_pos.y_ratio) + this.video_pos.y + 'px';
     }
     
+    private clear_temporary_product(product) {
+      delete product['field']
+      delete product['product']
+      delete product['content']
+    }
+
     edit_row(key) {
+
+      console.log(key)
+      console.log(this.added_items.get(key))
       
       // Edit all itens on that key
       for(let id of this.added_items.get(key)) {

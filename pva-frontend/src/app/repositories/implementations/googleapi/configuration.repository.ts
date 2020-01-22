@@ -9,11 +9,16 @@ export class ConfigurationRepository implements ConfigurationInterface {
 
     constructor(public googleApi : GoogleAPI) {}
 
-    async load_fonts(): Promise<string[]> {
+    async load_fonts(): Promise<object> {
         
         const drive_folder = await this.load_drive_folder()
-        
-        return Object.keys((await this.googleApi.list_files_from_folder(drive_folder, 'fonts')))
+        const fonts = await this.googleApi.list_files_from_folder(drive_folder, 'fonts')
+
+        // Downloads font file
+        for (let [font_name, id] of Object.entries(fonts))
+            fonts[font_name] = (await this.googleApi.download_file(id as string))
+
+        return fonts
     }
     
     async load_drive_folder(): Promise<string> {

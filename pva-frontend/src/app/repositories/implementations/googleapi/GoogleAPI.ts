@@ -100,4 +100,14 @@ export class GoogleAPI {
         
         return files
     }
+
+    async download_file(file_id : string) : Promise<any> {
+  
+      const response = await this.gapi.client.drive.files.get({
+        fileId: file_id,
+        alt: 'media'
+      })
+      
+      return response.body
+  }
 }

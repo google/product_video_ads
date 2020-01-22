@@ -4,7 +4,7 @@ export interface ConfigurationInterface {
 
     load_drive_folder() : Promise<string>
 
-    load_fonts() : Promise<string[]>
+    load_fonts() : Promise<object>
 
     load_products() : Promise<Product[]>
     save_products(products : Product[]) : Promise<any>

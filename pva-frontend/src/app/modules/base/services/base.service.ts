@@ -8,7 +8,7 @@ import { LoginService } from 'app/modules/login/services/login.service'
 export class BaseService {
 
     private readonly _bases = new BehaviorSubject<Base[]>([])
-    private readonly _fonts = new BehaviorSubject<string[]>([])
+    private readonly _fonts = new BehaviorSubject<object>([])
 
     /** Published state to application **/
     readonly bases$ = this._bases.asObservable()
@@ -19,7 +19,7 @@ export class BaseService {
     }
 
     get fonts() {
-        return [...this._fonts.getValue()]
+        return {...this._fonts.getValue()}
     }
 
     constructor(private repository : CachedConfigurationRepository, loginService : LoginService) {

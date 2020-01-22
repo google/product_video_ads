@@ -111,8 +111,8 @@
           <mat-form-field>
             <mat-label>Font</mat-label>
             <mat-select [(ngModel)]="current_product.font">
-              <mat-option *ngFor="let f of facade.fonts$ | async" [value]="f">
-                {{f}}
+              <mat-option *ngFor="let f of facade.fonts$ | async | keyvalue" [value]="f.key">
+                {{f.key}}
               </mat-option>
             </mat-select>
           </mat-form-field>
@@ -132,7 +132,7 @@
           <mat-form-field>
             <mat-label>Align</mat-label>
             <mat-select [(ngModel)]="current_product.align" value="center">
-              <mat-option *ngFor="let a of ['center', 'left']" [value]="a">
+              <mat-option *ngFor="let a of ['center', 'left', 'right']" [value]="a">
                 {{a}}
               </mat-option>
             </mat-select>
@@ -208,6 +208,7 @@
         [ngStyle]="{
           'color': el.color,
           'font-size': el.size + 'px',
+          'font-family': el.font_family,
           'text-align': el.align,
           'position': 'absolute',
           'line-height': el.size * 1.2 + 'px',
