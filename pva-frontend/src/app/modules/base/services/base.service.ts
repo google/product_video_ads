@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs'
 import { Base, BaseConfigs } from 'app/models/entities'
 import { CachedConfigurationRepository } from 'app/repositories/implementations/googleapi/cached-configuration.repository'
 import { LoginService } from 'app/modules/login/services/login.service'
+import * as UUID from 'uuid/v4'
 
 @Injectable({providedIn: 'root'})
 export class BaseService {
@@ -33,7 +34,7 @@ export class BaseService {
 
     add_config(base : Base, config : BaseConfigs) {
         base.configs.push(config)
-        config.id = base.configs.length-1
+        config.id = UUID()
     }
 
     delete_config(base : Base, id : number) {

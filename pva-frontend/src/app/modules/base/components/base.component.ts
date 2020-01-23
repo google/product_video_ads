@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Base, BaseConfigs } from 'app/models/entities';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BaseFacade } from '../base.facade';
-import * as WebFont from 'webfontloader'
 
 @Component({
   selector: 'app-base',
@@ -310,10 +309,10 @@ export class BaseComponent implements OnInit {
       // Adjust on align
       let align_adjust = 0
       
-      if (element.align == 'left')
+      if (element.align && element.align == 'left')
         align_adjust = dm.offsetWidth/2
 
-      if (element.align == 'right')
+      if (element.align && element.align == 'right')
         align_adjust = -dm.offsetWidth/2
 
       element.x = ((event.clientX - this.video_pos.x - align_adjust) * this.video_pos.x_ratio).toFixed(0)
@@ -357,9 +356,6 @@ export class BaseComponent implements OnInit {
 
     edit_row(key) {
 
-      console.log(key)
-      console.log(this.added_items.get(key))
-      
       // Edit all itens on that key
       for(let id of this.added_items.get(key)) {
 
@@ -463,7 +459,7 @@ export class BaseComponent implements OnInit {
         element.end_time,
         element.font,
         element.color,
-        element.size*this.video_pos.x_ratio,
+        Math.floor(element.size*this.video_pos.x_ratio),
         element.field == 'image' ? Math.floor(element.width*this.video_pos.x_ratio) : element.width,
         element.field == 'image' ? Math.floor(element.height*this.video_pos.y_ratio) : element.height,
         element.align,
