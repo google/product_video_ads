@@ -65,11 +65,16 @@ def main():
 
   while True:
 
-    # Sync drive files to local tmp
-    storage.update_local_files()
+    try:
 
-    # Process configuration joining threads
-    handler.handle_configuration()
+      # Sync drive files to local tmp
+      storage.update_local_files()
+
+      # Process configuration joining threads
+      handler.handle_configuration()
+
+    except Exception as e:
+      logger.error(e)
 
     # Sleep!
     interval = configuration.get_interval_in_minutes()

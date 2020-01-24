@@ -1,5 +1,5 @@
 #!/bin/bash
-# this is a commit test
+
 gsutil cp gs://video-generator-image/video-generator.tar .
 
 docker load -i video-generator.tar

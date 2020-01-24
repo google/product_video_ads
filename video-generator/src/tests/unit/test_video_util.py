@@ -3,6 +3,7 @@ from pytest import fixture
 
 from video import util
 
+
 def test_convert_text_overlay_for_title_multiline():
 
   config = {
@@ -45,10 +46,7 @@ def test_convert_text_overlay_for_title():
       'font_size': '30'
   }
 
-  product_data = {
-      'title': 'nice product',
-      'price': 120
-  }
+  product_data = {'title': 'nice product', 'price': 120}
 
   storage = Mock()
   storage.get_absolute_path.return_value = 'abs/path/'
@@ -80,10 +78,7 @@ def test_convert_text_overlay_for_price():
       'font_size': '30'
   }
 
-  product_data = {
-      'title': 'nice product',
-      'price': 120
-  }
+  product_data = {'title': 'nice product', 'price': 120}
 
   storage = Mock()
   storage.get_absolute_path.return_value = 'abs/path/'
@@ -93,6 +88,41 @@ def test_convert_text_overlay_for_price():
   title_overlay = title_overlay_list[0]
 
   assert title_overlay['text'] == product_data['price']
+  assert title_overlay['x'] == config['x']
+  assert title_overlay['y'] == config['y']
+  assert title_overlay['start_time'] == config['start_time']
+  assert title_overlay['end_time'] == config['end_time']
+  assert title_overlay['font'] == 'abs/path/'
+  assert title_overlay['font_color'] == config['font_color']
+  assert title_overlay['font_size'] == config['font_size']
+
+
+def test_convert_text_overlay_for_retail_price():
+
+  config = {
+      'field': 'Retail price',
+      'x': 200,
+      'y': 400,
+      'start_time': 3,
+      'end_time': 10,
+      'font': 'Roboto.ttf',
+      'font_color': '#FF0000',
+      'font_size': '300'
+  }
+
+  product_data = {'title': 'nice product', 'price': '2,99'}
+
+  storage = Mock()
+  storage.get_absolute_path.return_value = 'abs/path/'
+
+  title_overlay_list = util.convert_retail_price_overlay(
+      config, product_data, storage)
+
+  title_overlay = title_overlay_list[0]
+
+  print(title_overlay_list)
+
+  assert title_overlay['text'] == '2'
   assert title_overlay['x'] == config['x']
   assert title_overlay['y'] == config['y']
   assert title_overlay['start_time'] == config['start_time']

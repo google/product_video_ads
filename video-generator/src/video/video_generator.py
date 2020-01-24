@@ -231,7 +231,7 @@ class VideoGenerator(object):
       else:
         f = self._text_filter((i + 1), ovr['text'], ovr['font'],
                               ovr['font_size'], ovr['font_color'],
-                              ovr['h_align'], ovr['start_time'],
+                              ovr['align'], ovr['start_time'],
                               ovr['end_time'],
                               ovr.get('angle', None), use_cropped_text_fix)
 
@@ -249,7 +249,7 @@ class VideoGenerator(object):
                                else None),
                               ovr.get('fade_in_duration', 0.1),
                               ovr.get('fade_out_duration', 0.1),
-                              ovr.get('h_align', None))
+                              ovr.get('align', None))
       retval.append(f)
 
       # makes current concat of overlays the one to concat next overlay
@@ -266,7 +266,7 @@ class VideoGenerator(object):
 
   def _video_filter(self, input_stream, image_stream_index, x, y, width, height,
                     t_start, t_end, output_stream, angle, fade_in_duration,
-                    fade_out_duration, h_align):
+                    fade_out_duration, align):
     """Generates a ffmeg filter specification for an image input.
 
     Args:
@@ -279,7 +279,7 @@ class VideoGenerator(object):
       output_stream: name of the output stream
       fade_in_duration: float of representing how many seconds should fade in
       fade_out_duration: float of representing how many seconds should fade out
-      h_align: horizontal align, for texts made image
+      align: align, for texts made image
 
     Returns:
       A string that represents an image filter specification, ready to be
@@ -292,10 +292,10 @@ class VideoGenerator(object):
     fadein_str = '[vid%sfadedin]' % image_stream_index
     fadeout_str = '[vid%sfadedout]' % image_stream_index
 
-    if h_align == 'center':
+    if align == 'center':
       x = '%s-overlay_w/2' % x
 
-    if h_align == 'right':
+    if align == 'right':
       x = '%s-overlay_w' % x
 
     if not width:
@@ -352,7 +352,7 @@ class VideoGenerator(object):
                    font,
                    font_size,
                    font_color,
-                   h_align,
+                   align,
                    t_start,
                    t_end,
                    angle,
@@ -365,7 +365,7 @@ class VideoGenerator(object):
       font: the file name of the font to be used
       font_size: font size in dots
       font_color: font color, in hex RGB
-      h_align: horizontal text alignment ("left" or "center")
+      align: text alignment ("left" or "center")
       t_start: start time of the image's appearance
       t_end: end time of the image's appearance
 

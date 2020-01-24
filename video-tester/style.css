@@ -1,0 +1,27 @@
+body {
+  margin: 0;
+}
+
+body input {
+  font-family: Verdana;
+  font-size: 20px;
+}
+
+.container * {
+  position: relative;
+  margin: 15% auto;
+  text-align: center;
+  font-weight: bold;
+}
+
+.video {
+  position: relative;
+  top: 0;
+  left: 0;
+}
+
+.right {
+  position: absolute;
+  left: 30%;
+  top: 5%;
+}

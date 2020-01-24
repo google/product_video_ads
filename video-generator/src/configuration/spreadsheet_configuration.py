@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """SpreadsheetConfiguration."""
 
 from googleapiclient.discovery import build
@@ -55,11 +54,14 @@ class SpreadsheetConfiguration(object):
         spreadsheetId=self.spreadsheet_id,
         range='Generator!A:A',
         valueInputOption='RAW',
-        body={'values': [[message]]}).execute()
+        body={
+            'values': [[message]]
+        }).execute()
 
   def update_status(self, row, video_id, status):
 
-    range_a1_notation = self.__get_named_range_A1_notation(self.STATUS_VIDEO_NAMED_RANGE)
+    range_a1_notation = self.__get_named_range_A1_notation(
+        self.STATUS_VIDEO_NAMED_RANGE)
 
     # Update only one line
     range_a1_notation['startRow'] = range_a1_notation['endRow'] = row
@@ -68,13 +70,16 @@ class SpreadsheetConfiguration(object):
         spreadsheetId=self.spreadsheet_id,
         range=range_a1_notation['str'](),
         valueInputOption='RAW',
-        body={'values': [[status, video_id]]}).execute()
+        body={
+            'values': [[status, video_id]]
+        }).execute()
 
     self.logger.info('Updating status to %s and video_id to %s to row %s',
                      status, video_id, row)
 
   def get_all_base_videos(self):
     """Return will be in the following format:
+
        {
            'Base1': '/my/base/video/file.mp4'
        }
@@ -96,6 +101,7 @@ class SpreadsheetConfiguration(object):
 
   def get_base_config(self, base_config):
     """Return will be in the following format:
+
        {
            'Base1': [{
              'product': 1,
@@ -108,12 +114,16 @@ class SpreadsheetConfiguration(object):
              'font_color': '#FF0000',
              'font_size': '30',
              'width': '100',
-             'height': '100'
+             'height': '100',
+             'align': 'center',
+             'angle': 0
            }]
         }
     """
-    headers = ['product','field','x','y','start_time','end_time','font',
-               'font_color', 'font_size', 'width', 'height']
+    headers = [
+        'product', 'field', 'x', 'y', 'start_time', 'end_time', 'font',
+        'font_color', 'font_size', 'width', 'height', 'align', 'angle'
+    ]
 
     video_config = dict()
 
@@ -121,8 +131,8 @@ class SpreadsheetConfiguration(object):
 
       props = self.sheet.values().get(
           spreadsheetId=self.spreadsheet_id,
-          range=base + '!A2:' + chr(ord('A') + len(headers) - 1)
-      ).execute().get('values', [])
+          range=base + '!A2:' + chr(ord('A') + len(headers) - 1)).execute().get(
+              'values', [])
 
       video_config[base] = []
 
@@ -133,6 +143,7 @@ class SpreadsheetConfiguration(object):
 
   def get_products_data(self):
     """Return will be in the following format:
+
        {
            'product_id_100293': {
              'title': 'nice product',
@@ -158,22 +169,24 @@ class SpreadsheetConfiguration(object):
     return self.__get_named_range_values(self.DRIVE_CONFIG_NAMED_RANGE)[0][0]
 
   def get_interval_in_minutes(self):
-    return self.__get_named_range_values(self.INTERVAL_IN_MINUTES_NAMED_RANGE)[0][0]
+    return self.__get_named_range_values(
+        self.INTERVAL_IN_MINUTES_NAMED_RANGE)[0][0]
 
   def __get_named_range_values(self, range_name):
 
     range_a1_notation = self.__get_named_range_A1_notation(range_name)
 
-    return self.sheet.values().get(spreadsheetId=self.spreadsheet_id,
-                                   range=range_a1_notation['str']()
-                                  ).execute().get('values', [])
+    return self.sheet.values().get(
+        spreadsheetId=self.spreadsheet_id,
+        range=range_a1_notation['str']()).execute().get('values', [])
 
   def __get_named_range_A1_notation(self, range_name):
 
     range_notation = dict()
     sheetId = None
 
-    spreadsheet_data = self.sheet.get(spreadsheetId=self.spreadsheet_id).execute()
+    spreadsheet_data = self.sheet.get(
+        spreadsheetId=self.spreadsheet_id).execute()
 
     # Find named range in A1 notation
     for namedRange in spreadsheet_data['namedRanges']:
@@ -182,10 +195,12 @@ class SpreadsheetConfiguration(object):
 
         sheetId = range['sheetId']
 
-        range_notation['startColumn'] = chr(ord('A') + range['startColumnIndex'])
+        range_notation['startColumn'] = chr(
+            ord('A') + range['startColumnIndex'])
         range_notation['startRow'] = str(range['startRowIndex'] + 1)
-        range_notation['endColumn'] = chr(ord('A') + range['endColumnIndex'] - 1)
-        range_notation['endRow'] =  str(range['endRowIndex'])
+        range_notation['endColumn'] = chr(
+            ord('A') + range['endColumnIndex'] - 1)
+        range_notation['endRow'] = str(range['endRowIndex'])
         break
 
     if sheetId is None:
@@ -198,8 +213,9 @@ class SpreadsheetConfiguration(object):
         break
 
     # Build a str method to assemble everything
-    range_notation['str'] = lambda: '%s!%s:%s' % (range_notation['sheetName'],
-              (range_notation['startColumn'] + range_notation['startRow']),
-              (range_notation['endColumn'] + range_notation['endRow']))
+    range_notation['str'] = lambda: '%s!%s:%s' % (
+        range_notation['sheetName'],
+        (range_notation['startColumn'] + range_notation['startRow']),
+        (range_notation['endColumn'] + range_notation['endRow']))
 
     return range_notation
