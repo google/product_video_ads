@@ -3,12 +3,14 @@ import { LoginService } from '../login/services/login.service';
 import { OfferTypeService } from './services/offer_type.service';
 import { ProductService } from '../products/services/product.service';
 import { OfferType } from 'app/models/offertype';
+import { AssetsService } from '../static_assets/services/assets.service';
 
 @Injectable()
 export class OfferTypeFacade {
     
     constructor(private loginService : LoginService,
                 private offerTypeService : OfferTypeService,
+                private assetsService : AssetsService,
                 private productsService : ProductService) {}
 
     get ready$() {
@@ -19,16 +21,24 @@ export class OfferTypeFacade {
         return this.offerTypeService.bases$
     }
 
-    get fonts$() {
-        return this.offerTypeService.fonts$
+    get fonts() {
+        return this.offerTypeService.fonts
     }
 
     get offer_types$() {
         return this.offerTypeService.offer_types$
     }
 
+    get product_headers() {
+        return this.productsService.headers
+    }
+
     get products() {
-        return this.productsService.products$
+        return this.productsService.products
+    }
+
+    get assets() {
+        return this.assetsService.assets
     }
 
     delete_offer_type(title : string) {

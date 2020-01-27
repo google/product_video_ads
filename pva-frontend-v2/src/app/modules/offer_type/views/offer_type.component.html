@@ -80,65 +80,66 @@
       <!-- Choose type -->
       <mat-form-field>
         <mat-label>Insert new</mat-label>
-        <mat-select [(ngModel)]="current_product.product" (selectionChange)="select_element()">
-          <mat-option *ngFor="let item_option of ['Product', 'Asset']" [value]="item_option.product">
-            {{item_option.title}}
+        <mat-select [(ngModel)]="config.type" (selectionChange)="select_type(config.type)">
+          <mat-option *ngFor="let type of types" [value]="type">
+            {{type}}
           </mat-option>
         </mat-select>
       </mat-form-field>
-      
+
       <!-- Choose field -->
-      <mat-form-field *ngIf="current_product.product != undefined">
-        <mat-label>Field to Insert</mat-label>
-        <mat-select [(ngModel)]="current_product.field" (selectionChange)="select_field(current_product.field)">
-          <mat-option *ngFor="let field_option of field_options" [value]="field_option">
-            {{field_option}}
+      <mat-form-field *ngIf="config.type">
+        <mat-label>Field</mat-label>
+        <mat-select [(ngModel)]="config.field" (selectionChange)="select_field(config.field)">
+          <mat-option *ngFor="let field of fields" [value]="field">
+            {{field}}
           </mat-option>
         </mat-select>
       </mat-form-field>
-      
-      <!-- Example of content to place on top of video -->
-      <mat-form-field *ngIf="current_product.field && contents.length > 0">
-        <mat-label>Example</mat-label>
-        <mat-select #content (selectionChange)="select_example(content.value)">
-          <mat-option *ngFor="let content of contents" [value]="content">
-            {{current_product.field == 'image' ? content.content.split('/').pop() : content.content}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+
+      <!-- Content to place on top of video -->
+      <mat-form-field *ngIf="config.field">
+          <mat-label>Value</mat-label>
+          <mat-select [(ngModel)]="content" (selectionChange)="select_example(content)">
+            <mat-option *ngFor="let content of contents" [value]="content">
+              {{is_image(content.value) ? content.value.split('/').pop() : content.value}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
       
       <br/>
       
       <!-- Text -->
-      <div *ngIf="current_product.field">
-        <div *ngIf="['title', 'price', 'custom'].indexOf(current_product.field) >= 0">
+      <div *ngIf="config.key">
+
+        <div *ngIf="!is_image(content.value)">
           
           <mat-form-field>
             <mat-label>Font</mat-label>
-            <mat-select [(ngModel)]="current_product.font">
-              <mat-option *ngFor="let f of facade.fonts$ | async | keyvalue" [value]="f.key">
+            <mat-select [(ngModel)]="config.font">
+              <mat-option *ngFor="let f of facade.fonts | keyvalue" [value]="f.key">
                 {{f.key}}
               </mat-option>
             </mat-select>
           </mat-form-field>
           
-          <input [(ngModel)]="current_product.color"
-          [style.background]="current_product.color"
-          [(colorPicker)]="current_product.color"/> 
+          <input [(ngModel)]="config.color"
+          [style.background]="config.color"
+          [(colorPicker)]="config.color"/> 
           
           <mat-form-field class="example-full-width">
             <mat-label>Font size</mat-label>
-            <input [(ngModel)]="current_product.size" type="number" matInput placeholder="size">
+            <input [(ngModel)]="config.size" type="number" matInput placeholder="size">
           </mat-form-field>
           
           <mat-form-field class="example-full-width">
             <mat-label>Width (letters)</mat-label>
-            <input [(ngModel)]="current_product.width" type="number" matInput placeholder="width">
+            <input [(ngModel)]="config.width" type="number" matInput placeholder="width">
           </mat-form-field>
           
           <mat-form-field>
             <mat-label>Align</mat-label>
-            <mat-select [(ngModel)]="current_product.align" value="center">
+            <mat-select [(ngModel)]="config.align" value="center">
               <mat-option *ngFor="let a of ['center', 'left', 'right']" [value]="a">
                 {{a}}
               </mat-option>
@@ -147,7 +148,7 @@
           
           <mat-form-field class="example-full-width">
             <mat-label>Angle</mat-label>
-            <input [(ngModel)]="current_product.angle" type="number" matInput placeholder="angle">
+            <input [(ngModel)]="config.angle" type="number" matInput placeholder="angle">
           </mat-form-field>
           
           <br/>
@@ -156,21 +157,21 @@
         </div>
         
         <!-- Image -->
-        <div *ngIf="current_product.field == 'image'">
+        <div *ngIf="is_image(content.value)">
           
           <mat-form-field class="example-full-width">
             <mat-label>Width</mat-label>
-            <input [(ngModel)]="current_product.width" type="number" matInput placeholder="width">
+            <input [(ngModel)]="config.width" type="number" matInput placeholder="width">
           </mat-form-field>
           
           <mat-form-field class="example-full-width">
             <mat-label>Height</mat-label>
-            <input [(ngModel)]="current_product.height" type="number" matInput placeholder="height">
+            <input [(ngModel)]="config.height" type="number" matInput placeholder="height">
           </mat-form-field>
           
           <mat-form-field>
             <mat-label>Align</mat-label>
-            <mat-select [(ngModel)]="current_product.align">
+            <mat-select [(ngModel)]="config.align">
               <mat-option *ngFor="let a of ['center', 'left']" [value]="a">
                 {{a}}
               </mat-option>
@@ -183,27 +184,6 @@
         </div>
       </div>
       
-      <br/>
-
-      <!-- Added Items -->
-      <h2>{{offer_type.configs.length}} added items</h2>
-      
-      <!--div *ngIf="base">
-        <div class="added_item" *ngFor="let item of offer_type.configs | keyvalue">
-        
-          <p>{{item.value.length}} itens added</p>
-
-          <span style="cursor: pointer" (click)="edit_row(item.key)">
-            <mat-icon aria-hidden="false" aria-label="edit icon">edit</mat-icon>
-          </span>
-
-          <span style="cursor: pointer" (click)="delete_row(item.key)">
-            <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
-          </span>
-
-        </div>
-      </div-->
-
       <br/><br/>
       
       <button mat-stroked-button (click)="finish()">Save</button>
@@ -223,7 +203,8 @@
           'line-height': el.size * 1.2 + 'px',
           'top': '500px',
           'left': '500px',
-          'transform': 'rotate(' + el.angle + 'deg)'
+          'transform': 'rotate(' + el.angle + 'deg)',
+          'visibility': 'hidden'
         }"
         >{{el.content}}</div>
       </div>
@@ -239,7 +220,8 @@
           'position': 'absolute',
           'top': '500px',
           'left': '500px',
-          'transform': 'rotate(' + el.angle + 'deg)'
+          'transform': 'rotate(' + el.angle + 'deg)',
+          'visibility': 'hidden'
         }"/>
       </div>
 

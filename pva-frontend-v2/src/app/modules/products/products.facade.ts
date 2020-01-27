@@ -12,6 +12,10 @@ export class ProductsFacade {
         return this.loginService.ready$
     }
 
+    get headers() {
+        return this.productService.headers$
+    }
+
     get products() {
         return this.productService.products$
     }

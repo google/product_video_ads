@@ -3,6 +3,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { OfferTypeFacade } from '../offer_type.facade';
 import { Observable } from 'rxjs';
 import { OfferType } from 'app/models/offertype';
+import { Config } from 'app/models/config';
 
 @Component({
   selector: 'app-base',
@@ -12,41 +13,41 @@ import { OfferType } from 'app/models/offertype';
 })
 export class OfferTypeComponent implements OnInit {
   
-  step = 1
   video_base_url = 'https://storage.googleapis.com/teste-godoy-pva-imagens/videos_base/'
+  types : Array<string> = ['product', 'asset']
+  
+  step : number
   offer_types : Observable<OfferType[]>
   bases : Observable<object>
   offer_type : OfferType
-
-  field_options = []
-  elements = []
-  text_elements = []
-  image_elements = []
-  loaded_fonts : Set<string> = new Set()
-
-  focused_element : any
-  fonts : object = {}
-  added_items : Map<string, Array<number>> = new Map()
-
-  seconds : any = 0.0
+  config : any = {}
+  fields : Array<string>
+  contents : Array<any>
+  content : object
+  elements : Array<any>
+  text_elements : Array<any>
+  image_elements : Array<any>
+  loaded_fonts : Set<string>
+  seconds : any
   video
   video_url
   video_pos
-  contents : Array<any> = []
-  current_product = {
-    width: 0,
-    align: 'center',
-    color: '#000'
-  }
 
   constructor(public facade : OfferTypeFacade, private _snackBar: MatSnackBar) {
     this.offer_types = this.facade.offer_types$
     this.bases = this.facade.bases$
-    this.offer_type = new OfferType('Untitled', 0.0, 0.0, [])
   }
 
   ngOnInit() {
-    this.facade.fonts$.subscribe(fonts => this.fonts = fonts)
+    this.elements = []
+    this.image_elements = []
+    this.text_elements = []
+    this.step = 1 
+    this.video_url = ''
+    this.seconds = 0.0
+    this.loaded_fonts = new Set()
+    this.offer_type = new OfferType('Untitled', 0.0, 0.0, [])
+    this.config = new Config()
   }
 
   move_step(step) {
@@ -65,6 +66,7 @@ export class OfferTypeComponent implements OnInit {
 
   delete_type(offer_type) {
     this.facade.delete_offer_type(offer_type.title)
+    this.save()
   }
   
   /*********** Video controls **********/
@@ -87,6 +89,8 @@ export class OfferTypeComponent implements OnInit {
       x_ratio: video.videoWidth/WIDTH,
       y_ratio: video.videoHeight/HEIGHT
     }
+
+    this.load_elements_on_video()
   }
 
   play_pause() {
@@ -114,43 +118,37 @@ export class OfferTypeComponent implements OnInit {
   }
 
   /*********** Element choosing controls **********/
-  select_element() {
-    
-    // Load field options based on which element to insert (product or auxiliar)
-    delete this.current_product['field']
-    delete this.current_product['content']
-    
-    // If choose auxiliar
-    if (this.current_product['product'] == 0)
-      this.field_options = ['custom', 'image']
+  select_type(type) {
+    if (type == 'product')
+      this.fields = this.facade.product_headers
     else
-      this.field_options = ['title', 'price', 'custom', 'image']
+      this.fields = ['text', 'image']
+
+    this.contents = []
   }
-  
+
   select_field(field) {
-    
-    // Load content examples of chosen field
-    this.current_product['field'] = field
-    
-    // Load content for that field
-    // this.contents = this.facade.products
-    // .filter(p => p.is_product == (this.current_product['product'] < 0) && p[field] != '')
-    // .map(p => { 
-    //   return { 
-    //     content: p[field], 
-    //     product: p['id'] 
-    //   }
-    // })
+    if (this.config.type == 'product') {
+
+      const field_index = this.fields.indexOf(field)
+
+      this.contents = this.facade.products.map(p => { 
+        return {'id': p.id, 'value': p.values.length > field_index ? p.values[field_index] : ''} 
+      })
+    } else {
+      this.contents = this.facade.assets.map(a => { return {'id': a.id, 'value': a[field] || ''} })
+    }
+
+    this.contents = this.contents.filter(a => a.value != '')
   }
-  
+
   select_example(content) {
-    
-    // Set chosen content
-    this.current_product['content'] = content.content
-    
-    // If its auxiliar, set correct product
-    if (this.current_product['product'] == 0)
-      this.current_product['product'] = content.product
+    this.config.key = content.id
+    this.config.content = content.value
+  }
+
+  is_image(content) {
+    return content.startsWith('http')
   }
   
   private create_element(product) {
@@ -172,7 +170,7 @@ export class OfferTypeComponent implements OnInit {
   // Bind from view
   create_text(product?) {
     
-    const current_product = product ? product : this.current_product
+    const current_product = product ? product : this.config
     const element = this.create_element(current_product)
 
     // Load font for this text, if not loaded yet
@@ -180,7 +178,7 @@ export class OfferTypeComponent implements OnInit {
 
     if (!this.loaded_fonts.has(font_name)) {
 
-      const font_content = this.fonts[current_product.font]
+      const font_content = this.facade.fonts[current_product.font]
 
       const styles = `
       @font-face {
@@ -205,7 +203,6 @@ export class OfferTypeComponent implements OnInit {
       .join('<br/>')
       
       this.text_elements.push(element)
-      this.clear_temporary_product(current_product)
 
       return element
     }
@@ -213,11 +210,10 @@ export class OfferTypeComponent implements OnInit {
     // Bind from view
     create_image(product?) {
       
-      const current_product = product ? product : this.current_product
+      const current_product = product ? product : this.config
       const element = this.create_element(current_product)
       
       this.image_elements.push(element)
-      this.clear_temporary_product(current_product)
 
       return element
     }
@@ -255,9 +251,9 @@ export class OfferTypeComponent implements OnInit {
       
       const el = document.getElementById(element.id)
       
-      el.addEventListener('click', this.focus_element.bind(this), false)
+      //el.addEventListener('click', this.focus_element.bind(this), false)
+      //el.addEventListener('contextmenu', this.save_element.bind(this), false)
       el.addEventListener('dragstart', this.drag_start, false)
-      el.addEventListener('contextmenu', this.save_element.bind(this), false)
       el.addEventListener('dblclick', this.delete_element.bind(this), false)
       
       document.body.addEventListener('dragover', this.drag_over,false)
@@ -266,10 +262,6 @@ export class OfferTypeComponent implements OnInit {
       this.elements.push(element)
     }
 
-    private focus_element(event) {
-      this.focused_element = this.elements.filter(e => e.id == event.target.id)[0]
-    }
-    
     private drag_start(event) {
       event.dataTransfer.setData("text/plain", event.target.id)
     }
@@ -303,8 +295,6 @@ export class OfferTypeComponent implements OnInit {
       element.x = ((event.clientX - this.video_pos.x - align_adjust) * this.video_pos.x_ratio).toFixed(0)
       element.y = ((event.clientY - dm.offsetHeight/2 - this.video_pos.y) * this.video_pos.y_ratio).toFixed(0)
       
-      this.focused_element = element
-
       event.preventDefault()
       return false
     }
@@ -313,7 +303,7 @@ export class OfferTypeComponent implements OnInit {
 
       const dm = document.getElementById(element.id)
 
-      if (element.field == 'image') {
+      if (this.is_image(element.content)) {
         element.width /= this.video_pos.x_ratio
         element.height /= this.video_pos.y_ratio
       }
@@ -331,85 +321,50 @@ export class OfferTypeComponent implements OnInit {
 
       dm.style.left = ((parseInt(element.x) - align_adjust) / this.video_pos.x_ratio) + this.video_pos.x + 'px'
       dm.style.top =  (parseInt(element.y) / this.video_pos.y_ratio) + this.video_pos.y + 'px';
+
+      // Shows it
+      dm.style.visibility = 'visible'
     }
     
-    private clear_temporary_product(product) {
-      delete product['field']
-      delete product['product']
-      delete product['content']
-    }
+    load_elements_on_video() {
 
-    edit_row(key) {
+      // Go to video position
+      this.seconds = this.offer_type.start_time
+      this.go_to_second()
 
-      // Edit all itens on that key
-      // for(let id of this.added_items.get(key)) {
+      // Add all elements on screen
+      for(let c of this.offer_type.configs) {
 
-      //   const row = this.base.configs.filter(c => c.id == id)[0]
-      //   const product_index = this.base.indexes[row.product - 1]
+        let element
 
-      //   let content
-        
-      //   // Fix product ID to differ from auxiliar
-      //   if (product_index < 0) {
-      //     row.product = product_index
-      //     content = this.facade.products.filter(p => p.is_product)[product_index*-1-1][row.field]
-      //   } else {
-      //     row.product = product_index
-      //     content  =  this.facade.products.filter(p => p.id == product_index)[0][row.field]
-      //   }
+        // Draw assets
+        if (c.type == 'asset') {
+          
+          const content = this.facade.assets.filter(a => a.id = c.key)[0][c.field]
 
-      //   const element = row.field == 'image' ? 
-      //                   this.create_image({content, ...row}) : 
-      //                   this.create_text({content, ...row})
+          if (c.field == 'image')
+            element = this.create_image({...c, content})
+          else
+            element = this.create_text({...c, content})
+        } else {
 
-      //   setTimeout(() => {
-      //     this.element_position_to_style(element)
-      //   }, 500)
-      // }
+          // Product
+          const field_index = this.facade.product_headers.indexOf(c.field)
+          const content = this.facade.products.filter(p => p.id = c.key)[0].values[field_index]
 
-      // Now that element is on screen, delete from configs
-      this.delete_row(key)
-    }
-    
-    delete_row(key) {
+          if (this.is_image(content))
+            element = this.create_image({...c, content})
+          else
+            element = this.create_text({...c, content})
+        }
 
-      // Delete all itens on key
-      // for(let id of this.added_items.get(key)) {
-      //   this.facade.delete_config(this.base, id)
-      // }
-
-      this.update_configs()
-    }
-    
-    private save_element(event) {
-      
-      event.preventDefault();
-      
-      const id = event.target.id
-      const el = this.elements.filter(e => e.id == id)[0]
-      
-      // Set times
-      if (!el.start_time) {
-        el.start_time = this.seconds
-        this._snackBar.open("Start time saved to element", 'OK', {
-          duration: 2000,
-        })
-        return
+        // Position it correctly
+        setTimeout(() => {
+          this.element_position_to_style(element)
+        }, 800)
       }
-      
-      if (!el.end_time) {
-        el.end_time = this.seconds
-        this._snackBar.open("End time saved to element", 'OK', {
-          duration: 2000,
-        })
-        return
-      }
-      
-      this.add_element_to_configs(el)
-      
-      this.delete_element(event)
-      
-      return false;
+
+      this.offer_type.configs = []
     }
     
     private delete_element(event) {
@@ -426,46 +381,75 @@ export class OfferTypeComponent implements OnInit {
       return false;
     }
     
-    private add_element_to_configs(element) {
+    private add_elements_to_configs() {
       
-      // const alreadyExistIndex = this.base.indexes.indexOf(element.product)
-      
-      // if (alreadyExistIndex > -1)
-      //   element.product = alreadyExistIndex + 1
-      // else
-      //   element.product = this.base.indexes.push(element.product)
-      
-      // this.facade.add_config(this.base, new BaseConfigs(
-      //   element.product,
-      //   element.field,
-      //   parseInt(element.x),
-      //   parseInt(element.y),
-      //   element.start_time,
-      //   element.end_time,
-      //   element.font,
-      //   element.color,
-      //   Math.floor(element.size*this.video_pos.x_ratio),
-      //   element.field == 'image' ? Math.floor(element.width*this.video_pos.x_ratio) : element.width,
-      //   element.field == 'image' ? Math.floor(element.height*this.video_pos.y_ratio) : element.height,
-      //   element.align,
-      //   element.angle
-      //   ))
-        
-      //   this._snackBar.open("Element added!", 'OK', {
-      //     duration: 2000,
-      //   })
+      // Add all texts
+      for (let e of this.text_elements) {
+        this.offer_type.configs.push(new Config(
+          e.key,
+          e.type,
+          e.field,
+          parseInt(e.x),
+          parseInt(e.y),
+          this.offer_type.start_time,
+          this.offer_type.end_time,
+          e.font,
+          e.color,
+          Math.floor(e.size * this.video_pos.x_ratio),
+          e.width,
+          0,
+          e.align,
+          e.angle
+        ))
+      }
 
-      //   this.update_configs()
+      // Add all images
+      for (let e of this.image_elements) {
+        this.offer_type.configs.push(new Config(
+          e.key,
+          e.type,
+          e.field,
+          parseInt(e.x),
+          parseInt(e.y),
+          this.offer_type.start_time,
+          this.offer_type.end_time,
+          '',
+          '',
+          0,
+          e.width * this.video_pos.x_ratio,
+          e.height * this.video_pos.y_ratio,
+          e.align,
+          e.angle
+        ))
+      }
+
+      this.text_elements = []
+      this.image_elements = []
+      this.elements = []
+      
+      // Delete any other with same title
+      this.facade.delete_offer_type(this.offer_type.title)
+
+      // Add it
+      this.facade.add_offer_type(this.offer_type)
+    }
+
+      finish() {
+        this.add_elements_to_configs()
+        this.save()
       }
       
-      finish() {
+      save() {
 
-        this._snackBar.open("Saving configuration...", 'OK', {
+        this._snackBar.open("Saving...", 'OK', {
           duration: 2000,
         })
 
         this.facade.save().then(response => {
-          this._snackBar.open("Saved: " + response['status'], 'OK', {
+
+          const status = response['status']
+
+          this._snackBar.open("Saved: " + status, 'OK', {
             duration: 2000
           })
         })

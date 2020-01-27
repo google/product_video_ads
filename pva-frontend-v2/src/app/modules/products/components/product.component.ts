@@ -11,34 +11,23 @@ import { Product } from 'app/models/product';
 })
 export class ProductComponent implements OnInit {
 
-  @ViewChild(MatTable, {static: false}) table
-
   ready : Observable<number>
-  headers : Array<string>
-  products : Product[] = []
-  edit_id : number = 0
+  headers : Observable<string[]>
+  products : Observable<Product[]>
 
-  constructor(private productsFacade : ProductsFacade) {}
+  constructor(private facade : ProductsFacade) {}
 
   ngOnInit() {
-    this.ready = this.productsFacade.ready
-
-    this.productsFacade.products.subscribe(p => {
-
-      if (p[0]) {
-        this.headers = p[0].values
-        this.products = p.slice(1)
-      }
-    })
+    this.ready = this.facade.ready
+    this.products = this.facade.products
+    this.headers = this.facade.headers
   }
 
   add_product(values) {
-    this.productsFacade.add_product(values)
-    this.table.renderRows()
+    this.facade.add_product(values)
   }
 
   delete_product(product) {
-    this.productsFacade.delete_product(product.id)
-    this.table.renderRows()
+    this.facade.delete_product(product.id)
   }
 }
