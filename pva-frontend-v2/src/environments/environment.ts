@@ -15,18 +15,20 @@ export const environment = {
 
   local_storage_keys: {
     products: 'products',
+    static_assets: 'static_assets',
     bases: 'bases',
+    offer_types: 'offer_types',
     videos: 'videos',
     drive_folder: 'drive_folder',
     fonts: 'fonts'
   },
 
   configuration: {
-    base_range: '!A2:M',
     campaign_range: 'Campaigns!A2:K',
-    product_range: 'Prices!A2:F',
+    product_range: 'Prices!A1:Z',
     drive_folder: 'Configuration!C6',
-    base_videos: 'Configuration!E6:J'
+    static_assets: 'Static!A2:C',
+    offer_types_range: 'OfferTypes!A2:D'
   }
 }
 

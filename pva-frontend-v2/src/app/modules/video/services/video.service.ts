@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
-import { Video } from 'app/models/entities'
+import { Video } from 'app/models/video'
 import { CachedConfigurationRepository } from 'app/repositories/implementations/googleapi/cached-configuration.repository'
 import { LoginService } from 'app/modules/login/services/login.service'
 

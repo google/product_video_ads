@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
-import { Product } from 'app/models/entities'
+import { Product } from 'app/models/product'
 import { CachedConfigurationRepository } from 'app/repositories/implementations/googleapi/cached-configuration.repository'
 import { LoginService } from 'app/modules/login/services/login.service'
 
@@ -33,18 +33,8 @@ export class ProductService {
         return this.productsRepository.save_products(this.products)
     }
         
-    delete_product(product : Product) : Promise<any> {
-        this._products.next(this.products.filter(p => p.id != product.id))
-        return this.productsRepository.save_products(this.products)
-    }
-    
-    update_product(product : Product) : Promise<any> {
-        const edited_product = this.products.filter(p => p.id == product.id)[0]
-        edited_product.image = product.image
-        edited_product.custom = product.custom
-        edited_product.price = product.price
-        edited_product.title = product.title
-        this._products.next(this.products)
+    delete_product(id : number) : Promise<any> {
+        this._products.next(this.products.filter(p => p.id != id))
         return this.productsRepository.save_products(this.products)
     }
 }

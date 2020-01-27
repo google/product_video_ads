@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Product } from 'app/models/entities';
+import { Product } from 'app/models/product';
 import { LoginService } from '../login/services/login.service';
 import { ProductService } from './services/product.service';
 
@@ -8,23 +8,19 @@ export class ProductsFacade {
     
     constructor(private loginService : LoginService, private productService : ProductService) {}
 
-    ready_state() {
+    get ready() {
         return this.loginService.ready$
     }
 
-    list_products() {
-        return this.productService.products
+    get products() {
+        return this.productService.products$
     }
 
-    add_product(title, price, image, custom, is_product=true) {
-        this.productService.add_product(new Product(undefined, title, price, image, custom, is_product))
+    add_product(values : Array<string>) {
+        this.productService.add_product(new Product(undefined, values))
     }
     
-    delete_product(product) {
-        this.productService.delete_product(product)
-    }
-
-    add_auxiliar(image, custom) {
-        this.add_product('', '', image, custom, false)
+    delete_product(id : number) {
+        this.productService.delete_product(id)
     }
 }

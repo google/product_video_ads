@@ -1,7 +1,10 @@
-import { Injectable, Type } from '@angular/core';
-import { Video, Base, Product } from 'app/models/entities';
+import { Injectable } from '@angular/core';
 import { ConfigurationRepository } from './configuration.repository';
 import { environment } from 'environments/environment';
+import { Product } from 'app/models/product';
+import { Video } from 'app/models/video';
+import { OfferType } from 'app/models/offertype';
+import { Asset } from 'app/models/asset';
 
 @Injectable({providedIn: 'root'})
 export class CachedConfigurationRepository extends ConfigurationRepository {
@@ -15,12 +18,24 @@ export class CachedConfigurationRepository extends ConfigurationRepository {
         return (await this.load_data<object>(environment.local_storage_keys.fonts, super.load_fonts.bind(this)))
     }
 
-    async load_products() : Promise<Product[]> {
+    async load_bases(): Promise<object> {
+        return (await this.load_data<object>(environment.local_storage_keys.bases, super.load_bases.bind(this)))
+    }
+
+    async load_offer_type() : Promise<Product[]> {
         return (await this.load_data<Product[]>(environment.local_storage_keys.products, super.load_products.bind(this)))
     }    
     
-    async load_bases(): Promise<Base[]> {
-        return (await this.load_data<Base[]>(environment.local_storage_keys.bases, super.load_bases.bind(this)))
+    async load_offer_types(): Promise<OfferType[]> {
+        return (await this.load_data<OfferType[]>(environment.local_storage_keys.offer_types, super.load_offer_types.bind(this)))
+    }
+
+    async load_assets() : Promise<Asset[]> {
+        return (await this.load_data<Asset[]>(environment.local_storage_keys.static_assets, super.load_assets.bind(this)))
+    }
+
+    async load_products() : Promise<Product[]> {
+        return (await this.load_data<Product[]>(environment.local_storage_keys.products, super.load_products.bind(this)))
     }
 
     async load_videos() : Promise<Video[]> {
@@ -32,14 +47,19 @@ export class CachedConfigurationRepository extends ConfigurationRepository {
         return drive_folder != null ? drive_folder : super.load_drive_folder()
     }
 
+    async save_assets(assets: Asset[]): Promise<any> {
+        this.save_to_cache(environment.local_storage_keys.static_assets, assets)
+        return super.save_assets(assets)
+    }
+
     async save_products(products: Product[]): Promise<any> {
         this.save_to_cache(environment.local_storage_keys.products, products)
         return super.save_products(products)
     }
 
-    async save_bases(bases: Base[]): Promise<any> {
-        this.save_to_cache(environment.local_storage_keys.bases, bases)
-        return super.save_bases(bases)
+    async save_offer_type(offer_types: OfferType[]): Promise<any> {
+        this.save_to_cache(environment.local_storage_keys.offer_types, offer_types)
+        return super.save_offer_types(offer_types)
     }
 
     async save_videos(videos: Video[]): Promise<any> {

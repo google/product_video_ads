@@ -2,6 +2,7 @@ import { Component, ViewChild, Pipe, PipeTransform, OnInit, Inject  } from '@ang
 import { MatTable } from '@angular/material/table'
 import { ProductsFacade } from '../products.facade';
 import { Observable } from 'rxjs';
+import { Product } from 'app/models/product';
 
 @Component({
   selector: 'app-product',
@@ -11,37 +12,33 @@ import { Observable } from 'rxjs';
 export class ProductComponent implements OnInit {
 
   @ViewChild(MatTable, {static: false}) table
-  ready_state : Observable<number>
-  edit_id : number = 0
 
-  productColumns = ['title', 'price', 'image', 'custom', 'edit', 'delete']
+  ready : Observable<number>
+  headers : Array<string>
+  products : Product[] = []
+  edit_id : number = 0
 
   constructor(private productsFacade : ProductsFacade) {}
 
   ngOnInit() {
-    this.ready_state = this.productsFacade.ready_state()
+    this.ready = this.productsFacade.ready
+
+    this.productsFacade.products.subscribe(p => {
+
+      if (p[0]) {
+        this.headers = p[0].values
+        this.products = p.slice(1)
+      }
+    })
   }
 
-  list_products() {
-    return this.productsFacade.list_products()
-  }
-
-  add_product(title, price, image, custom) {
-    this.productsFacade.add_product(title, price, image, custom)
+  add_product(values) {
+    this.productsFacade.add_product(values)
     this.table.renderRows()
   }
 
   delete_product(product) {
-    this.productsFacade.delete_product(product)
+    this.productsFacade.delete_product(product.id)
     this.table.renderRows()
-  }
-
-  choose_edit(id) {
-    this.edit_id = id
-  }
-
-  save_edit(product) {
-    this.edit_id = undefined
-    alert('saving ' + JSON.stringify(product))
   }
 }

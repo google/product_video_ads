@@ -1,4 +1,3 @@
 file 'partes/cabeca.mp4'
 file 'output.mp4'
 file 'partes/rabicho.mp4'
-file 'partes/aprecie.mp4'

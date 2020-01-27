@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { Base, Product } from 'app/models/entities';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { LoginService } from 'app/modules/login/services/login.service';
 import { ProductService } from 'app/modules/products/services/product.service';
-import { BaseService } from 'app/modules/base/services/base.service';
+import { OfferTypeService } from 'app/modules/offer_type/services/offer_type.service';
 import { VideoService } from '../services/video.service';
+import { Product } from 'app/models/product';
 
 @Component({
   selector: 'app-video',
@@ -14,17 +14,16 @@ import { VideoService } from '../services/video.service';
 export class VideoComponent implements OnInit {
 
   // Data to view
-  bases : Array<Base>
+  bases : Array<string>
   products : Array<Product>
 
   // Chosen base
-  base : Base
   current_product : number = 0
   selected_products : Array<number> = []
 
   constructor(private loginService : LoginService, 
               private productsService : ProductService, 
-              private baseService : BaseService,
+              private offerTypeService : OfferTypeService,
               private videoService : VideoService,
               private _snackBar: MatSnackBar) {}
   
@@ -36,8 +35,8 @@ export class VideoComponent implements OnInit {
       if (!ready)
         return
 
-      this.bases = this.baseService.bases
-      this.products = this.productsService.products.filter(p => p.is_product)
+    //  this.bases = this.baseService.bases
+    //  this.products = this.productsService.products.filter(p => p.is_product)
     })
   }
 
@@ -46,7 +45,7 @@ export class VideoComponent implements OnInit {
     this.current_product++
     this.selected_products.push(id)
 
-    if (this.current_product >= this.base.number_of_products) {
+    /*if (this.current_product >= this.base.number_of_products) {
 
       const indexes = [...this.selected_products, ...this.base.indexes.filter(i => i > 0)]
       
@@ -56,6 +55,6 @@ export class VideoComponent implements OnInit {
               duration: 5000
             })
           })
-    }
+    }*/
   }
 }
