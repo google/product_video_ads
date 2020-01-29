@@ -27,7 +27,7 @@ export class BaseFacade {
         return this.productsService.products
     }
 
-    delete_config(base : Base, id : number) {
+    delete_config(base : Base, id : string) {
         this.baseService.delete_config(base, id)
     }
 

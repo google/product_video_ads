@@ -22,7 +22,7 @@ export class BaseComponent implements OnInit {
 
   focused_element : any
   fonts : object = {}
-  added_items : Map<string, Array<number>> = new Map()
+  added_items : Map<string, Array<string>> = new Map()
 
   seconds : any = 0.0
   video

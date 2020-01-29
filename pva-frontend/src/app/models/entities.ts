@@ -1,3 +1,5 @@
+import * as UUID from 'uuid/v4'
+
 export class Product {
     
     constructor(public id : number,
@@ -46,10 +48,10 @@ export class Product {
                 public height : number = 0,
                 public align : string = 'center',
                 public angle : number = 0,
-                public id? : number
+                public id : string = UUID()
                 ) {}
 
-            public static from_base_configs_array(base_config_array : Array<any>, id : number) : BaseConfigs {
+            public static from_base_configs_array(base_config_array : Array<any>) : BaseConfigs {
                 return new BaseConfigs(
                     base_config_array[0],
                     base_config_array[1],
@@ -64,7 +66,7 @@ export class Product {
                     base_config_array[10],
                     base_config_array[11],
                     base_config_array[12],
-                    id
+                    UUID()
                 )
             }
 
@@ -104,7 +106,7 @@ export class Product {
                         if (indexes != '')
                             this.indexes = indexes.split(',').map(parseFloat)
                             
-                        this.configs = configs.map((v, i) => BaseConfigs.from_base_configs_array(v, i))
+                        this.configs = configs.map(BaseConfigs.from_base_configs_array)
                     }
                 }
 

@@ -37,7 +37,7 @@ export class BaseService {
         config.id = UUID()
     }
 
-    delete_config(base : Base, id : number) {
+    delete_config(base : Base, id : string) {
 
         let index = -1
 

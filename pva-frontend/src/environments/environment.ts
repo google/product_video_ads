@@ -25,8 +25,8 @@ export const environment = {
     base_range: '!A2:M',
     campaign_range: 'Campaigns!A2:K',
     product_range: 'Prices!A2:F',
-    drive_folder: 'Configuration!C6',
-    base_videos: 'Configuration!E6:J'
+    drive_folder: 'Configuration!C8',
+    base_videos: 'Configuration!G6:J'
   }
 }
 
