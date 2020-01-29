@@ -1,0 +1,61 @@
+<div class="container">
+    
+    <h2>Select base to configure:</h2>
+    
+    <div class="added_item" *ngFor="let base of bases | async" (click)="choose_base(base)">
+        <p>{{base.title}}</p>
+    </div>
+    
+    <!-- Spinner -->
+    <mat-spinner *ngIf="video_url && !video"></mat-spinner>
+    
+    <!-- Configure chosen base video -->
+    <div [hidden]="!video">
+        
+        <video #vd1 *ngIf="video_url" class="video" (canplay)="on_video_loaded(vd1)" muted>
+            <source [src]="video_url" type="video/mp4">
+            </video>
+            
+            <br><br>
+            
+            <button mat-stroked-button id="play" (click)="play_pause()">Play/Pause</button>
+            
+            <br/><br/>
+            
+            <button mat-stroked-button id="secondback" (click)="go_seconds_back(1)">Fast Back</button>
+            <button mat-stroked-button id="secondback" (click)="go_seconds_back(0.1)">Back</button>
+            <span id="seconds">{{seconds}}</span>
+            <button mat-stroked-button id="secondforward" (click)="go_seconds_forward(0.1)">Forward</button>
+            <button mat-stroked-button id="secondforward" (click)="go_seconds_forward(1)">Fast Forward</button>
+            
+            <br/><br/><br/>
+
+            <mat-form-field class="example-full-width">
+                <mat-label>Start Time</mat-label>
+                <input [(ngModel)]="product.start_time" type="number" matInput >
+            </mat-form-field>
+
+            <mat-form-field class="example-full-width">
+                <mat-label>End Time</mat-label>
+                <input [(ngModel)]="product.end_time" type="number" matInput >
+            </mat-form-field>
+
+            <button mat-stroked-button (click)="add_product()">Add</button>
+            
+            <br/>
+
+            <h2>Products:</h2>
+
+            <div class="added_item" *ngFor="let product of base ? base.products : []; let i = index">
+                <p>{{product.start_time}}s - {{product.end_time}}s</p>
+                <span style="cursor: pointer" (click)="delete_product(i)">
+                    <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
+                </span>
+            </div>
+
+            <br/><br/>
+
+            <button mat-stroked-button (click)="finish()">Save</button>
+            
+        </div>
+    </div>

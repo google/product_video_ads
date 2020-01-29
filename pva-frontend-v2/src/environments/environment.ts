@@ -28,7 +28,8 @@ export const environment = {
     product_range: 'Prices!A1:Z',
     drive_folder: 'Configuration!C6',
     static_assets: 'Static!A2:C',
-    offer_types_range: 'OfferTypes!A2:D'
+    offer_types_range: 'OfferTypes!A2:C',
+    bases_range: 'Bases!A2:C'
   }
 }
 

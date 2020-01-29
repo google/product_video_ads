@@ -1,40 +1,51 @@
 <div class="container">
   
-    <!-- Choose base video to configure -->
-    <div *ngIf="!video_url">
-      
-      <mat-form-field>
-        <mat-label>Base Video</mat-label>
-        <mat-select [(ngModel)]="base">
-          <mat-option *ngFor="let base of bases" [value]="base">
-            {{base.name}} ({{base.number_of_products ? base.number_of_products : 'No'}} products)
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      
-      <div id="products_amount" *ngIf="base">
-        <div>{{base.number_of_products}} products for this base video</div>
-        
+  <!-- Choose base video to configure -->
+  <div *ngIf="!video_url">
+    
+    <h2>Select base to use:</h2>
+    <mat-spinner *ngIf="(bases | async).length == 0"></mat-spinner>
+    
+    <div class="added_item" *ngFor="let base of bases | async " (click)="choose_base(base)">
+      <p>{{base.title}}</p>
     </div>
     
   </div>
   
   <!-- Configure chosen base video -->
   <div *ngIf="base">
+    
+    <h2>This base needs {{base.products.length}} products</h2>
+    
+    <div class="added_item" *ngFor="let p of base.products">
+      
+      <!-- Offer Type -->
+      <mat-form-field>
+        <mat-label>Offer Type</mat-label>
+        <mat-select>
+          <mat-option *ngFor="let p of products | async" [value]="p.id">
+            {{p.id}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      
+      <br/><br/>
 
-    <h4>Select product</h4>
-
-    <mat-form-field>
-      <mat-select #product>
-        <mat-option *ngFor="let p of products" [value]="p.id">
-          {{p.id}}: {{p.title}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <br/><br/>
-
-    <button [disabled]="current_product == base.number_of_products" mat-stroked-button (click)="add_product(product.value)">Add</button>
-
+      <!-- Product -->
+      <mat-form-field>
+        <mat-label>Product</mat-label>
+        <mat-select>
+          <mat-option *ngFor="let p of products | async" [value]="p.id">
+            {{p.id}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      
     </div>
+    
+    <br/><br/>
+    
+    <button [disabled]="current_product == base.number_of_products" mat-stroked-button (click)="add_product(product.value)">Create Video</button>
+    
   </div>
+</div>

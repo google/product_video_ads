@@ -6,6 +6,7 @@ import { Product } from 'app/models/product';
 import { OfferType } from 'app/models/offertype';
 import { Video } from 'app/models/video';
 import { Asset } from 'app/models/asset';
+import { Base } from 'app/models/base';
 
 @Injectable({providedIn: 'root'})
 export class ConfigurationRepository implements ConfigurationInterface {
@@ -24,9 +25,12 @@ export class ConfigurationRepository implements ConfigurationInterface {
         return fonts
     }
 
-    async load_bases(): Promise<object> {
-        const drive_folder = await this.load_drive_folder()
-        return (await this.googleApi.list_files_from_folder(drive_folder, 'base_videos'))
+    async load_bases(): Promise<Base[]> {
+
+        // const drive_folder = await this.load_drive_folder()
+        const bases = (await this.googleApi.get_values(environment.configuration.bases_range)).map(Base.from_base_array)
+
+        return bases //(await this.googleApi.list_files_from_folder(drive_folder, 'base_videos'))
     }
     
     async load_drive_folder(): Promise<string> {
@@ -48,6 +52,19 @@ export class ConfigurationRepository implements ConfigurationInterface {
 
     async load_videos() : Promise<Video[]> {
         return (await this.googleApi.get_values(environment.configuration.campaign_range)).map(Video.from_video_array)
+    }
+
+    async save_bases(bases: Base[]): Promise<any> {
+
+        const data = []
+  
+        // Bases
+        data.push({
+          range: environment.configuration.bases_range,
+          values: bases.map(Base.to_base_array)
+        })
+      
+        return this.googleApi.save_values(data)
     }
 
     async save_assets(assets: Asset[]): Promise<any> {

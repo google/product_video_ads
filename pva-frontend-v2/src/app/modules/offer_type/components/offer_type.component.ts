@@ -4,6 +4,8 @@ import { OfferTypeFacade } from '../offer_type.facade';
 import { Observable } from 'rxjs';
 import { OfferType } from 'app/models/offertype';
 import { Config } from 'app/models/config';
+import { Router } from '@angular/router';
+import { Base } from 'app/models/base';
 
 @Component({
   selector: 'app-base',
@@ -13,14 +15,14 @@ import { Config } from 'app/models/config';
 })
 export class OfferTypeComponent implements OnInit {
   
-  video_base_url = 'https://storage.googleapis.com/teste-godoy-pva-imagens/videos_base/'
   types : Array<string> = ['product', 'asset']
   
   step : number
   offer_types : Observable<OfferType[]>
-  bases : Observable<object>
+  bases : Array<Base>
   offer_type : OfferType
   config : any = {}
+  example_time = {}
   fields : Array<string>
   contents : Array<any>
   content : object
@@ -33,9 +35,11 @@ export class OfferTypeComponent implements OnInit {
   video_url
   video_pos
 
-  constructor(public facade : OfferTypeFacade, private _snackBar: MatSnackBar) {
+  constructor(public facade : OfferTypeFacade, private router: Router, private _snackBar: MatSnackBar) {
     this.offer_types = this.facade.offer_types$
-    this.bases = this.facade.bases$
+    this.facade.bases.subscribe(bases => {
+      this.bases = bases
+    })
   }
 
   ngOnInit() {
@@ -46,7 +50,7 @@ export class OfferTypeComponent implements OnInit {
     this.video_url = ''
     this.seconds = 0.0
     this.loaded_fonts = new Set()
-    this.offer_type = new OfferType('Untitled', 0.0, 0.0, [])
+    this.offer_type = new OfferType('Untitled', '', [])
     this.config = new Config()
   }
 
@@ -54,14 +58,16 @@ export class OfferTypeComponent implements OnInit {
     this.step = step
   }
 
-  choose_base(base) {
-    this.video_url = this.video_base_url + base
+  choose_base(base : Base) {
+    this.video_url = base.file
+    this.offer_type.base = base.title
+    this.example_time = base.products[0]
     this.move_step(3)
   }
 
-  edit_type(offer_type) {
+  edit_type(offer_type : OfferType) {
     this.offer_type = offer_type
-    this.move_step(2)
+    this.choose_base(this.bases.filter(b => b.title = offer_type.base)[0])
   }
 
   delete_type(offer_type) {
@@ -329,7 +335,7 @@ export class OfferTypeComponent implements OnInit {
     load_elements_on_video() {
 
       // Go to video position
-      this.seconds = this.offer_type.start_time
+      this.seconds = this.example_time['start_time']
       this.go_to_second()
 
       // Add all elements on screen
@@ -391,8 +397,8 @@ export class OfferTypeComponent implements OnInit {
           e.field,
           parseInt(e.x),
           parseInt(e.y),
-          this.offer_type.start_time,
-          this.offer_type.end_time,
+          0,//this.offer_type.start_time,
+          0,//this.offer_type.end_time,
           e.font,
           e.color,
           Math.floor(e.size * this.video_pos.x_ratio),
@@ -411,8 +417,8 @@ export class OfferTypeComponent implements OnInit {
           e.field,
           parseInt(e.x),
           parseInt(e.y),
-          this.offer_type.start_time,
-          this.offer_type.end_time,
+          0,//this.offer_type.start_time,
+          0,//this.offer_type.end_time,
           '',
           '',
           0,
@@ -452,6 +458,10 @@ export class OfferTypeComponent implements OnInit {
           this._snackBar.open("Saved: " + status, 'OK', {
             duration: 2000
           })
+
+          if (status == 200)
+            this.router.navigate(['/videos'])
+          
         })
       }
     }

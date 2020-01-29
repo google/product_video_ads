@@ -7,6 +7,14 @@ table {
   button, mat-form-field {
     margin-left: 1%;
   }
+
+  iframe {
+    position: absolute; 
+    height: 90%; 
+    width: 95%;
+    margin: 0 auto;
+    border: none;
+  }
   
   #fields {
     width: 60%;

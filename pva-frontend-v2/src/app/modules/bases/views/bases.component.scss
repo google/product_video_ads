@@ -1,0 +1,20 @@
+mat-form-field, input {
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.added_item {
+  display: inline-block;
+  padding: 1%;
+  margin: 0 1% 1% 0;
+  border: 1px solid black;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+}
+
+#seconds {
+  margin: 0 1% 0 1%;
+}

@@ -4,6 +4,7 @@ import { OfferTypeService } from './services/offer_type.service';
 import { ProductService } from '../products/services/product.service';
 import { OfferType } from 'app/models/offertype';
 import { AssetsService } from '../static_assets/services/assets.service';
+import { BasesService } from '../bases/services/bases.service';
 
 @Injectable()
 export class OfferTypeFacade {
@@ -11,14 +12,15 @@ export class OfferTypeFacade {
     constructor(private loginService : LoginService,
                 private offerTypeService : OfferTypeService,
                 private assetsService : AssetsService,
+                private basesService : BasesService,
                 private productsService : ProductService) {}
 
     get ready$() {
         return this.loginService.ready$
     }
 
-    get bases$() {
-        return this.offerTypeService.bases$
+    get bases() {
+        return this.basesService.bases$
     }
 
     get fonts() {
