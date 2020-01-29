@@ -17,14 +17,14 @@
     
     <h2>This base needs {{base.products.length}} products</h2>
     
-    <div class="added_item" *ngFor="let p of base.products">
+    <div class="added_item" *ngFor="let c of configs">
       
       <!-- Offer Type -->
       <mat-form-field>
         <mat-label>Offer Type</mat-label>
-        <mat-select>
-          <mat-option *ngFor="let p of products | async" [value]="p.id">
-            {{p.id}}
+        <mat-select [(ngModel)]="c.configs">
+          <mat-option *ngFor="let type of offer_types | async" [value]="type.configs">
+            {{type.title}}
           </mat-option>
         </mat-select>
       </mat-form-field>
@@ -34,18 +34,17 @@
       <!-- Product -->
       <mat-form-field>
         <mat-label>Product</mat-label>
-        <mat-select>
-          <mat-option *ngFor="let p of products | async" [value]="p.id">
-            {{p.id}}
+        <mat-select [(ngModel)]="c.product">
+          <mat-option *ngFor="let product of products | async" [value]="product.id">
+            {{product.id}}) {{product.values[0]}}
           </mat-option>
         </mat-select>
       </mat-form-field>
-      
     </div>
     
     <br/><br/>
     
-    <button [disabled]="current_product == base.number_of_products" mat-stroked-button (click)="add_product(product.value)">Create Video</button>
+    <button mat-stroked-button (click)="add_video()">Create Video</button>
     
   </div>
 </div>

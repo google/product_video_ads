@@ -16,7 +16,7 @@ export class ConfigurationRepository implements ConfigurationInterface {
     async load_fonts(): Promise<object> {
         
         const drive_folder = await this.load_drive_folder()
-        const fonts = await this.googleApi.list_files_from_folder(drive_folder, 'fonts')
+        const fonts = (await this.googleApi.list_files_from_folder(drive_folder, 'fonts')) || []
 
         // Downloads font file
         for (let [font_name, id] of Object.entries(fonts))
@@ -26,11 +26,8 @@ export class ConfigurationRepository implements ConfigurationInterface {
     }
 
     async load_bases(): Promise<Base[]> {
-
-        // const drive_folder = await this.load_drive_folder()
-        const bases = (await this.googleApi.get_values(environment.configuration.bases_range)).map(Base.from_base_array)
-
-        return bases //(await this.googleApi.list_files_from_folder(drive_folder, 'base_videos'))
+        const bases = (await this.googleApi.get_values(environment.configuration.bases_range)) || []
+        return bases.map(Base.from_base_array)
     }
     
     async load_drive_folder(): Promise<string> {
@@ -38,20 +35,23 @@ export class ConfigurationRepository implements ConfigurationInterface {
     }
 
     async load_assets(): Promise<Asset[]> {
-        return (await this.googleApi.get_values(environment.configuration.static_assets)).map(Asset.from_asset_array)
+        const assets = (await this.googleApi.get_values(environment.configuration.static_assets)) || []
+        return assets.map(Asset.from_asset_array)
     }
 
     async load_products() : Promise<Product[]> {
-        const products = await this.googleApi.get_values(environment.configuration.product_range)
+        const products = (await this.googleApi.get_values(environment.configuration.product_range)) || []
         return products.map(Product.from_product_array)
     }    
     
     async load_offer_types(): Promise<OfferType[]> {
-        return (await this.googleApi.get_values(environment.configuration.offer_types_range)).map(OfferType.from_offertype_array)
+        const offer_types = (await this.googleApi.get_values(environment.configuration.offer_types_range)) || []
+        return offer_types.map(OfferType.from_offertype_array)
     }
 
     async load_videos() : Promise<Video[]> {
-        return (await this.googleApi.get_values(environment.configuration.campaign_range)).map(Video.from_video_array)
+        const videos = (await this.googleApi.get_values(environment.configuration.campaign_range)) || []
+        return videos.map(Video.from_video_array)
     }
 
     async save_bases(bases: Base[]): Promise<any> {

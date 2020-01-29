@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs'
 import { Video } from 'app/models/video'
 import { CachedConfigurationRepository } from 'app/repositories/implementations/googleapi/cached-configuration.repository'
 import { LoginService } from 'app/modules/login/services/login.service'
+import { Config } from 'app/models/config'
 
 @Injectable({providedIn: 'root'})
 export class VideoService {
@@ -23,8 +24,8 @@ export class VideoService {
         })
     }
 
-    add_preview_video(indexes, base) {
-        this._videos.next([...this.videos, new Video(indexes, base, 'Preview')])
+    add_preview_video(configs : Array<Config>, base : string) {
+        this._videos.next([...this.videos, new Video(configs, base, 'Preview')])
         return this.repository.save_videos(this.videos)
     }
 }

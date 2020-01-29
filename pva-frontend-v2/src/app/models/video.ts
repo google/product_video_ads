@@ -18,7 +18,7 @@ export class Video {
         
     public static from_video_array(video_array : Array<any>) : Video {
         return new Video(
-            video_array[8],
+            JSON.parse(video_array[8] || '[]'),
             video_array[9],
             video_array[10],
             video_array[0],
@@ -42,7 +42,7 @@ export class Video {
             video.url,
             video.call_to_action,
             video.adgroup_type,
-            video.configs,
+            JSON.stringify(video.configs),
             video.base_video,
             video.status
         ]
