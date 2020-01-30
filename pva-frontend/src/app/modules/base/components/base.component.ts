@@ -66,6 +66,10 @@ export class BaseComponent implements OnInit {
         this.base.indexes.push(i*-1)
   }
 
+  choose_base() {
+    this.base = this.facade.remove_config(this.base.name)
+  }
+
   private update_configs() {
 
     // Added itens with time range
@@ -450,7 +454,7 @@ export class BaseComponent implements OnInit {
       else
         element.product = this.base.indexes.push(element.product)
       
-      this.facade.add_config(this.base, new BaseConfigs(
+      this.base.configs.push(new BaseConfigs(
         element.product,
         element.field,
         parseInt(element.x),
@@ -478,6 +482,8 @@ export class BaseComponent implements OnInit {
         this._snackBar.open("Saving configuration...", 'OK', {
           duration: 2000,
         })
+
+        this.facade.add_config(this.base)
 
         this.facade.save().then(response => {
           this._snackBar.open("Saved: " + response['status'], 'OK', {

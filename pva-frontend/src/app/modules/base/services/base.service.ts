@@ -32,9 +32,14 @@ export class BaseService {
         })
     }
 
-    add_config(base : Base, config : BaseConfigs) {
-        base.configs.push(config)
-        config.id = UUID()
+    add_config(base : Base) {
+        this._bases.next([...this.bases, base])
+    }
+
+    remove_config(name : string) {
+        const base = this.bases.filter(b => b.name == name)[0]
+        this._bases.next(this.bases.filter(b => b.name != name))
+        return base
     }
 
     delete_config(base : Base, id : string) {
@@ -48,11 +53,20 @@ export class BaseService {
             }
         }
 
+        console.log('before ' + base.configs.length)
+
         if (index >= 0)
             base.configs.splice(index, 1)
+
+        console.log('after ' + base.configs.length)
+
+
     }
 
     save_all_configs() {
+
+        console.log()
+
         return this.repository.save_bases(this.bases)
     }
 }

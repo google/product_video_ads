@@ -5,7 +5,7 @@
       
       <mat-form-field>
         <mat-label>Base Video</mat-label>
-        <mat-select [(ngModel)]="base">
+        <mat-select [(ngModel)]="base" (selectionChange)="choose_base()">
           <mat-option *ngFor="let base of facade.bases$ | async" [value]="base">
             {{base.name}} ({{base.number_of_products ? base.number_of_products : 'No'}} products)
           </mat-option>

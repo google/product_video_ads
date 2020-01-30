@@ -31,8 +31,12 @@ export class BaseFacade {
         this.baseService.delete_config(base, id)
     }
 
-    add_config(base : Base, config : BaseConfigs) {
-        this.baseService.add_config(base, config)
+    remove_config(name : string) {
+        return this.baseService.remove_config(name)
+    }
+
+    add_config(base : Base) {
+        this.baseService.add_config(base)
     }
 
     save() {
