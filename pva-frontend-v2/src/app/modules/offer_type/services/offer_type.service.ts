@@ -40,14 +40,17 @@ export class OfferTypeService {
     }
 
     add_offer_type(offer_type : OfferType) {
-        this._offer_types.next([...this.offer_types, offer_type])
+        console.log('Adding offer type...')
+        this._offer_types.next([...this.offer_types, {...offer_type, ...offer_type.configs }])
     }
 
     delete_offer_type(title : string) {
+        console.log('Deleting offer type...')
         this._offer_types.next(this.offer_types.filter(o => o.title != title))
     }
 
     save() {
+        console.log('Saving offer types...')
         return this.repository.save_offer_type(this.offer_types)
     }
 }

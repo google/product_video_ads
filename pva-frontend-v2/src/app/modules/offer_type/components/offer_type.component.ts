@@ -66,7 +66,7 @@ export class OfferTypeComponent implements OnInit {
   }
 
   edit_type(offer_type : OfferType) {
-    this.offer_type = offer_type
+    this.offer_type = {...offer_type}
     this.choose_base(this.bases.filter(b => b.title = offer_type.base)[0])
   }
 
@@ -264,6 +264,8 @@ export class OfferTypeComponent implements OnInit {
       
       document.body.addEventListener('dragover', this.drag_over,false)
       document.body.addEventListener('drop', this.drop_event.bind(this), false)
+
+      el.style.visibility = 'visible'
       
       this.elements.push(element)
     }
@@ -287,6 +289,7 @@ export class OfferTypeComponent implements OnInit {
       dm.style.top = (event.clientY - dm.offsetHeight/2) + 'px';
       
       // Element saved
+
       const element = this.elements.filter(e => e.id == id)[0]
     
       // Adjust on align
@@ -356,7 +359,7 @@ export class OfferTypeComponent implements OnInit {
 
           // Product
           const field_index = this.facade.product_headers.indexOf(c.field)
-          const content = this.facade.products.filter(p => p.id = c.key)[0].values[field_index]
+          const content = this.facade.products.filter(p => p.id == c.key)[0].values[field_index]
 
           if (this.is_image(content))
             element = this.create_image({...c, content})

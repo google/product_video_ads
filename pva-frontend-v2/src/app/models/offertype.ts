@@ -10,7 +10,7 @@ export class OfferType {
         return new OfferType(
             offertype_array[0],
             offertype_array[1],
-            JSON.parse(offertype_array[2]) as Array<Config>,
+            JSON.parse(offertype_array[2] || '[]') as Array<Config>,
         )
     }
             

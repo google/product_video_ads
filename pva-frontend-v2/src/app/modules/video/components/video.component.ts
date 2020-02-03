@@ -26,15 +26,19 @@ export class VideoComponent implements OnInit {
   configs : Array<any>
 
   constructor(private facade : VideoFacade,
-              private _snackBar: MatSnackBar) {}
+              private _snackBar: MatSnackBar) {
+                this.offer_types = this.facade.offer_types$
+              }
   
   ngOnInit() {
     this.bases = this.facade.bases
     this.products = this.facade.products
-    this.offer_types = this.facade.offer_types$
+
+    this.products.subscribe(p => console.log(p))
   }
 
   choose_base(base : Base) {
+
     this.configs = new Array(base.products.length).fill({})
 
     for(let i = 0; i < this.configs.length; i++) {
