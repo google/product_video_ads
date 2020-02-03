@@ -154,7 +154,7 @@ export class OfferTypeComponent implements OnInit {
   }
 
   is_image(content) {
-    return content.startsWith('http')
+    return content && content.startsWith('http')
   }
   
   private create_element(product) {
@@ -283,6 +283,8 @@ export class OfferTypeComponent implements OnInit {
       
       var id = event.dataTransfer.getData("text/plain")
       
+      console.log('Dropping ' + id)
+
       // Element on screen
       const dm = document.getElementById(id)
       dm.style.left = (event.clientX - dm.offsetWidth/2) + 'px';
@@ -308,9 +310,11 @@ export class OfferTypeComponent implements OnInit {
       return false
     }
     
-    private element_position_to_style(element) {
+    private element_position_to_style(element, interval) {
 
-      const dm = document.getElementById(element.id)
+      setTimeout(() => {
+
+        const dm = document.getElementById(element.id)
 
       if (this.is_image(element.content)) {
         element.width /= this.video_pos.x_ratio
@@ -333,6 +337,7 @@ export class OfferTypeComponent implements OnInit {
 
       // Shows it
       dm.style.visibility = 'visible'
+      }, interval)
     }
     
     load_elements_on_video() {
@@ -367,10 +372,7 @@ export class OfferTypeComponent implements OnInit {
             element = this.create_text({...c, content})
         }
 
-        // Position it correctly
-        setTimeout(() => {
-          this.element_position_to_style(element)
-        }, 800)
+        this.element_position_to_style(element, 1000)
       }
 
       this.offer_type.configs = []
@@ -462,7 +464,7 @@ export class OfferTypeComponent implements OnInit {
             duration: 2000
           })
 
-          if (status == 200)
+          if (status == 2002)
             this.router.navigate(['/videos'])
           
         })

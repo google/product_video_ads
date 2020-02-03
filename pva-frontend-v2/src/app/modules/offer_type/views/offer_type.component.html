@@ -46,33 +46,11 @@
 
       <br><br>
       
-      <!--button mat-stroked-button id="play" (click)="play_pause()">Play/Pause</button>
-
-      <br/><br/>
-
-      <button mat-stroked-button id="secondback" (click)="go_seconds_back(1)">Fast Back</button>
-      <button mat-stroked-button id="secondback" (click)="go_seconds_back(0.1)">Back</button>
-      <span id="seconds">{{seconds}}</span>
-      <button mat-stroked-button id="secondforward" (click)="go_seconds_forward(0.1)">Forward</button>
-      <button mat-stroked-button id="secondforward" (click)="go_seconds_forward(1)">Fast Forward</button--->
-      
-      <br/><br/>
-
       <!-- Offer Type -->
       <mat-form-field class="example-full-width">
         <mat-label>Title</mat-label>
         <input [(ngModel)]="offer_type.title" matInput >
       </mat-form-field>
-
-      <!--mat-form-field class="example-full-width">
-        <mat-label>Start Time</mat-label>
-        <input [(ngModel)]="offer_type.start_time" type="number" matInput >
-      </mat-form-field>
-
-      <mat-form-field class="example-full-width">
-        <mat-label>End Time </mat-label>
-        <input [(ngModel)]="offer_type.end_time" type="number" matInput >
-      </mat-form-field-->
 
       <!-- Add New Items -->
       <h2>Add New Item</h2>
@@ -201,10 +179,10 @@
           'text-align': el.align,
           'position': 'absolute',
           'line-height': el.size * 1.2 + 'px',
-          'top': '500px',
+          'top': '-2500px',
           'left': '500px',
           'transform': 'rotate(' + el.angle + 'deg)',
-          'visibility': 'hidden'
+          'visibility': hidden
         }"
         >{{el.content}}</div>
       </div>
@@ -218,10 +196,10 @@
         draggable="true" 
         [ngStyle]="{
           'position': 'absolute',
-          'top': '500px',
+          'top': '-2500px',
           'left': '500px',
           'transform': 'rotate(' + el.angle + 'deg)',
-          'visibility': 'hidden'
+          'visibility': hidden
         }"/>
       </div>
 

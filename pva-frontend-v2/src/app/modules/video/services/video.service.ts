@@ -21,11 +21,16 @@ export class VideoService {
         loginService.ready$.subscribe(async ready => {
             if (ready == 1)
                 this._videos.next(await this.repository.load_videos())
+            
         })
     }
 
     add_preview_video(configs : Array<Config>, base : string) {
         this._videos.next([...this.videos, new Video(configs, base, 'Preview')])
         return this.repository.save_videos(this.videos)
+    }
+
+    async update_videos() {
+        this._videos.next(await this.repository.load_videos())
     }
 }

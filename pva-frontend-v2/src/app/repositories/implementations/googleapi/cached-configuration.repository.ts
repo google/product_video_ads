@@ -40,7 +40,7 @@ export class CachedConfigurationRepository extends ConfigurationRepository {
     }
 
     async load_videos() : Promise<Video[]> {
-        return (await this.load_data<Video[]>(environment.local_storage_keys.videos, super.load_videos.bind(this)))
+        return await super.load_videos()
     }
 
     async load_drive_folder() : Promise<string> {

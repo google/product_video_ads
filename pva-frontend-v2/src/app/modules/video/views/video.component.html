@@ -1,7 +1,27 @@
 <div class="container">
   
+    <!-- Videos already created -->
+    <h2>Videos:</h2>
+    <button mat-stroked-button (click)="update_video()">Update</button>
+
+    <br/><br/>
+
+    <mat-spinner *ngIf="(videos | async).length == 0"></mat-spinner>
+
+    <div style="display: inline-block; margin-right: 1%;" *ngFor="let video of videos | async">
+
+      <video *ngIf="video.generated_video" width="300" height="200" controls>
+          <source [src]="drive_url + video.generated_video" type="video/mp4">
+      </video>
+
+      <span class="added_item" *ngIf="video.status == 'Preview'">
+        Generating latest video...
+      </span>
+
+    </div>
+    
   <!-- Choose base video to configure -->
-  <div *ngIf="!video_url">
+  <div>
     
     <h2>Select base to use:</h2>
     <mat-spinner *ngIf="(bases | async).length == 0"></mat-spinner>
@@ -15,14 +35,14 @@
   <!-- Configure chosen base video -->
   <div *ngIf="base">
     
-    <h2>This base needs {{base.products.length}} products</h2>
+    <h2>This base needs {{base.products.length}} products:</h2>
     
-    <div class="added_item" *ngFor="let c of configs">
+    <div class="added_item" *ngFor="let c of configs; let i = index; trackBy: indexTracker">
       
       <!-- Offer Type -->
       <mat-form-field>
         <mat-label>Offer Type</mat-label>
-        <mat-select [(ngModel)]="c.configs">
+        <mat-select [(ngModel)]="configs[i]">
           <mat-option *ngFor="let type of offer_types | async" [value]="type.configs">
             {{type.title}} - {{type.configs.length}} itens
           </mat-option>
@@ -34,17 +54,18 @@
       <!-- Product -->
       <mat-form-field>
         <mat-label>Product</mat-label>
-        <mat-select [(ngModel)]="c.product">
+        <mat-select [(ngModel)]="product_keys[i]">
           <mat-option *ngFor="let product of products | async" [value]="product.id">
             {{product.id}}) {{product.values[0]}}
           </mat-option>
         </mat-select>
       </mat-form-field>
+
     </div>
     
     <br/><br/>
     
-    <button mat-stroked-button (click)="add_video()">Create Video</button>
+    <button mat-stroked-button [disabled]="!is_all_filled()" (click)="add_video()">Create Video</button>
     
   </div>
 </div>

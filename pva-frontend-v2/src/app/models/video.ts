@@ -6,6 +6,7 @@ export class Video {
         public configs : Array<Config>,
         public base_video : string,
         public status : string,
+        public generated_video : string = '',
         public account_id : string = '',
         public campaign_name : string = '',
         public target : string = '',
@@ -21,6 +22,7 @@ export class Video {
             JSON.parse(video_array[8] || '[]'),
             video_array[9],
             video_array[10],
+            video_array[11],
             video_array[0],
             video_array[1],
             video_array[2],
@@ -44,7 +46,8 @@ export class Video {
             video.adgroup_type,
             JSON.stringify(video.configs),
             video.base_video,
-            video.status
+            video.status,
+            video.generated_video
         ]
     }
 }

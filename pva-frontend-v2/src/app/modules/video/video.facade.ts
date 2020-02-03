@@ -35,7 +35,15 @@ export class VideoFacade {
         return this.productsService.products$
     }
 
+    get videos() {
+        return this.videoService.videos$
+    }
+
     add_preview_video(configs : Array<Config>, base : string) {
         return this.videoService.add_preview_video(configs, base)
+    }
+
+    update_videos() {
+        this.videoService.update_videos()
     }
 }
