@@ -6,8 +6,6 @@
 
     <br/><br/>
 
-    <mat-spinner *ngIf="(videos | async).length == 0"></mat-spinner>
-
     <div style="display: inline-block; margin-right: 1%;" *ngFor="let video of videos | async">
 
       <video *ngIf="video.generated_video" width="300" height="200" controls>

@@ -6,6 +6,7 @@ import { OfferType } from 'app/models/offertype';
 import { Config } from 'app/models/config';
 import { Router } from '@angular/router';
 import { Base } from 'app/models/base';
+import * as UUID from 'uuid/v4'
 
 @Component({
   selector: 'app-base',
@@ -160,7 +161,7 @@ export class OfferTypeComponent implements OnInit {
   private create_element(product) {
     
     const element = {
-      id: Date.now(),
+      id: UUID(),
       x: 0,
       y: 0,
       ...product
@@ -168,7 +169,7 @@ export class OfferTypeComponent implements OnInit {
 
     setTimeout(() => {
       this.add_events(element)
-    }, 500)
+    }, 1000)
     
     return element
   }
@@ -257,8 +258,6 @@ export class OfferTypeComponent implements OnInit {
       
       const el = document.getElementById(element.id)
       
-      //el.addEventListener('click', this.focus_element.bind(this), false)
-      //el.addEventListener('contextmenu', this.save_element.bind(this), false)
       el.addEventListener('dragstart', this.drag_start, false)
       el.addEventListener('dblclick', this.delete_element.bind(this), false)
       
@@ -266,7 +265,7 @@ export class OfferTypeComponent implements OnInit {
       document.body.addEventListener('drop', this.drop_event.bind(this), false)
 
       el.style.visibility = 'visible'
-      
+
       this.elements.push(element)
     }
 
@@ -316,27 +315,25 @@ export class OfferTypeComponent implements OnInit {
 
         const dm = document.getElementById(element.id)
 
-      if (this.is_image(element.content)) {
-        element.width /= this.video_pos.x_ratio
-        element.height /= this.video_pos.y_ratio
-      }
+        if (this.is_image(element.content)) {
+          element.width /= this.video_pos.x_ratio
+          element.height /= this.video_pos.y_ratio
+        }
 
-      element.size /= this.video_pos.x_ratio
+        element.size /= this.video_pos.x_ratio
 
-      // Adjust on align
-      let align_adjust = 0
-      
-      if (element.align == 'center')
-        align_adjust = dm.offsetWidth/2
+        // Adjust on align
+        let align_adjust = 0
+        
+        if (element.align == 'center')
+          align_adjust = dm.offsetWidth/2
 
-      if (element.align == 'right')
-        align_adjust = dm.offsetWidth
+        if (element.align == 'right')
+          align_adjust = dm.offsetWidth
 
-      dm.style.left = ((parseInt(element.x) - align_adjust) / this.video_pos.x_ratio) + this.video_pos.x + 'px'
-      dm.style.top =  (parseInt(element.y) / this.video_pos.y_ratio) + this.video_pos.y + 'px';
+        dm.style.left = ((parseInt(element.x) - align_adjust) / this.video_pos.x_ratio) + this.video_pos.x + 'px'
+        dm.style.top =  (parseInt(element.y) / this.video_pos.y_ratio) + this.video_pos.y + 'px';
 
-      // Shows it
-      dm.style.visibility = 'visible'
       }, interval)
     }
     
@@ -354,7 +351,7 @@ export class OfferTypeComponent implements OnInit {
         // Draw assets
         if (c.type == 'asset') {
           
-          const content = this.facade.assets.filter(a => a.id = c.key)[0][c.field]
+          const content = this.facade.assets.filter(a => a.id == c.key)[0][c.field]
 
           if (c.field == 'image')
             element = this.create_image({...c, content})
@@ -372,7 +369,7 @@ export class OfferTypeComponent implements OnInit {
             element = this.create_text({...c, content})
         }
 
-        this.element_position_to_style(element, 1000)
+        this.element_position_to_style(element, 500)
       }
 
       this.offer_type.configs = []
@@ -464,7 +461,7 @@ export class OfferTypeComponent implements OnInit {
             duration: 2000
           })
 
-          if (status == 2002)
+          if (status == 200)
             this.router.navigate(['/videos'])
           
         })
