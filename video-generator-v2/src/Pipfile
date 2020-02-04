@@ -1,0 +1,19 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pytest = "*"
+
+[packages]
+google-api-python-client = "*"
+google-auth = "*"
+google-auth-oauthlib = "*"
+flask = "*"
+google-cloud-storage = "*"
+pytest = "*"
+pytest-mock = "*"
+
+[requires]
+python_version = "2.7"
