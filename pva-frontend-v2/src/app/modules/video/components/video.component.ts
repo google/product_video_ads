@@ -85,6 +85,10 @@ export class VideoComponent implements OnInit {
     update_video() {
       this.facade.update_videos()
     }
+
+    delete_video(video : Video) {
+      this.facade.delete_video(video.generated_video)
+    }
     
     indexTracker(index: number, value: any) {
       return index;

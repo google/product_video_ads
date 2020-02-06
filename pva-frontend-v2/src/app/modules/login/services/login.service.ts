@@ -10,10 +10,12 @@ export class LoginService {
     // -1: not loaded / 0: loading / 1: loaded
     private readonly _ready = new BehaviorSubject<number>(0)
     private readonly _sheet_id = new BehaviorSubject<string>('')
+    private readonly _drive_folder = new BehaviorSubject<string>('')
     
     /** Published state to application **/
     readonly ready$ = this._ready.asObservable()
     readonly sheet_id$ = this._sheet_id.asObservable()
+    readonly drive_folder$ = this._drive_folder.asObservable()
 
     get ready() : number {
         return this._ready.getValue()
@@ -21,6 +23,10 @@ export class LoginService {
 
     get sheet_id() : string {
         return this._sheet_id.getValue()
+    }
+
+    get drive_folder() : string {
+        return this,this._drive_folder.getValue()
     }
 
     // Tries to log in and load all configs automatically
@@ -47,7 +53,7 @@ export class LoginService {
 
         try {
             // Brief validation to check if sheet exists
-            await this.repository.load_drive_folder()
+            this._drive_folder.next(await this.repository.load_drive_folder())
 
             this.emit_status_event(1)
         } catch (e) {

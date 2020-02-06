@@ -431,10 +431,6 @@ export class OfferTypeComponent implements OnInit {
         ))
       }
 
-      this.text_elements = []
-      this.image_elements = []
-      this.elements = []
-      
       // Delete any other with same title
       this.facade.delete_offer_type(this.offer_type.title)
 
@@ -461,8 +457,8 @@ export class OfferTypeComponent implements OnInit {
             duration: 2000
           })
 
-          if (status == 200)
-            this.router.navigate(['/videos'])
+          //if (status == 200)
+          //  this.router.navigate(['/videos'])
           
         })
       }

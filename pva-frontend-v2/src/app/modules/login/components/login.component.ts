@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
       <login-view 
           [ready]='ready | async'
           [sheet_id]='sheet_id | async'
+          [drive_folder]='drive_folder | async'
           (onlogin)='login($event)'
           (onlogout)='logout()'
           (onreload)='reload()'>
@@ -19,12 +20,14 @@ export class LoginComponent implements OnInit {
 
   ready : Observable<number>
   sheet_id : Observable<string>
+  drive_folder : Observable<string>
 
   constructor(private loginFacade : LoginFacade) {}
 
   ngOnInit() {
     this.ready = this.loginFacade.ready
     this.sheet_id = this.loginFacade.sheet_id
+    this.drive_folder = this.loginFacade.drive_folder
   }
 
   login(sheet_id) {

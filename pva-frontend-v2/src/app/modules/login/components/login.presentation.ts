@@ -11,6 +11,7 @@ export class LoginPresentation {
 
   @Input() ready : number
   @Input() sheet_id : string
+  @Input() drive_folder : string
 
   @Output() onlogin = new EventEmitter<string>()
   @Output() onlogout = new EventEmitter()

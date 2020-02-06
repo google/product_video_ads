@@ -46,4 +46,8 @@ export class VideoFacade {
     update_videos() {
         this.videoService.update_videos()
     }
+
+    delete_video(generated_video : string) {
+        this.videoService.delete_video(generated_video)
+    }
 }

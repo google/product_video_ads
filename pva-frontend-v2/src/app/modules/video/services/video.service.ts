@@ -33,4 +33,9 @@ export class VideoService {
     async update_videos() {
         this._videos.next(await this.repository.load_videos())
     }
+
+    delete_video(generated_video : string) {
+        this._videos.next(this.videos.filter(v => v.generated_video != generated_video))
+        return this.repository.save_videos(this.videos)
+    }
 }
