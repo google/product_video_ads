@@ -47,7 +47,7 @@
       <mat-form-field>
         <mat-label>Offer Type</mat-label>
         <mat-select [(ngModel)]="configs[i]">
-          <mat-option *ngFor="let type of offer_types | async" [value]="type.configs">
+          <mat-option *ngFor="let type of (offer_types | async | filterOfferTypes: base.title)" [value]="type.configs">
             {{type.title}} - {{type.configs.length}} itens
           </mat-option>
         </mat-select>

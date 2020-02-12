@@ -19,6 +19,10 @@ export class CachedConfigurationRepository extends ConfigurationRepository {
         return (await this.load_data<object>(environment.local_storage_keys.fonts, super.load_fonts.bind(this)))
     }
 
+    async upload_base_file(file : File) : Promise<any> {
+        return super.upload_base_file(file)
+    }
+
     async load_bases(): Promise<Base[]> {
         return (await this.load_data<Base[]>(environment.local_storage_keys.bases, super.load_bases.bind(this)))
     }

@@ -2,7 +2,8 @@ export class Base {
     
     constructor(public title : string,
         public file : string,
-        public products : Array<any>) {}
+        public products : Array<any>,
+        public url? : string) {}
         
     public static from_base_array(base_array : Array<any>) {
         return new Base(

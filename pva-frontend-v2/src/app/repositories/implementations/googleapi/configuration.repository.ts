@@ -25,9 +25,25 @@ export class ConfigurationRepository implements ConfigurationInterface {
         return fonts
     }
 
+    async upload_base_file(file : File) : Promise<any> {
+
+        const drive_folder = await this.load_drive_folder()
+        const folders = await this.googleApi.list_files_from_folder(drive_folder, '')
+
+        return this.googleApi.upload_file(file, folders['base_videos'])
+    }
+
     async load_bases(): Promise<Base[]> {
-        const bases = (await this.googleApi.get_values(environment.configuration.bases_range)) || []
-        return bases.map(Base.from_base_array)
+
+        const bases = ((await this.googleApi.get_values(environment.configuration.bases_range)).map(Base.from_base_array) || []) as Base[]
+        
+        const drive_folder = await this.load_drive_folder()
+        const base_videos = (await this.googleApi.list_files_from_folder(drive_folder, 'base_videos')) || []
+        
+        for (let base of bases)
+            base.url = environment.drive_file_prefix + base_videos[base.file]
+
+        return bases
     }
     
     async load_drive_folder(): Promise<string> {

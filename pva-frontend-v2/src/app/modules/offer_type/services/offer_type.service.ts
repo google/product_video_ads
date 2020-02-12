@@ -41,12 +41,12 @@ export class OfferTypeService {
 
     add_offer_type(offer_type : OfferType) {
         console.log('Adding offer type...')
-        this._offer_types.next([...this.offer_types, {...offer_type, ...offer_type.configs }])
+        this._offer_types.next([...this.offer_types, {...offer_type}])
     }
 
-    delete_offer_type(title : string) {
+    delete_offer_type(title : string, base : string) {
         console.log('Deleting offer type...')
-        this._offer_types.next(this.offer_types.filter(o => o.title != title))
+        this._offer_types.next(this.offer_types.filter(o => o.title != title || o.base != base))
     }
 
     save() {

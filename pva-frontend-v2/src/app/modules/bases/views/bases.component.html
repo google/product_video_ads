@@ -1,11 +1,35 @@
 <div class="container">
     
-    <h2>Select base to configure:</h2>
-    
-    <div class="added_item" *ngFor="let base of bases | async" (click)="choose_base(base)">
-        <p>{{base.title}}</p>
+    <div *ngIf="!video">
+        <h2>Select base to configure:</h2>
+        
+        <div class="added_item" *ngFor="let base of bases | async" >
+            <p (click)="choose_base(base)">{{base.title}}</p>
+            <a href="{{base.url}}" target="_blank">Download base video</a>
+        </div>
+
+        <br/>
+
+        <button mat-stroked-button (click)="new_base=true">Create new</button>
+
+        <br/><br/>
+        
+        <div *ngIf="new_base">
+            <h2>Create new base:</h2>
+
+            <mat-form-field class="example-full-width">
+                <mat-label>Title</mat-label>
+                <input #base_title matInput>
+            </mat-form-field>
+
+            <div class="form-group">
+                <input #base_file type="file" id="file" accept=".mp4">
+            </div>
+
+            <button mat-stroked-button (click)="create_base(base_title.value, base_file.files[0])">Create!</button>
+        </div>
     </div>
-    
+
     <!-- Spinner -->
     <mat-spinner *ngIf="video_url && !video"></mat-spinner>
     
@@ -58,4 +82,4 @@
             <button mat-stroked-button (click)="finish()">Save</button>
             
         </div>
-    </div>
+</div>

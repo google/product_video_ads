@@ -60,7 +60,7 @@ export class OfferTypeComponent implements OnInit {
   }
 
   choose_base(base : Base) {
-    this.video_url = base.file
+    this.video_url = base.url
     this.offer_type.base = base.title
     this.example_time = base.products[0]
     this.move_step(3)
@@ -68,11 +68,16 @@ export class OfferTypeComponent implements OnInit {
 
   edit_type(offer_type : OfferType) {
     this.offer_type = {...offer_type}
-    this.choose_base(this.bases.filter(b => b.title = offer_type.base)[0])
+    this.choose_base(this.bases.filter(b => b.title == offer_type.base)[0])
+  }
+
+  copy_type(offer_type : OfferType) {
+    this.offer_type = {...offer_type}
+    this.move_step(2)
   }
 
   delete_type(offer_type) {
-    this.facade.delete_offer_type(offer_type.title)
+    this.facade.delete_offer_type(offer_type.title, offer_type.base)
     this.save()
   }
   
@@ -339,9 +344,8 @@ export class OfferTypeComponent implements OnInit {
     
     load_elements_on_video() {
 
-      // Go to video position
-      this.seconds = this.example_time['start_time']
-      this.go_to_second()
+      if (this.offer_type.configs.length == 0)
+        return
 
       // Add all elements on screen
       for(let c of this.offer_type.configs) {
@@ -371,6 +375,10 @@ export class OfferTypeComponent implements OnInit {
 
         this.element_position_to_style(element, 500)
       }
+
+      // Go to video position
+      this.seconds = this.example_time['start_time']
+      this.go_to_second()
 
       this.offer_type.configs = []
     }
@@ -432,7 +440,7 @@ export class OfferTypeComponent implements OnInit {
       }
 
       // Delete any other with same title
-      this.facade.delete_offer_type(this.offer_type.title)
+      this.facade.delete_offer_type(this.offer_type.title, this.offer_type.base)
 
       // Add it
       this.facade.add_offer_type(this.offer_type)

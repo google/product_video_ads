@@ -8,13 +8,18 @@
     <div class="added_item" *ngFor="let offer of offer_types | async">
 
       <p>{{offer.title}}</p>
+      <p>({{offer.base}})</p>
 
-      <span style="cursor: pointer" (click)="edit_type(offer)">
-        <mat-icon aria-hidden="false" aria-label="edit icon">edit</mat-icon>
+      <span style="cursor: pointer" (click)="edit_type(offer)" >
+        <mat-icon aria-hidden="false" aria-label="edit icon" title="Edit">edit</mat-icon>
+      </span>
+
+      <span style="cursor: pointer" (click)="copy_type(offer)">
+        <mat-icon aria-hidden="false" aria-label="copy icon" title="Copy">file_copy</mat-icon>
       </span>
 
       <span style="cursor: pointer" (click)="delete_type(offer)">
-        <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
+        <mat-icon aria-hidden="false" aria-label="delete icon" title="Delete">delete</mat-icon>
       </span>
     </div>
 
@@ -38,7 +43,7 @@
   <mat-spinner *ngIf="video_url && !video"></mat-spinner>
   
   <!-- Configure chosen base video -->
-  <div [hidden]="!video">
+  <div [hidden]="!video_url">
 
       <video #vd1 *ngIf="video_url" class="video" (canplay)="on_video_loaded(vd1)" muted>
         <source [src]="video_url" type="video/mp4">

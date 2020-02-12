@@ -12,6 +12,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class BasessComponents implements OnInit {
   
+  new_base = false
   bases : Observable<Base[]>
   base : Base
   seconds : any
@@ -30,7 +31,7 @@ export class BasessComponents implements OnInit {
   
   choose_base(base : Base) {
     this.base = base
-    this.video_url = base.file
+    this.video_url = base.url
   }
   
   on_video_loaded(video) {
@@ -70,6 +71,32 @@ export class BasessComponents implements OnInit {
 
   delete_product(index) {
     this.base.products.splice(index, 1)
+  }
+
+  create_base(title : string, file : File) {
+
+    this.new_base = false
+
+    this._snackBar.open("Creating new base...", 'OK', {
+      duration: 10000,
+    })
+
+    this.facade.upload_base_file(file).then(response => {
+
+      this._snackBar.open("Uploaded successfuly!", 'OK', {
+        duration: 2000
+      })
+
+      this.facade.add_base(title, file.name, response.id).then(response => {
+        this._snackBar.open("Created: " + response['status'], 'OK', {
+          duration: 2000
+        })
+      })
+    }).catch(err => {
+      this._snackBar.open("Fail: " + err, 'OK', {
+        duration: 4000
+      })
+    }) 
   }
   
   finish() {

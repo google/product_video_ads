@@ -7,7 +7,7 @@ import { Base } from 'app/models/base';
 export interface ConfigurationInterface {
 
     load_drive_folder() : Promise<string>
-
+    upload_base_file(file : File) : Promise<any>
     load_fonts() : Promise<object>
 
     load_bases() : Promise<Base[]>
