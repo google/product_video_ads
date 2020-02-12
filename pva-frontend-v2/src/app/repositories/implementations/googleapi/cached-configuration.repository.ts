@@ -27,10 +27,6 @@ export class CachedConfigurationRepository extends ConfigurationRepository {
         return (await this.load_data<Base[]>(environment.local_storage_keys.bases, super.load_bases.bind(this)))
     }
 
-    async load_offer_type() : Promise<Product[]> {
-        return (await this.load_data<Product[]>(environment.local_storage_keys.products, super.load_products.bind(this)))
-    }    
-    
     async load_offer_types(): Promise<OfferType[]> {
         return (await this.load_data<OfferType[]>(environment.local_storage_keys.offer_types, super.load_offer_types.bind(this)))
     }

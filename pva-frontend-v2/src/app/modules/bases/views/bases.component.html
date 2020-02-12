@@ -71,6 +71,7 @@
             <h2>Products:</h2>
 
             <div class="added_item" *ngFor="let product of base ? base.products : []; let i = index">
+                <p>Position {{i + 1}}</p>
                 <p>{{product.start_time}}s - {{product.end_time}}s</p>
                 <span style="cursor: pointer" (click)="delete_product(i)">
                     <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>

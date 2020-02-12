@@ -26,20 +26,31 @@
     
   <!-- Choose base video to configure -->
   <div>
-    
     <h2>Select base to use:</h2>
     <mat-spinner *ngIf="(bases | async).length == 0"></mat-spinner>
     
     <div class="added_item" *ngFor="let base of bases | async " (click)="choose_base(base)">
       <p>{{base.title}}</p>
     </div>
-    
   </div>
   
-  <!-- Configure chosen base video -->
+  <!-- Configure if it's preview or bulk creation -->
   <div *ngIf="base">
+      <h2>Select how do you want to create:</h2>
+
+      <div class="added_item" (click)="mode='single'">
+        <p>Single video</p>
+      </div>
+
+      <div class="added_item" (click)="mode='bulk'">
+        <p>Bulk creation</p>
+      </div>
+  </div>
+
+  <!-- Configure single video -->
+  <div *ngIf="mode=='single'">
     
-    <h2>This base needs {{base.products.length}} products:</h2>
+    <h2>The base "{{base.title}}" needs {{base.products.length}} products:</h2>
     
     <div class="added_item" *ngFor="let c of configs; let i = index; trackBy: indexTracker">
       
@@ -70,6 +81,10 @@
     <br/><br/>
     
     <button mat-stroked-button [disabled]="!is_all_filled()" (click)="add_video()">Create Video</button>
-    
   </div>
+
+    <!-- Configure bulk video creation -->
+    <div *ngIf="mode=='bulk'">
+      <p>bulk!</p>
+    </div>
 </div>
