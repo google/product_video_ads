@@ -1,6 +1,14 @@
   <!-- Input to insert spreadsheet ID -->
   <div *ngIf="ready == -1">
-    <span>Insert your spreadsheet ID to begin:</span>
+
+    <h2>Steps to use this solution:</h2>
+
+    <p>1. Create a drive folder, and inside it, create three folders: <b>base_videos, fonts and preview</b></p>
+    <p>2. Make a copy of <a href="https://docs.google.com/spreadsheets/d/1piL-0-LrbpZZJ9xG1IY6ZOhktYvQ96hgQnPK4Y4tVac/edit#gid=6031590" target="_blank">this</a> spreadsheet</p>
+    <p>3. On field <b>DriveConfigFolder</b> insert the ID of your folder created on step 1</p>
+    <p>4. To begin, insert your spreadsheet ID bellow and you're good to go!</p>
+
+    <span><b>Insert your spreadsheet ID to begin:</b></span>
     <br/>
     <input #sheet type="text" size="45" (keyup)="0">
     <br/>
