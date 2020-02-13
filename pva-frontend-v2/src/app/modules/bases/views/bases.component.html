@@ -6,6 +6,9 @@
         <div class="added_item" *ngFor="let base of bases | async" >
             <p (click)="choose_base(base)">{{base.title}}</p>
             <a href="{{base.url}}" target="_blank">Download base video</a>
+            <p style="cursor: pointer" (click)="delete_base(base)">
+                <mat-icon aria-hidden="false" aria-label="delete icon" title="Delete">delete</mat-icon>
+            </p>
         </div>
 
         <br/>

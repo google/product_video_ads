@@ -31,6 +31,7 @@ export class OfferTypeComponent implements OnInit {
   text_elements : Array<any>
   image_elements : Array<any>
   loaded_fonts : Set<string>
+  locked_name = false
   seconds : any
   video
   video_url
@@ -69,6 +70,7 @@ export class OfferTypeComponent implements OnInit {
   edit_type(offer_type : OfferType) {
     this.offer_type = {...offer_type}
     this.choose_base(this.bases.filter(b => b.title == offer_type.base)[0])
+    this.locked_name = true
   }
 
   copy_type(offer_type : OfferType) {
@@ -101,6 +103,8 @@ export class OfferTypeComponent implements OnInit {
       x_ratio: video.videoWidth/WIDTH,
       y_ratio: video.videoHeight/HEIGHT
     }
+
+    console.log(this.video_pos)
 
     this.load_elements_on_video()
   }
@@ -142,10 +146,8 @@ export class OfferTypeComponent implements OnInit {
   select_field(field) {
     if (this.config.type == 'product') {
 
-      const field_index = this.fields.indexOf(field)
-
       this.contents = this.facade.products.map(p => { 
-        return {'id': p.id, 'value': p.values.length > field_index ? p.values[field_index] : ''} 
+        return {'id': p.id, 'value': p.values[field] } 
       })
     } else {
       this.contents = this.facade.assets.map(a => { return {'id': a.id, 'value': a[field] || ''} })
@@ -344,8 +346,11 @@ export class OfferTypeComponent implements OnInit {
     
     load_elements_on_video() {
 
-      if (this.offer_type.configs.length == 0)
-        return
+      // Go to video position
+      if (this.seconds != this.example_time['start_time']) {
+        this.seconds = this.example_time['start_time']
+        this.go_to_second()
+      }
 
       // Add all elements on screen
       for(let c of this.offer_type.configs) {
@@ -364,8 +369,7 @@ export class OfferTypeComponent implements OnInit {
         } else {
 
           // Product
-          const field_index = this.facade.product_headers.indexOf(c.field)
-          const content = this.facade.products.filter(p => p.id == c.key)[0].values[field_index]
+          const content = this.facade.products.filter(p => p.id == c.key)[0].values[c.field]
 
           if (this.is_image(content))
             element = this.create_image({...c, content})
@@ -375,10 +379,6 @@ export class OfferTypeComponent implements OnInit {
 
         this.element_position_to_style(element, 500)
       }
-
-      // Go to video position
-      this.seconds = this.example_time['start_time']
-      this.go_to_second()
 
       this.offer_type.configs = []
     }

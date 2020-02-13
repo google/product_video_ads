@@ -12,16 +12,12 @@ export class ProductsFacade {
         return this.loginService.ready$
     }
 
-    get headers() {
-        return this.productService.headers$
-    }
-
     get products() {
         return this.productService.products$
     }
 
     add_product(values : Array<string>) {
-        this.productService.add_product(new Product(undefined, values))
+        // TODO: IMPLEMENT
     }
     
     delete_product(id : number) {

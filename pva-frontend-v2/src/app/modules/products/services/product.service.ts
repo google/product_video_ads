@@ -9,16 +9,10 @@ import { LoginService } from 'app/modules/login/services/login.service'
 })
 export class ProductService {
 
-    private readonly _headers = new BehaviorSubject<string[]>([])
     private readonly _products = new BehaviorSubject<Product[]>([])
     
     /** Published state to application **/
-    readonly headers$ = this._headers.asObservable()
     readonly products$ = this._products.asObservable()
-
-    get headers() {
-        return [...this._headers.getValue()]
-    }
 
     get products() {
         return [...this._products.getValue()]
@@ -27,13 +21,8 @@ export class ProductService {
     constructor(private productsRepository : CachedConfigurationRepository, loginService : LoginService) {
         loginService.ready$.subscribe(async ready => {
 
-            if (ready == 1) {
-
-                const products = await this.productsRepository.load_products()
-
-                this._headers.next(products ? products[0].values : [])
-                this._products.next(products.slice(1))
-            }
+            if (ready == 1)
+                this._products.next(await this.productsRepository.load_products())
         })
     }
 

@@ -40,7 +40,7 @@
   </div>
 
   <!-- Spinner -->
-  <mat-spinner *ngIf="video_url && !video"></mat-spinner>
+  <mat-spinner style="position: absolute" *ngIf="video_url && !video"></mat-spinner>
   
   <!-- Configure chosen base video -->
   <div [hidden]="!video_url">
@@ -54,7 +54,7 @@
       <!-- Offer Type -->
       <mat-form-field class="example-full-width">
         <mat-label>Title</mat-label>
-        <input [(ngModel)]="offer_type.title" matInput >
+        <input [(ngModel)]="offer_type.title" matInput [disabled]="locked_name">
       </mat-form-field>
 
       <!-- Add New Items -->

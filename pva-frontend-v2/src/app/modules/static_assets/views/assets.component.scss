@@ -1,14 +1,7 @@
-table {
-    width: 50%;
-    margin: 0 auto;
-    text-align: center;
-  }
-  
-  button, mat-form-field {
-    margin-left: 1%;
-  }
-  
-  #fields {
-    width: 50%;
-    margin: 1% auto;
-  }
+iframe {
+  position: absolute; 
+  height: 90%; 
+  width: 95%;
+  margin: 0 auto;
+  border: none;
+}

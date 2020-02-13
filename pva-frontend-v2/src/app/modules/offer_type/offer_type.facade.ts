@@ -31,12 +31,12 @@ export class OfferTypeFacade {
         return this.offerTypeService.offer_types$
     }
 
-    get product_headers() {
-        return this.productsService.headers
-    }
-
     get products() {
         return this.productsService.products
+    }
+
+    get product_headers() {
+        return this.products.length > 0 ? Object.keys(this.products[0].values) : []
     }
 
     get assets() {

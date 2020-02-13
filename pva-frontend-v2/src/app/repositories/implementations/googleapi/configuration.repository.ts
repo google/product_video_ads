@@ -56,8 +56,33 @@ export class ConfigurationRepository implements ConfigurationInterface {
     }
 
     async load_products() : Promise<Product[]> {
-        const products = (await this.googleApi.get_values(environment.configuration.product_range)) || []
-        return products.map(Product.from_product_array)
+
+        const products_array = (await this.googleApi.get_values(environment.configuration.product_range)) || []
+
+        // No products to parse
+        if (products_array.length == 0)
+            return products_array
+
+        // Parse products array and header to map object
+        const header : Array<string> = products_array.shift().slice(4) // Remove 4 first columns as they are properties
+        const products : Array<Product> = []
+
+        // Each product
+        for(let product of products_array) {
+
+            const id = product.shift()
+            const group = product.shift()
+            const offer_type = product.shift()
+            const position = product.shift()
+            const values : object = {}
+
+            for(let i = 0; i < product.length; i++)
+                values[header[i]] = product[i]
+
+            products.push(new Product(id, group, offer_type, position, values))
+        }
+
+        return products
     }    
     
     async load_offer_types(): Promise<OfferType[]> {
@@ -74,7 +99,6 @@ export class ConfigurationRepository implements ConfigurationInterface {
 
         const data = []
   
-        // Bases
         data.push({
           range: environment.configuration.bases_range,
           values: bases.map(Base.to_base_array)
@@ -87,7 +111,6 @@ export class ConfigurationRepository implements ConfigurationInterface {
 
         const data = []
   
-        // Static Assets
         data.push({
           range: environment.configuration.static_assets,
           values: assets.map(Asset.to_asset_array)
@@ -98,15 +121,16 @@ export class ConfigurationRepository implements ConfigurationInterface {
 
     async save_products(products: Product[]): Promise<any> {
         
-        const data = []
+        // TODO: IMPLEMENT
+        
+        /*const data = []
   
-        // Products
         data.push({
           range: environment.configuration.product_range,
           values: products.map(Product.to_product_array)
         })
       
-        return this.googleApi.save_values(data)
+        return this.googleApi.save_values(data)*/
     }
 
     async save_offer_types(offer_types: OfferType[]): Promise<any> {
@@ -125,7 +149,6 @@ export class ConfigurationRepository implements ConfigurationInterface {
 
         const data = []
   
-        // Campaigns (videos)
         data.push({
             range: environment.configuration.campaign_range,
             values: videos.map(Video.to_video_array)

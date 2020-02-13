@@ -28,6 +28,10 @@ export class BasesFacade {
         return this.service.upload_base_file(file)
     }
 
+    delete_base(title : string) : Promise<any> {
+        return this.service.delete_base(title)
+    }
+
     save() {
         return this.service.save()
     }

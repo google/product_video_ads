@@ -37,6 +37,11 @@ export class BasesService {
         return this.save()
     }
 
+    delete_base(title : string) : Promise<any> {
+        this._bases.next(this.bases.filter(b => b.title != title))
+        return this.save()
+    }
+
     upload_base_file(file : File) : Promise<any> {
         return this.repository.upload_base_file(file)
     }

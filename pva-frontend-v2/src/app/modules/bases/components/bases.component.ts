@@ -73,6 +73,14 @@ export class BasessComponents implements OnInit {
     this.base.products.splice(index, 1)
   }
 
+  delete_base(base : Base) {
+    this.facade.delete_base(base.title).then(response => {
+      this._snackBar.open("Base deleted status: " + response.status, 'OK', {
+        duration: 2000
+      })
+    })
+  }
+
   create_base(title : string, file : File) {
 
     this.new_base = false

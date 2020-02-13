@@ -1,33 +1,20 @@
-import { Component, ViewChild, Pipe, PipeTransform, OnInit, Inject  } from '@angular/core';
-import { MatTable } from '@angular/material/table'
-import { ProductsFacade } from '../products.facade';
-import { Observable } from 'rxjs';
-import { Product } from 'app/models/product';
+import { Component, OnInit } from '@angular/core';
+import { LoginService } from 'app/modules/login/services/login.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-product',
   templateUrl: '../views/product.component.html',
   styleUrls: ['../views/product.component.scss']
 })
-export class ProductComponent implements OnInit {
+export class ProductComponent {
 
-  ready : Observable<number>
-  headers : Observable<string[]>
-  products : Observable<Product[]>
+  url : SafeResourceUrl
 
-  constructor(private facade : ProductsFacade) {}
-
-  ngOnInit() {
-    this.ready = this.facade.ready
-    this.products = this.facade.products
-    this.headers = this.facade.headers
-  }
-
-  add_product(values) {
-    this.facade.add_product(values)
-  }
-
-  delete_product(product) {
-    this.facade.delete_product(product.id)
+  constructor(private service : LoginService, private sanitizer: DomSanitizer) {
+    this.service.ready$.subscribe(status => {
+      if (status == 1)
+        this.url = this.sanitizer.bypassSecurityTrustResourceUrl('https://docs.google.com/spreadsheets/d/'+ this.service.sheet_id +'/edit#gid=1670058881')
+    })
   }
 }
