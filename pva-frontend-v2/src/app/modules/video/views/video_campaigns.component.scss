@@ -1,0 +1,17 @@
+.added_item {
+    display: inline-block;
+    padding: 2%;
+    margin: 0 1% 1% 0;
+    border: 1px solid black;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.campaign_config {
+    margin: 2%;
+}
+
+mat-form-field {
+    margin-right: 2%;
+}

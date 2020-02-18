@@ -11,13 +11,20 @@ import { TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-video',
-  templateUrl: '../views/video.component.html',
-  styleUrls: ['../views/video.component.scss'],
+  templateUrl: '../views/video_campaigns.component.html',
+  styleUrls: ['../views/video_campaigns.component.scss'],
   providers: [VideoFacade]
 })
-export class VideoComponent implements OnInit {
+export class VideoCampaignsComponent implements OnInit {
 
-  drive_url = 'https://drive.google.com/uc?export=download&id='
+  yt_url = 'https://www.youtube.com/watch?v='
+
+  ad_group_types = [
+    'TRUE_VIEW_IN_STREAM', 
+    'TRUE_VIEW_IN_DISPLAY', 
+    'NON_SKIPPABLE_IN_STREAM',
+    'BUMPER'
+  ]
   
   // Data to view
   bases : Observable<Base[]>
@@ -26,13 +33,14 @@ export class VideoComponent implements OnInit {
   videos : Observable<Video[]>
 
   product_groups : Map<string, Product[]>
-  selected_groups : Set<string> = new Set<string>()
+  selected_groups : Map<string, object> = new Map<string,object>()
   mode : string
   
   // Chosen
   base : Base
   configs : Array<any>
   product_keys: Array<any>
+  campaign : object = {}
   
   constructor(private facade : VideoFacade, private _snackBar: MatSnackBar) {
       this.offer_types = this.facade.offer_types$
@@ -64,8 +72,8 @@ export class VideoComponent implements OnInit {
       return !this.configs.includes(undefined) && !this.product_keys.includes(undefined)
     }
     
-    add_video() {
-      this.facade.add_preview_video(this.configs, this.base, this.product_keys).then(response => {
+    add_video(product_keys, configs, campaign_configs) {
+      this.facade.add_production_video(configs, this.base, product_keys, campaign_configs).then(response => {
         this.mode = ''
         this._snackBar.open('Saved ' + response['status'], 'OK', { duration: 2000 })
       })
@@ -73,24 +81,21 @@ export class VideoComponent implements OnInit {
 
     check_group(element, group) {
       if (element.checked)
-        this.selected_groups.add(group)
+        this.selected_groups.set(group, {})
       else
         this.selected_groups.delete(group)
     }
 
     create_bulk() {
 
-      for(let group of this.selected_groups) {
+      for(let [group, campaign_configs] of this.selected_groups.entries()) {
 
         const sorted_products = this.product_groups.get(group).sort((a, b) => a.position - b.position)
 
-        this.product_keys = sorted_products.map(p => p.id)
-        this.configs = sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type, this.base.title))
+        const product_keys = sorted_products.map(p => p.id)
+        const configs = sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type, this.base.title))
 
-        //console.log(JSON.stringify(this.product_keys))
-        //console.log(JSON.stringify(this.configs))
-
-        this.add_video()
+        this.add_video(product_keys, configs, campaign_configs)
       }
 
       this._snackBar.open('Created ' + this.selected_groups.size + ' videos!', 'OK', { duration: 4000 })

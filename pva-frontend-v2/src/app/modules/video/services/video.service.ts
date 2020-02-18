@@ -4,6 +4,7 @@ import { Video } from 'app/models/video'
 import { CachedConfigurationRepository } from 'app/repositories/implementations/googleapi/cached-configuration.repository'
 import { LoginService } from 'app/modules/login/services/login.service'
 import { Config } from 'app/models/config'
+import { Campaign } from 'app/models/campaign'
 
 @Injectable({providedIn: 'root'})
 export class VideoService {
@@ -26,7 +27,15 @@ export class VideoService {
     }
 
     add_preview_video(configs : Array<Config>, base : string) {
-        this._videos.next([...this.videos, new Video(configs, base, 'Preview')])
+        return this.add_video(configs, base, 'Preview')
+    }
+
+    add_production_video(configs : Array<Config>, base : string, campaign : Campaign) {
+        return this.add_video(configs, base, 'On', campaign)
+    }
+
+    private add_video(configs : Array<Config>, base : string, status : string, campaign? : Campaign) {
+        this._videos.next([...this.videos, new Video(configs, base, status, campaign)])
         return this.repository.save_videos(this.videos)
     }
 
