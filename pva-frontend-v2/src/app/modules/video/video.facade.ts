@@ -80,7 +80,9 @@ export class VideoFacade {
             const campaign = new Campaign(
                 campaign_configs.account,
                 campaign_configs.campaign,
-                campaign_configs.target,
+                campaign_configs.target_location,
+                campaign_configs.target_age,
+                campaign_configs.target_user_interest,
                 campaign_configs.url,
                 campaign_configs.call_to_action,
                 campaign_configs.adgroup_type

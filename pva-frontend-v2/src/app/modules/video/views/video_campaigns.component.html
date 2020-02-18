@@ -187,6 +187,28 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
+
+          <br/>
+
+          <h3>Targets</h3>
+
+          <!-- Target: location -->
+          <mat-form-field class="example-full-width">
+            <mat-label>Location</mat-label>
+            <input [(ngModel)]="selected_groups.get(group.key).target_location" matInput>
+          </mat-form-field>
+          
+          <!-- Target: age -->
+          <mat-form-field class="example-full-width">
+            <mat-label>Age</mat-label>
+            <input [(ngModel)]="selected_groups.get(group.key).target_age" matInput>
+          </mat-form-field>
+          
+          <!-- Target: user interest -->
+          <mat-form-field class="example-full-width">
+            <mat-label>User Interest</mat-label>
+            <input [(ngModel)]="selected_groups.get(group.key).target_user_interest" matInput>
+          </mat-form-field>
           
         </div>   
       </section>

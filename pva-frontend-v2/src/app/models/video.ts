@@ -13,9 +13,9 @@ export class Video {
         
     public static from_video_array(video_array : Array<any>) : Video {
         return new Video(
-            JSON.parse(video_array[8] || '[]'),
-            video_array[9],
-            video_array[10],
+            JSON.parse(video_array[10] || '[]'),
+            video_array[11],
+            video_array[12],
             new Campaign(
                 video_array[0],
                 video_array[1],
@@ -23,10 +23,12 @@ export class Video {
                 video_array[5],
                 video_array[6],
                 video_array[7],
+                video_array[8],
+                video_array[9],
                 video_array[2],
                 video_array[3]
             ),
-            video_array[11]
+            video_array[13]
         )
     }
             
@@ -36,7 +38,9 @@ export class Video {
             video.campaign.campaign_name,
             video.campaign.adgroup_name,
             video.campaign.ad_name,
-            video.campaign.target,
+            video.campaign.target_location,
+            video.campaign.target_age,
+            video.campaign.target_user_interest,
             video.campaign.url,
             video.campaign.call_to_action,
             video.campaign.adgroup_type,
