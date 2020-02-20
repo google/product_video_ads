@@ -1,3 +1,5 @@
+<h2 class="main_title">Log In</h2>
+<div class="inner_content">
   <!-- Input to insert spreadsheet ID -->
   <div *ngIf="ready == -1">
 
@@ -14,21 +16,21 @@
     <br/>
     <input type="button" [disabled]="!sheet.value" value="Start" (click)="login(sheet.value)"/>
   </div>
-  
+
   <!-- Spinner waiting for APIs to return -->
   <div *ngIf="ready == 0">
     <mat-spinner diameter="60"></mat-spinner>
   </div>
-  
+
   <!-- Logged in -->
   <div *ngIf="ready == 1">
-    <h2 style="color: green">Logged In</h2>
 
     <h3>Your spreadsheet is <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}">here</a></h3>
-    
+
     <p>There you can create <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}/edit#gid=1565524886">bases</a>, update <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}/edit#gid=1670058881">products</a> and <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}/edit#gid=1412792783">static assets</a></p>
     <p>Make sure to upload your bases and fonts to your <a target="_blank" href="https://drive.google.com/corp/drive/u/0/folders/{{drive_folder}}">drive folder</a></p>
 
     <button mat-stroked-button color="warn" (click)="logout()">Logout</button>
     <button mat-stroked-button color="warn" (click)="reload()">Reload</button>
   </div>
+</div>

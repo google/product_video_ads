@@ -1,5 +1,6 @@
-<div class="container">
-  
+<h2 class="main_title">Offer Types</h2>
+<div class="inner_content">
+
   <!-- First screen: choose to edit or create new -->
   <div *ngIf="step == 1">
 
@@ -41,7 +42,7 @@
 
   <!-- Spinner -->
   <mat-spinner style="position: absolute" *ngIf="video_url && !video"></mat-spinner>
-  
+
   <!-- Configure chosen base video -->
   <div [hidden]="!video_url">
 
@@ -50,7 +51,7 @@
       </video>
 
       <br><br>
-      
+
       <!-- Offer Type -->
       <mat-form-field class="example-full-width">
         <mat-label>Title</mat-label>
@@ -59,7 +60,7 @@
 
       <!-- Add New Items -->
       <h2>Add New Item</h2>
-      
+
       <!-- Choose type -->
       <mat-form-field>
         <mat-label>Insert new</mat-label>
@@ -89,14 +90,14 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
-      
+
       <br/>
-      
+
       <!-- Text -->
       <div *ngIf="config.key">
 
         <div *ngIf="!is_image(content.value)">
-          
+
           <mat-form-field>
             <mat-label>Font</mat-label>
             <mat-select [(ngModel)]="config.font">
@@ -105,21 +106,21 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
-          
+
           <input [(ngModel)]="config.color"
           [style.background]="config.color"
-          [(colorPicker)]="config.color"/> 
-          
+          [(colorPicker)]="config.color"/>
+
           <mat-form-field class="example-full-width">
             <mat-label>Font size</mat-label>
             <input [(ngModel)]="config.size" type="number" matInput placeholder="size">
           </mat-form-field>
-          
+
           <mat-form-field class="example-full-width">
             <mat-label>Width (letters)</mat-label>
             <input [(ngModel)]="config.width" type="number" matInput placeholder="width">
           </mat-form-field>
-          
+
           <mat-form-field>
             <mat-label>Align</mat-label>
             <mat-select [(ngModel)]="config.align" value="center">
@@ -128,30 +129,30 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
-          
+
           <mat-form-field class="example-full-width">
             <mat-label>Angle</mat-label>
             <input [(ngModel)]="config.angle" type="number" matInput placeholder="angle">
           </mat-form-field>
-          
+
           <br/>
-          
+
           <button mat-stroked-button (click)="create_text()">Insert Text</button>
         </div>
-        
+
         <!-- Image -->
         <div *ngIf="is_image(content.value)">
-          
+
           <mat-form-field class="example-full-width">
             <mat-label>Width</mat-label>
             <input [(ngModel)]="config.width" type="number" matInput placeholder="width">
           </mat-form-field>
-          
+
           <mat-form-field class="example-full-width">
             <mat-label>Height</mat-label>
             <input [(ngModel)]="config.height" type="number" matInput placeholder="height">
           </mat-form-field>
-          
+
           <mat-form-field>
             <mat-label>Align</mat-label>
             <mat-select [(ngModel)]="config.align">
@@ -160,23 +161,23 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
-          
+
           <br/>
-          
+
           <button mat-stroked-button (click)="create_image()">Insert Image</button>
         </div>
       </div>
-      
+
       <br/><br/>
-      
+
       <button mat-stroked-button (click)="finish()">Save</button>
-      
+
       <!-- Items on screen -->
       <div *ngFor="let el of text_elements">
-        <div 
-        id="{{el.id}}" 
+        <div
+        id="{{el.id}}"
         innerHTML={{el.content}}
-        draggable="true" 
+        draggable="true"
         [ngStyle]="{
           'color': el.color,
           'font-size': el.size + 'px',
@@ -191,14 +192,14 @@
         }"
         >{{el.content}}</div>
       </div>
-      
+
       <div *ngFor="let el of image_elements">
-        <img 
-        id="{{el.id}}" 
+        <img
+        id="{{el.id}}"
         src={{el.content}}
         width={{el.width}}
         height={{el.height}}
-        draggable="true" 
+        draggable="true"
         [ngStyle]="{
           'position': 'absolute',
           'top': '500px',

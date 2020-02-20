@@ -1,59 +1,60 @@
-<div class="container">
-  
+<h2 class="main_title">Configure Ad Campaign</h2>
+<div class="inner_content">
+
   <!-- Videos already created -->
   <h2>Videos Campaigns:</h2>
   <button mat-stroked-button (click)="update_video()">Update</button>
-  
+
   <br/><br/>
-  
+
   <div style="display: inline-block; margin-right: 1%;" *ngFor="let video of videos | async">
-    
+
     <span class="added_item" *ngIf="video.generated_video && ['Running', 'Video Ready'].indexOf(video.status) >= 0" >
       <video width="300" height="200" controls>
         <source [src]="yt_url + video.generated_video" type="video/mp4">
         </video>
-        
+
         <span style="cursor: pointer" (click)="delete_video(video)">
           <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
         </span>
       </span>
-      
+
       <span class="added_item" *ngIf="video.status == 'On'">
         Generating latest video...
       </span>
-      
+
     </div>
-    
+
     <!-- Choose base video to configure -->
     <div>
       <h2>Select base to use:</h2>
       <mat-spinner *ngIf="(bases | async).length == 0"></mat-spinner>
-      
+
       <div class="added_item" *ngFor="let base of bases | async " (click)="choose_base(base)">
         <p>{{base.title}}</p>
       </div>
     </div>
-    
+
     <!-- Configure if it's preview or bulk creation -->
     <div *ngIf="base">
       <h2>Select how do you want to create:</h2>
-      
+
       <div class="added_item" (click)="select_single_video_mode()">
         <p>Single video</p>
       </div>
-      
+
       <div class="added_item" (click)="select_bulk_video_mode()">
         <p>Bulk creation</p>
       </div>
     </div>
-    
+
     <!-- Configure single video -->
     <div *ngIf="mode=='single'">
-      
+
       <h2>The base "{{base.title}}" needs {{base.products.length}} products:</h2>
-      
+
       <div class="added_item" *ngFor="let c of configs; let i = index; trackBy: indexTracker">
-        
+
         <!-- Offer Type -->
         <mat-form-field>
           <mat-label>Offer Type</mat-label>
@@ -63,9 +64,9 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
-        
+
         <br/><br/>
-        
+
         <!-- Product -->
         <mat-form-field>
           <mat-label>Product</mat-label>
@@ -75,35 +76,35 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
-        
+
       </div>
-      
+
       <br/>
-      
+
       <!-- Account -->
       <mat-form-field class="example-full-width">
         <mat-label>Account</mat-label>
         <input [(ngModel)]="campaign.account" matInput>
       </mat-form-field>
-      
+
       <!-- Campaign -->
       <mat-form-field class="example-full-width">
         <mat-label>Campaign</mat-label>
         <input [(ngModel)]="campaign.campaign" matInput>
       </mat-form-field>
-      
+
       <!-- URL -->
       <mat-form-field class="example-full-width">
         <mat-label>URL (after click)</mat-label>
         <input [(ngModel)]="campaign.url" matInput>
       </mat-form-field>
-      
+
       <!-- Call to Action -->
       <mat-form-field class="example-full-width">
         <mat-label>Call To Action (button text)</mat-label>
         <input [(ngModel)]="campaign.call_to_action" matInput>
       </mat-form-field>
-      
+
       <!-- AdGroup Type -->
       <mat-form-field class="example-full-width">
         <mat-label>Type of Ad</mat-label>
@@ -113,9 +114,9 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
-      
+
       <br/>
-      
+
       <h3>Targets <a href="https://developers.google.com/adwords/api/docs/appendix/geotargeting" target="_blank">(locations)</a></h3>
 
       <!-- Target: location -->
@@ -123,61 +124,61 @@
         <mat-label>Location</mat-label>
         <input [(ngModel)]="campaign.target_location" matInput>
       </mat-form-field>
-      
+
       <!-- Target: age -->
       <mat-form-field class="example-full-width">
         <mat-label>Age</mat-label>
         <input [(ngModel)]="campaign.target_age" matInput>
       </mat-form-field>
-      
+
       <!-- Target: user interest -->
       <mat-form-field class="example-full-width">
         <mat-label>User Interest</mat-label>
         <input [(ngModel)]="campaign.target_user_interest" matInput>
       </mat-form-field>
-      
+
       <br/><br/>
-      
+
       <button mat-stroked-button [disabled]="!is_all_filled()" (click)="add_video(product_keys, configs, campaign)">Create Video</button>
     </div>
-    
+
     <!-- Configure bulk video creation -->
     <div *ngIf="mode=='bulk'">
-      
+
       <h2>Select product group to create video for "{{base.title}}":</h2>
-      
+
       <!-- Product Group -->
       <section *ngFor="let group of product_groups | keyvalue">
         <mat-checkbox class="example-margin" (change)="check_group($event, group.key)">
           {{group.key}}
         </mat-checkbox>
-        
+
         <div class="campaign_config" *ngIf="selected_groups.has(group.key)">
-          
+
           <!-- Account -->
           <mat-form-field class="example-full-width">
             <mat-label>Account</mat-label>
             <input [(ngModel)]="selected_groups.get(group.key).account" matInput>
           </mat-form-field>
-          
+
           <!-- Campaign -->
           <mat-form-field class="example-full-width">
             <mat-label>Campaign</mat-label>
             <input [(ngModel)]="selected_groups.get(group.key).campaign" matInput>
           </mat-form-field>
-          
+
           <!-- URL -->
           <mat-form-field class="example-full-width">
             <mat-label>URL (after click)</mat-label>
             <input [(ngModel)]="selected_groups.get(group.key).url" matInput>
           </mat-form-field>
-          
+
           <!-- Call to Action -->
           <mat-form-field class="example-full-width">
             <mat-label>Call To Action (button text)</mat-label>
             <input [(ngModel)]="selected_groups.get(group.key).call_to_action" matInput>
           </mat-form-field>
-          
+
           <!-- AdGroup Type -->
           <mat-form-field class="example-full-width">
             <mat-label>Type of Ad</mat-label>
@@ -197,24 +198,24 @@
             <mat-label>Location</mat-label>
             <input [(ngModel)]="selected_groups.get(group.key).target_location" matInput>
           </mat-form-field>
-          
+
           <!-- Target: age -->
           <mat-form-field class="example-full-width">
             <mat-label>Age</mat-label>
             <input [(ngModel)]="selected_groups.get(group.key).target_age" matInput>
           </mat-form-field>
-          
+
           <!-- Target: user interest -->
           <mat-form-field class="example-full-width">
             <mat-label>User Interest</mat-label>
             <input [(ngModel)]="selected_groups.get(group.key).target_user_interest" matInput>
           </mat-form-field>
-          
-        </div>   
+
+        </div>
       </section>
-      
+
       <br/><br/>
-      
+
       <button mat-stroked-button (click)="create_bulk()">Create Production Videos and Ads</button>
     </div>
   </div>
