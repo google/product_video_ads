@@ -9,14 +9,8 @@
   <div style="display: inline-block; margin-right: 1%;" *ngFor="let video of videos | async">
     
     <span class="added_item" *ngIf="video.generated_video && ['Running', 'Video Ready'].indexOf(video.status) >= 0" >
-      <video width="300" height="200" controls>
-        <source [src]="yt_url + video.generated_video" type="video/mp4">
-        </video>
-        
-        <span style="cursor: pointer" (click)="delete_video(video)">
-          <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
-        </span>
-      </span>
+      <a href="{{yt_url + video.generated_video}}" target="_blank">Video Ready</a>
+    </span>
       
       <span class="added_item" *ngIf="video.status == 'On'">
         Generating latest video...
