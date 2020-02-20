@@ -27,6 +27,8 @@ export class GoogleAPI {
           scope: environment.scopes
         }).then(() => {
           
+          // console.log(gapi.auth2.getAuthInstance().currentUser.get())
+
           // Listen for sign-in state changes
           gapi.auth2.getAuthInstance().isSignedIn.listen(callback)
           
