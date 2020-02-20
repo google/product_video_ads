@@ -8,13 +8,19 @@ body {
 }
 
 a {
+    font-size: 16px;
+    vertical-align: middle;
     padding: 1em;
     margin-right: 0.3em;
     text-decoration: none;
     color: #000;
     background-color: #5eaaff;
-    border-radius: 10%;
+    border-radius: 5%;
     cursor: pointer;
+}
+
+a:hover {
+    opacity: 0.8;
 }
 
 #content {
