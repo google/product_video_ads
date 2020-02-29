@@ -90,9 +90,11 @@ export class OfferTypeComponent implements OnInit {
     const HEIGHT = 450
 
     this.video = video
-    
+
     video.width = WIDTH
     video.height = HEIGHT
+
+    var rect = video.getBoundingClientRect();
 
     // To calculate elements positions relative
     this.video_pos = {
@@ -289,14 +291,13 @@ export class OfferTypeComponent implements OnInit {
       
       var id = event.dataTransfer.getData("text/plain")
       
-      console.log('Dropping ' + id)
-
       // Element on screen
       const dm = document.getElementById(id)
+
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+
       dm.style.left = (event.clientX - dm.offsetWidth/2) + 'px';
-      dm.style.top = (event.clientY - dm.offsetHeight/2) + 'px';
-      
-      // Element saved
+      dm.style.top = (event.clientY - dm.offsetHeight/2 + scrollTop) + 'px';
 
       const element = this.elements.filter(e => e.id == id)[0]
     
@@ -310,12 +311,12 @@ export class OfferTypeComponent implements OnInit {
         align_adjust = -dm.offsetWidth/2
 
       element.x = ((event.clientX - this.video_pos.x - align_adjust) * this.video_pos.x_ratio).toFixed(0)
-      element.y = ((event.clientY - dm.offsetHeight/2 - this.video_pos.y) * this.video_pos.y_ratio).toFixed(0)
+      element.y = ((event.clientY - dm.offsetHeight/2 - this.video_pos.y + scrollTop) * this.video_pos.y_ratio).toFixed(0)
       
       event.preventDefault()
       return false
     }
-    
+
     private element_position_to_style(element, interval) {
 
       setTimeout(() => {

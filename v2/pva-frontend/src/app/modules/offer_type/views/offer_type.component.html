@@ -46,9 +46,11 @@
   <!-- Configure chosen base video -->
   <div [hidden]="!video_url">
 
-      <video #vd1 *ngIf="video_url" class="video" (canplay)="on_video_loaded(vd1)" muted>
-        <source [src]="video_url" type="video/mp4">
-      </video>
+      <div id="video">
+        <video #vd1 *ngIf="video_url" class="video" (canplay)="on_video_loaded(vd1)" muted>
+          <source [src]="video_url" type="video/mp4">
+        </video>
+      </div>
 
       <br><br>
 

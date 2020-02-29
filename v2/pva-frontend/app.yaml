@@ -1,11 +1,15 @@
 runtime: python37
 
 handlers:
+
+- url: /(login|products|bases|offer_types|videos|videos/campaigns)
+  static_files: dist/index.html
+  upload: dist/index.html
+
 - url: /(.+)
-  static_files: dist/pva-frontend/\1
-  upload: dist/pva-frontend/.*
+  static_files: dist/\1
+  upload: dist/.*
 
 - url: /
-  static_files: dist/pva-frontend/index.html
-  upload: dist/pva-frontend/index.html
-
+  static_files: dist/index.html
+  upload: dist/index.html
