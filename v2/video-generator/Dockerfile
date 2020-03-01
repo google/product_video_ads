@@ -1,7 +1,7 @@
 FROM python:2.7-alpine
 
 # Unzip and ImageMagick dependencies
-RUN apk update && apk add unzip imagemagick==7.0.8.58-r0
+RUN apk update && apk add unzip imagemagick==7.0.9.7-r0
 
 # Create empty folder to custom credentials mapping
 RUN mkdir -p /credentials

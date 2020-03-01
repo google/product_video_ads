@@ -10,4 +10,4 @@ cat -- !(Main).gs >> script.js
 cd ..
 mv src/script.js .
 
-gsutil cp -r * gs://video-generator-adscripts/
+gsutil cp -r * gs://product-video-ads/adscripts/

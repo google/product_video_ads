@@ -1,0 +1,1 @@
+gsutil cp gs://product-video-ads/install.sh . && sh install.sh

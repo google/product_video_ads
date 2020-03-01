@@ -24,7 +24,7 @@ video-generator-cluster
 sleep 5
 
 # Get docker image
-gsutil cp gs://video-generator-image/video-generator.tar .
+gsutil cp gs://product-video-ads/video-generator/video-generator.tar .
 docker load -i video-generator.tar
 
 PROJECT_ID=$(gcloud config list --format 'value(core.project)' 2>/dev/null)
@@ -37,7 +37,7 @@ docker push $IMAGE_NAME
 # Install application to cluster
 echo 'Apply application to cluster...'
 
-gsutil cp gs://video-generator-image/video-generator.yaml video-generator.yaml
+gsutil cp gs://product-video-ads/video-generator/video-generator.yaml video-generator.yaml
 
 echo -n 'Type the spreadsheet ID: '
 read SPREADSHEET_ID

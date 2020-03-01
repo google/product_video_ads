@@ -1,7 +1,10 @@
 runtime: python37
 
-handlers:
+env_variables:
+  client_id: "$FRONTEND_CLIENT_ID"
+  api_key: "$FRONTEND_API_KEY"
 
+handlers:
 - url: /(login|products|bases|offer_types|videos|videos/campaigns)
   static_files: dist/index.html
   upload: dist/index.html

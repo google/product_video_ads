@@ -85,7 +85,7 @@ function processAccount() {
       var accountId = accountIds[row][0]
 
       if (accountId == '')
-        break
+        continue
 
       // + 2 because we need to skip header, and sheet rows start at 1 (instead of 0)
       if (accountId == currentAccount)
@@ -173,6 +173,8 @@ var STATUS_HANDLERS = {
         
         // This may be null if video is not available
         if (videoAd != null) {
+          
+          Logger.log('videoAd %s created with type %s', videoAd.getName(), videoAd.getType())
           row.set('AdName', videoAd.getName())
 
           // It's running

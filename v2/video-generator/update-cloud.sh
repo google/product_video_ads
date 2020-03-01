@@ -1,6 +1,6 @@
 #!/bin/bash
 
-gsutil cp gs://video-generator-image/video-generator.tar .
+gsutil cp gs://product-video-ads/video-generator/video-generator.tar .
 
 docker load -i video-generator.tar
 

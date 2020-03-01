@@ -19,9 +19,9 @@ docker save $PROJECT_NAME -o video-generator.tar
 
 echo 'Sending docker image as TAR to cloud storage...'
 # Copy files to Cloud Storage
-gsutil cp video-generator.tar gs://video-generator-image/video-generator.tar
-gsutil cp video-generator.yaml gs://video-generator-image/video-generator.yaml
-gsutil cp install-cloud.sh gs://video-generator-image/install-cloud.sh
-gsutil cp update-cloud.sh gs://video-generator-image/update-cloud.sh
+gsutil cp video-generator.tar gs://product-video-ads/video-generator/video-generator.tar
+gsutil cp video-generator.yaml gs://product-video-ads/video-generator/video-generator.yaml
+gsutil cp install-cloud.sh gs://product-video-ads/video-generator/install-cloud.sh
+gsutil cp update-cloud.sh gs://product-video-ads/video-generator/update-cloud.sh
 
 echo 'Done'
