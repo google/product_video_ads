@@ -1,68 +1,105 @@
 <h2 class="main_title">Offer Types</h2>
 <div class="inner_content">
-
+  
   <!-- First screen: choose to edit or create new -->
   <div *ngIf="step == 1">
-
+    
     <h2>Choose type to edit or create new one</h2>
-
+    
     <div class="added_item" *ngFor="let offer of offer_types | async">
-
+      
       <p>{{offer.title}}</p>
       <p>({{offer.base}})</p>
-
+      
       <span style="cursor: pointer" (click)="edit_type(offer)" >
         <mat-icon aria-hidden="false" aria-label="edit icon" title="Edit">edit</mat-icon>
       </span>
-
+      
       <span style="cursor: pointer" (click)="copy_type(offer)">
         <mat-icon aria-hidden="false" aria-label="copy icon" title="Copy">file_copy</mat-icon>
       </span>
-
+      
       <span style="cursor: pointer" (click)="delete_type(offer)">
         <mat-icon aria-hidden="false" aria-label="delete icon" title="Delete">delete</mat-icon>
       </span>
     </div>
-
+    
     <br/>
-
+    
     <button mat-stroked-button (click)="move_step(2)">Create New</button>
   </div>
-
+  
   <!-- Second screen: select base to create new -->
   <div *ngIf="step == 2">
-
+    
     <h2>Select base to use:</h2>
     <mat-spinner *ngIf="bases.length == 0"></mat-spinner>
-
+    
     <div class="added_item" *ngFor="let base of bases" (click)="choose_base(base)">
       <p>{{base.title}}</p>
     </div>
   </div>
-
+  
   <!-- Spinner -->
   <mat-spinner style="position: absolute" *ngIf="video_url && !video"></mat-spinner>
-
+  
   <!-- Configure chosen base video -->
   <div [hidden]="!video_url">
-
-      <div id="video">
-        <video #vd1 *ngIf="video_url" class="video" (canplay)="on_video_loaded(vd1)" muted>
-          <source [src]="video_url" type="video/mp4">
+    
+    <div id="video">
+      <video #vd1 *ngIf="video_url" class="video" (canplay)="on_video_loaded(vd1)" muted>
+        <source [src]="video_url" type="video/mp4">
         </video>
+        
+        <!-- Items on screen -->
+        <div *ngFor="let el of text_elements">
+          <div
+          id="{{el.id}}"
+          innerHTML={{el.content}}
+          draggable="true"
+          [ngStyle]="{
+            'color': el.color,
+            'font-size': el.size + 'px',
+            'font-family': el.font_family,
+            'text-align': el.align,
+            'position': 'absolute',
+            'line-height': el.size * 1.2 + 'px',
+            'top': '300px',
+            'left': '300px',
+            'transform': 'rotate(' + el.angle + 'deg)',
+            'visibility': 'hidden'
+          }"
+          >{{el.content}}</div>
+        </div>
+        
+        <div *ngFor="let el of image_elements">
+          <img
+          id="{{el.id}}"
+          src={{el.content}}
+          width={{el.width}}
+          height={{el.height}}
+          draggable="true"
+          [ngStyle]="{
+            'position': 'absolute',
+            'top': '300px',
+            'left': '300px',
+            'transform': 'rotate(' + el.angle + 'deg)',
+            'visibility': 'hidden'
+          }"/>
+        </div>
       </div>
-
+      
       <br><br>
-
+      
       <!-- Offer Type -->
       <mat-form-field class="example-full-width">
         <mat-label>Title</mat-label>
         <input [(ngModel)]="offer_type.title" matInput [disabled]="locked_name">
       </mat-form-field>
-
+      
       <!-- Add New Items -->
       <h2>Add New Item (double-click to delete)</h2>
-
+      
       <!-- Choose type -->
       <mat-form-field>
         <mat-label>Insert new</mat-label>
@@ -72,7 +109,7 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
-
+      
       <!-- Choose field -->
       <mat-form-field *ngIf="config.type">
         <mat-label>Field</mat-label>
@@ -82,24 +119,24 @@
           </mat-option>
         </mat-select>
       </mat-form-field>
-
+      
       <!-- Content to place on top of video -->
       <mat-form-field *ngIf="config.field">
-          <mat-label>Value</mat-label>
-          <mat-select [(ngModel)]="content" (selectionChange)="select_example(content)">
-            <mat-option *ngFor="let content of contents" [value]="content">
-              {{is_image(content.value) ? content.value.split('/').pop() : content.value}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
+        <mat-label>Value</mat-label>
+        <mat-select [(ngModel)]="content" (selectionChange)="select_example(content)">
+          <mat-option *ngFor="let content of contents" [value]="content">
+            {{is_image(content.value) ? content.value.split('/').pop() : content.value}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      
       <br/>
-
+      
       <!-- Text -->
       <div *ngIf="config.key">
-
+        
         <div *ngIf="!is_image(content.value)">
-
+          
           <mat-form-field>
             <mat-label>Font</mat-label>
             <mat-select [(ngModel)]="config.font">
@@ -108,21 +145,21 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
-
+          
           <input [(ngModel)]="config.color"
           [style.background]="config.color"
           [(colorPicker)]="config.color"/>
-
+          
           <mat-form-field class="example-full-width">
             <mat-label>Font size</mat-label>
             <input [(ngModel)]="config.size" type="number" matInput placeholder="size">
           </mat-form-field>
-
+          
           <mat-form-field class="example-full-width">
             <mat-label>Width (letters)</mat-label>
             <input [(ngModel)]="config.width" type="number" matInput placeholder="width">
           </mat-form-field>
-
+          
           <mat-form-field>
             <mat-label>Align</mat-label>
             <mat-select [(ngModel)]="config.align" value="center">
@@ -131,30 +168,30 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
-
+          
           <mat-form-field class="example-full-width">
             <mat-label>Angle</mat-label>
             <input [(ngModel)]="config.angle" type="number" matInput placeholder="angle">
           </mat-form-field>
-
+          
           <br/>
-
+          
           <button mat-stroked-button (click)="create_text()">Insert Text</button>
         </div>
-
+        
         <!-- Image -->
         <div *ngIf="is_image(content.value)">
-
+          
           <mat-form-field class="example-full-width">
             <mat-label>Width</mat-label>
             <input [(ngModel)]="config.width" type="number" matInput placeholder="width">
           </mat-form-field>
-
+          
           <mat-form-field class="example-full-width">
             <mat-label>Height</mat-label>
             <input [(ngModel)]="config.height" type="number" matInput placeholder="height">
           </mat-form-field>
-
+          
           <mat-form-field>
             <mat-label>Align</mat-label>
             <mat-select [(ngModel)]="config.align">
@@ -163,53 +200,18 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
-
+          
           <br/>
-
+          
           <button mat-stroked-button (click)="create_image()">Insert Image</button>
         </div>
       </div>
-
+      
       <br/><br/>
-
+      
       <button mat-stroked-button (click)="finish()">Save</button>
-
-      <!-- Items on screen -->
-      <div *ngFor="let el of text_elements">
-        <div
-        id="{{el.id}}"
-        innerHTML={{el.content}}
-        draggable="true"
-        [ngStyle]="{
-          'color': el.color,
-          'font-size': el.size + 'px',
-          'font-family': el.font_family,
-          'text-align': el.align,
-          'position': 'absolute',
-          'line-height': el.size * 1.2 + 'px',
-          'top': '500px',
-          'left': '700px',
-          'transform': 'rotate(' + el.angle + 'deg)',
-          'visibility': 'hidden'
-        }"
-        >{{el.content}}</div>
-      </div>
-
-      <div *ngFor="let el of image_elements">
-        <img
-        id="{{el.id}}"
-        src={{el.content}}
-        width={{el.width}}
-        height={{el.height}}
-        draggable="true"
-        [ngStyle]="{
-          'position': 'absolute',
-          'top': '500px',
-          'left': '700px',
-          'transform': 'rotate(' + el.angle + 'deg)',
-          'visibility': 'hidden'
-        }"/>
-      </div>
-
+      
+      
+      
     </div>
   </div>

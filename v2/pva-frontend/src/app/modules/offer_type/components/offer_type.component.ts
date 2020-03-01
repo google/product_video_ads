@@ -98,8 +98,10 @@ export class OfferTypeComponent implements OnInit {
 
     // To calculate elements positions relative
     this.video_pos = {
-      x: video.offsetLeft, 
-      y: video.offsetTop,
+      x: rect.left, 
+      y: rect.top,
+      offset_x: video.offsetLeft,
+      offset_y: video.offsetTop,
       width: video.videoWidth,
       height: video.videoHeight,
       x_ratio: video.videoWidth/WIDTH,
@@ -289,16 +291,18 @@ export class OfferTypeComponent implements OnInit {
     
     private drop_event(event) {
       
-      var id = event.dataTransfer.getData("text/plain")
-      
+      const id = event.dataTransfer.getData("text/plain")
+      const x = event.clientX - this.video_pos.x
+      const y = event.clientY - this.video_pos.y
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+
       // Element on screen
       const dm = document.getElementById(id)
 
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+      dm.style.left = (this.video_pos.offset_x + x - dm.offsetWidth/2) + 'px';
+      dm.style.top = (this.video_pos.offset_y + y - dm.offsetHeight/2 + scrollTop) + 'px';
 
-      dm.style.left = (event.clientX - dm.offsetWidth/2) + 'px';
-      dm.style.top = (event.clientY - dm.offsetHeight/2 + scrollTop) + 'px';
-
+      // Element saved
       const element = this.elements.filter(e => e.id == id)[0]
     
       // Adjust on align
@@ -310,8 +314,8 @@ export class OfferTypeComponent implements OnInit {
       if (element.align && element.align == 'right')
         align_adjust = -dm.offsetWidth/2
 
-      element.x = ((event.clientX - this.video_pos.x - align_adjust) * this.video_pos.x_ratio).toFixed(0)
-      element.y = ((event.clientY - dm.offsetHeight/2 - this.video_pos.y + scrollTop) * this.video_pos.y_ratio).toFixed(0)
+      element.x = ((x - align_adjust) * this.video_pos.x_ratio).toFixed(0)
+      element.y = ((y - dm.offsetHeight/2 + scrollTop) * this.video_pos.y_ratio).toFixed(0)
       
       event.preventDefault()
       return false
@@ -339,8 +343,8 @@ export class OfferTypeComponent implements OnInit {
         if (element.align == 'right')
           align_adjust = dm.offsetWidth
 
-        dm.style.left = ((parseInt(element.x) - align_adjust) / this.video_pos.x_ratio) + this.video_pos.x + 'px'
-        dm.style.top =  (parseInt(element.y) / this.video_pos.y_ratio) + this.video_pos.y + 'px';
+        dm.style.left = ((parseInt(element.x) - align_adjust) / this.video_pos.x_ratio) + this.video_pos.offset_x + 'px'
+        dm.style.top =  (parseInt(element.y) / this.video_pos.y_ratio) + this.video_pos.offset_y + 'px';
 
       }, interval)
     }
