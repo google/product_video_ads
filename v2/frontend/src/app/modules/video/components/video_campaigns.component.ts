@@ -8,6 +8,7 @@ import { Config } from 'app/models/config';
 import { OfferType } from 'app/models/offertype';
 import { Video } from 'app/models/video';
 import { TitleCasePipe } from '@angular/common';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-video',
@@ -17,7 +18,7 @@ import { TitleCasePipe } from '@angular/common';
 })
 export class VideoCampaignsComponent implements OnInit {
 
-  yt_url = 'https://www.youtube.com/watch?v='
+  yt_url = 'https://www.youtube.com/embed/'
 
   ad_group_types = [
     'TRUE_VIEW_IN_STREAM', 
@@ -42,7 +43,7 @@ export class VideoCampaignsComponent implements OnInit {
   product_keys: Array<any>
   campaign : any = {}
   
-  constructor(private facade : VideoFacade, private _snackBar: MatSnackBar) {
+  constructor(private facade : VideoFacade, private sanitizer: DomSanitizer, private _snackBar: MatSnackBar) {
       this.offer_types = this.facade.offer_types$
       this.videos = this.facade.videos
     }

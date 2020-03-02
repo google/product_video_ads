@@ -10,7 +10,10 @@
   <div style="display: inline-block; margin-right: 1%;" *ngFor="let video of videos | async">
 
     <span class="added_item" *ngIf="video.generated_video && ['Running', 'Video Ready'].indexOf(video.status) >= 0" >
-      <a href="{{yt_url + video.generated_video}}" target="_blank">Video Ready</a>
+      <iframe width="300" height="200" 
+        [src]="sanitizer.bypassSecurityTrustResourceUrl(yt_url + video.generated_video)" frameborder="0" 
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+      </iframe>
     </span>
 
       <span class="added_item" *ngIf="video.status == 'On'">
