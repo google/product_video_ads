@@ -43,6 +43,8 @@ echo -n 'Type the spreadsheet ID: '
 read SPREADSHEET_ID
 export SPREADSHEET_ID=$SPREADSHEET_ID
 
+echo 'Follow to https://product-video-ads-ext.appspot.com and save your token to a Cloud Storage bucket...'
+
 echo -n 'Type the bucket name: '
 read BUCKET_NAME
 export BUCKET_NAME=$BUCKET_NAME

@@ -33,14 +33,14 @@ export class VideoCampaignsComponent implements OnInit {
   videos : Observable<Video[]>
 
   product_groups : Map<string, Product[]>
-  selected_groups : Map<string, object> = new Map<string,object>()
+  selected_groups : Map<string, any> = new Map<string, any>()
   mode : string
   
   // Chosen
   base : Base
   configs : Array<any>
   product_keys: Array<any>
-  campaign : object = {}
+  campaign : any = {}
   
   constructor(private facade : VideoFacade, private _snackBar: MatSnackBar) {
       this.offer_types = this.facade.offer_types$

@@ -26,7 +26,7 @@ export class OfferTypeComponent implements OnInit {
   example_time = {}
   fields : Array<string>
   contents : Array<any>
-  content : object
+  content : any
   elements : Array<any>
   text_elements : Array<any>
   image_elements : Array<any>

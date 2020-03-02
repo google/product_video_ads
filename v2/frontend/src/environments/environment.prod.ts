@@ -3,11 +3,12 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-
+  
   production: true,
 
-  client_id: '$CLIENT_ID',
-  api_key: '$API_KEY',
+  client_id: window['__env'].client_id,
+  api_key: window['__env'].api_key,
+  
   discovery_docs: ["https://sheets.googleapis.com/$discovery/rest?version=v4", "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"],
   scopes: "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive",
   drive_file_prefix: 'https://drive.google.com/uc?export=download&id=',
