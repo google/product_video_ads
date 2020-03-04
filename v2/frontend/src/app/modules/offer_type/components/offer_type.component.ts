@@ -240,8 +240,8 @@ export class OfferTypeComponent implements OnInit {
       
       const words = []
       
-      if (charaters_per_line == 0)
-      return [text]
+      if (charaters_per_line == 0 || text == undefined)
+        return [text]
       
       const all_words = text.split(' ')
       let curr_chars = 0
