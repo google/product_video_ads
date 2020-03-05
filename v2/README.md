@@ -1,1 +1,1 @@
-gsutil cp gs://product-video-ads/install.sh . && sh install.sh
+Run this command on Cloud Shell to start: ```gsutil cp gs://product-video-ads/install.sh . && sh install.sh```

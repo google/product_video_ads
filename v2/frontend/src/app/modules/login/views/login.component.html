@@ -1,5 +1,26 @@
+<!--
+   Copyright 2020 Google LLC
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+   https://www.apache.org/licenses/LICENSE-2.0
+ 
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+
 <h2 class="main_title">Log In</h2>
 <div class="inner_content">
+
+  <img id="pva_logo" src="assets/images/pva.png"/>
+
+  <h1>Welcome to Product Video Ads</h1>
+
   <!-- Input to insert spreadsheet ID -->
   <div *ngIf="ready == -1">
 
@@ -25,10 +46,22 @@
   <!-- Logged in -->
   <div *ngIf="ready == 1">
 
-    <h3>Your spreadsheet is <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}">here</a></h3>
+    <p>
+      <b>Sheet ID:</b> {{sheet_id}}
 
-    <p>There you can create <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}/edit#gid=1565524886">bases</a>, update <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}/edit#gid=1670058881">products</a> and <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}/edit#gid=1412792783">static assets</a></p>
-    <p>Make sure to upload your bases and fonts to your <a target="_blank" href="https://drive.google.com/corp/drive/u/0/folders/{{drive_folder}}">drive folder</a></p>
+      <br/>
+
+      Your configuration spreadsheet is 
+      <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}">here</a>
+
+      <br/>
+
+      Your drive folder is 
+      <a target="_blank" href="https://drive.google.com/corp/drive/u/0/folders/{{drive_folder}}">here</a>
+    </p>
+
+    <!--p>There you can create <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}/edit#gid=1565524886">bases</a>, update <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}/edit#gid=1670058881">products</a> and <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}/edit#gid=1412792783">static assets</a></p>
+    <p>Make sure to upload your bases and fonts to your <a target="_blank" href="https://drive.google.com/corp/drive/u/0/folders/{{drive_folder}}">drive folder</a></p-->
 
     <button mat-stroked-button color="warn" (click)="logout()">Logout</button>
     <button mat-stroked-button color="warn" (click)="reload()">Reload</button>

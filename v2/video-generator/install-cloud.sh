@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# Copyright 2020 Google LLC
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#    https://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 PROJECT_NAME=video-generator:latest
 
 # Enable APIs
@@ -43,12 +57,25 @@ echo -n 'Type the spreadsheet ID: '
 read SPREADSHEET_ID
 export SPREADSHEET_ID=$SPREADSHEET_ID
 
-echo 'Follow to https://product-video-ads-ext.appspot.com and save your token to a Cloud Storage bucket...'
+echo 'Create a OAuth client ID credential with type Other, then press enter to continue...'
+read
 
-echo -n 'Type the bucket name: '
-read BUCKET_NAME
+# Generate auth token
+gsutil cp gs://product-video-ads/video-generator/authenticator.py authenticator.py
+pip install google-auth-oauthlib==0.4.0
+python authenticator.py
+
+# Crete bucket for token
+BUCKET_NAME=$(echo "${SPREADSHEET_ID}-token" | tr '[:upper:]' '[:lower:]')
+
+# Uploads token there
+gsutil mb -b on gs://$BUCKET_NAME/
+echo "Created bucket $BUCKET_NAME to store token"
+gsutil cp token gs://$BUCKET_NAME/
+
+#echo -n 'Type the bucket name: '
+#read BUCKET_NAME
 export BUCKET_NAME=$BUCKET_NAME
-
 export IMAGE_NAME=$IMAGE_NAME
 
 envsubst < video-generator.yaml | kubectl apply -f -
