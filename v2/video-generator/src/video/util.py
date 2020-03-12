@@ -110,7 +110,7 @@ def convert_image_overlay(config, field_value, storage):
   extension = 'jpg' if len(name_extension) < 2 else name_extension[1]
 
   # Save product image to image folder
-  image_path = storage.get_absolute_path(config['type'] + str(config['key']) + extension)
+  image_path = storage.get_absolute_path(config['type'] + str(config['key']) + '.' + extension)
   urllib.urlretrieve(field_value, image_path)
 
   return {
