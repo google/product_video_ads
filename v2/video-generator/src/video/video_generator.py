@@ -187,7 +187,9 @@ class VideoGenerator(object):
     #prepares audio files
     audio_files_index = len(img_overlays)
 
-    audio_args, audio_overlays = self._audio_inputs([], audio_files_index)
+    # forces input audio to output
+    audio_args, audio_overlays = [], [] # self._audio_inputs([], audio_files_index)
+    self.out_audio = '0:a?'
 
     # assets_args
     assets_args = img_args + audio_args
@@ -634,7 +636,11 @@ class VideoGenerator(object):
     extra_end_args += ['-shortest', '-y']  #, '-c:a', 'libfdk_aac']
 
     args = [executable, '-i', input_video] + assets_args
-    args += ['-filter_complex', '%s' % ';'.join(filters)] + extra_end_args
+
+    if filters:
+      args += ['-filter_complex', '%s' % ';'.join(filters)]
+      
+    args += extra_end_args
     args += [output_video]
 
     self.logger.info('Running ffmpeg with args:')

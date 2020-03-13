@@ -34,6 +34,7 @@ export class BasessComponents implements OnInit {
   seconds : any
   product = {'start_time': 0.0, 'end_time': 0.0}
   video
+  video_duration
   video_url
   
   constructor(private router: Router, private facade : BasesFacade, private _snackBar : MatSnackBar) {
@@ -53,6 +54,7 @@ export class BasessComponents implements OnInit {
   on_video_loaded(video) {
     this.video = video
     
+    this.video_duration = video.duration.toFixed(1)
     video.width = 800
     video.height = 450
   }

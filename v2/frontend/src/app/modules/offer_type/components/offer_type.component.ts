@@ -321,6 +321,8 @@ export class OfferTypeComponent implements OnInit {
       // Element saved
       const element = this.elements.filter(e => e.id == id)[0]
     
+    //  console.log(element)
+
       // Adjust on align
       let align_adjust = 0
       
