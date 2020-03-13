@@ -102,8 +102,10 @@ export class OfferTypeComponent implements OnInit {
   /*********** Video controls **********/
   on_video_loaded(video) {
     
-    const WIDTH = 800
-    const HEIGHT = 450
+    const adjust = video.videoWidth / 800
+
+    const WIDTH = video.videoWidth / adjust 
+    const HEIGHT = video.videoHeight / adjust 
 
     this.video = video
 
@@ -118,8 +120,6 @@ export class OfferTypeComponent implements OnInit {
       y: rect.top,
       offset_x: video.offsetLeft,
       offset_y: video.offsetTop,
-      width: video.videoWidth,
-      height: video.videoHeight,
       x_ratio: video.videoWidth/WIDTH,
       y_ratio: video.videoHeight/HEIGHT
     }
