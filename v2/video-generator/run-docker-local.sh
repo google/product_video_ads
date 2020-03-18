@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-CREDENTIALS_FOLDER=/usr/local/google/home/rgodoy/credentials
+CREDENTIALS_FOLDER=$(pwd)/credentials
+#CREDENTIALS_FOLDER=/usr/local/google/home/rgodoy/credentials
+#CREDENTIALS_FOLDER=/Users/rgodoy/credentials
 
 echo 'SPREADSHEET_ID: '
 read SPREADSHEET_ID

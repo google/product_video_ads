@@ -587,6 +587,7 @@ class VideoGenerator(object):
         if is_gif:
           include_args += ['-c:v', 'gif']
 
+        #include_args += ['-analyzeduration', '2147483647', '-probesize', '2147483647']
         include_args += ['-i']
         include_cmd += include_args + ['%s' % (filename)]
 
