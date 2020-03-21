@@ -19,10 +19,12 @@ CREDENTIALS_FOLDER=$(pwd)/credentials
 #CREDENTIALS_FOLDER=/Users/rgodoy/credentials
 
 echo 'SPREADSHEET_ID: '
-read SPREADSHEET_ID
+SPREADSHEET_ID=1yqn2zyCCIluXUEmlMcvCgWxQdTPTaAuherozaFjJzFQ
+#read SPREADSHEET_ID
 
 echo 'Bucket Name:'
-read BUCKET_NAME
+BUCKET_NAME=video-generator
+#read BUCKET_NAME
 
 if [[ "$(docker images -q video-generator:latest 2> /dev/null)" == "" ]]; then
   echo 'Image video-generator:latest not found - You must build it first!'

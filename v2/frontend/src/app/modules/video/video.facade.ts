@@ -38,8 +38,12 @@ export class VideoFacade {
             return this.loginService.ready$
         }
         
-        get bases() {
+        get bases$() {
             return this.basesService.bases$
+        }
+
+        get bases() {
+            return this.basesService.bases
         }
         
         get offer_types$() {

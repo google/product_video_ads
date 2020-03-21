@@ -34,7 +34,7 @@ export class VideoComponent implements OnInit {
   drive_url = 'https://drive.google.com/uc?export=download&id='
   
   // Data to view
-  bases : Observable<Base[]>
+  bases$ : Observable<Base[]>
   products : Observable<Product[]>
   offer_types : Observable<OfferType[]>
   videos : Observable<Video[]>
@@ -54,8 +54,12 @@ export class VideoComponent implements OnInit {
     }
     
     ngOnInit() {
-      this.bases = this.facade.bases
+      this.bases$ = this.facade.bases$
       this.products = this.facade.products
+    }
+
+    is_video(video : Video) {
+      return this.facade.bases.filter(b => b.title == video.base_video)[0].file.endsWith('mp4')
     }
     
     choose_base(base : Base) {

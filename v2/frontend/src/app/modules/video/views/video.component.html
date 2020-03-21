@@ -26,10 +26,14 @@
     <div style="display: inline-block; margin-right: 1%;" *ngFor="let video of videos | async">
 
       <span class="added_item" *ngIf="video.generated_video && video.status == 'Not Started'" >
-        <video width="300" height="200" controls>
+        
+        <video *ngIf="is_video(video)" width="300" height="200" controls>
             <source [src]="drive_url + video.generated_video" type="video/mp4">
         </video>
 
+        <a *ngIf="!is_video(video)" [href]="drive_url + video.generated_video">
+          <img width="300" height="200" [src]="drive_url + video.generated_video"/>
+        </a>
         <span style="cursor: pointer" (click)="delete_video(video)">
           <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
         </span>
@@ -44,9 +48,9 @@
   <!-- Choose base video to configure -->
   <div>
     <h2>Select base to use:</h2>
-    <mat-spinner *ngIf="(bases | async).length == 0"></mat-spinner>
+    <mat-spinner *ngIf="(bases$ | async).length == 0"></mat-spinner>
 
-    <div class="added_item" *ngFor="let base of bases | async " (click)="choose_base(base)">
+    <div class="added_item" *ngFor="let base of bases$ | async " (click)="choose_base(base)">
       <p>{{base.title}}</p>
     </div>
   </div>
@@ -56,7 +60,7 @@
       <h2>Select how do you want to create:</h2>
 
       <div class="added_item" (click)="select_single_video_mode()">
-        <p>Single video</p>
+        <p>Single creation</p>
       </div>
 
       <div class="added_item" (click)="select_bulk_video_mode()">

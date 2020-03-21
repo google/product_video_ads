@@ -63,7 +63,7 @@ export class VideoCampaignsComponent implements OnInit {
     }
     
     ngOnInit() {
-      this.bases = this.facade.bases
+      this.bases = this.facade.bases$
       this.products = this.facade.products
     }
     

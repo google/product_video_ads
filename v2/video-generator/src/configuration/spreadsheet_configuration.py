@@ -79,24 +79,24 @@ class SpreadsheetConfiguration(object):
     self.logger.info('Updating status to %s and video_id to %s to row %s',
                      status, video_id, row)
 
-  def get_all_base_videos(self):
+  def get_all_bases(self):
     """Return will be in the following format:
-
        {
+         'Base Name': 'FileNameInsideDriveFolder.xyz',
+         ...
        }
     """
-    base_videos = dict()
+    bases = dict()
     base_list = self.__get_named_range_values(self.BASE_VIDEOS_NAMED_RANGE)
 
     for video in base_list:
-      base_videos[video[0]] = video[1].split('/')[-1]
+      bases[video[0]] = video[1].split('/')[-1]
 
-    return base_videos
+    return bases
 
   def get_campaign_config(self):
     """Return will be in the following format:
-
-       [configs, base_video_name, status]
+       [configs, base_name, status]
     """
     return map(lambda c: [json.loads(c[0]), c[1], c[2]],
         self.__get_named_range_values(self.CAMPAIGN_NAMED_RANGE)
@@ -110,8 +110,9 @@ class SpreadsheetConfiguration(object):
              'title': 'nice product',
              'price': 120,
              'image': 'https://image/here',
-             ''
-           }
+             ...
+           },
+           ...
         }
     """
 

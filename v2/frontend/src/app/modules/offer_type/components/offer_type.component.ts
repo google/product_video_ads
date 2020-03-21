@@ -49,6 +49,7 @@ export class OfferTypeComponent implements OnInit {
   loaded_fonts : Set<string>
   locked_name = false
   seconds : any
+  is_video : boolean
   video
   video_url
   video_pos
@@ -79,6 +80,7 @@ export class OfferTypeComponent implements OnInit {
   choose_base(base : Base) {
     this.video_url = base.url
     this.offer_type.base = base.title
+    this.is_video = base.file.endsWith('.mp4')
     this.example_time = base.products[0]
     this.move_step(3)
   }
@@ -100,6 +102,27 @@ export class OfferTypeComponent implements OnInit {
   }
   
   /*********** Video controls **********/
+  on_image_loaded(img) {
+
+    this.video = img
+
+    var rect = img.getBoundingClientRect();
+
+    // To calculate elements positions relative
+    this.video_pos = {
+      x: rect.left, 
+      y: rect.top,
+      offset_x: img.offsetLeft,
+      offset_y: img.offsetTop,
+      x_ratio: 1,
+      y_ratio: 1
+    }
+
+    console.log(this.video_pos)
+
+    this.load_elements_on_video()
+  }
+
   on_video_loaded(video) {
     
     const adjust = video.videoWidth / 800
@@ -370,7 +393,7 @@ export class OfferTypeComponent implements OnInit {
     load_elements_on_video() {
 
       // Go to video position
-      if (this.seconds != this.example_time['start_time']) {
+      if (this.example_time && this.seconds != this.example_time['start_time']) {
         this.seconds = this.example_time['start_time']
         this.go_to_second()
       }

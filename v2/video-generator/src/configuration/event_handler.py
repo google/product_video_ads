@@ -19,27 +19,28 @@ import log
 logger = log.getLogger()
 
 
-class VideoHandler():
+class EventHandler():
 
   VIDEO_READY_STATUS = 'Video Ready'
   NOT_STARTED_STATUS = 'Not Started'
   PREVIEW_STATUS = 'Preview'
   HANDLED_STATUS = ['On', 'Paused', 'Preview']
 
-  def __init__(self, configuration, processor):
+  def __init__(self, configuration, video_processor, image_processor):
     self.configuration = configuration
-    self.processor = processor
+    self.video_processor = video_processor
+    self.image_processor = image_processor
 
   def handle_configuration(self):
-    """Generate custom videos according to the given configuration."""
+    """Generate custom videos/images according to the given configuration."""
 
     # All products title, price and image url
     products_data = self.configuration.get_products_data()
 
-    # All base videos name and location
-    base_videos = self.configuration.get_all_base_videos()
+    # All bases name and files
+    base_videos = self.configuration.get_all_bases()
 
-    # All configured ads: product_ids, base video name and status to process
+    # All configured ads: config info, base name and status to process
     campaign_config = self.configuration.get_campaign_config()
 
     # Go through all configured ads
@@ -53,20 +54,29 @@ class VideoHandler():
 
       # Skip header and starts on 1 instead of 0
       row = str(row + 2)
+
+      base_file_name = base_videos.get(base_name)
+
       config = {
-          'base_video': base_videos.get(base_name),
+          'base_file': base_file_name,
           'configs': configs,
           'products_data': products_data
       }
 
+      # Choose the correct processor to do the job (image or video)
+      if base_file_name and base_file_name.endswith('.mp4'):
+        processor = self.video_processor
+      else:
+        processor = self.image_processor
+
       # If it's a Preview status, preview the video only
       if status == self.PREVIEW_STATUS:
-        video_id = self.processor.process_task(row, config, True)
+        result_id = processor.process_task(row, config, True)
         new_status = self.NOT_STARTED_STATUS
       else:
-        video_id = self.processor.process_task(row, config)
+        result_id = processor.process_task(row, config)
         new_status = self.VIDEO_READY_STATUS
 
       # When processed with success, update configuration status
-      if video_id is not None:
-        self.configuration.update_status(row, video_id, new_status)
+      if result_id is not None:
+        self.configuration.update_status(row, result_id, new_status)

@@ -32,6 +32,10 @@ export class BasesFacade {
         return this.service.bases$
     }
 
+    get bases() {
+        return this.service.bases
+    }
+
     update_products(base : Base) {
         this.service.update_products(base.title, base.products)
     }

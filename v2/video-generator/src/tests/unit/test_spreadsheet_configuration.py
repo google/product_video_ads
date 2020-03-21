@@ -27,7 +27,7 @@ def sheets_data():
 
 
 @patch('configuration.spreadsheet_configuration.build')
-def test_get_all_base_videos(mock_build, sheets_data):
+def test_get_all_bases(mock_build, sheets_data):
 
   # Mock imported build for API
   sheets_mock = Mock()
@@ -49,7 +49,7 @@ def test_get_all_base_videos(mock_build, sheets_data):
 
   # Act
   configuration = SpreadsheetConfiguration('spreadsheet_id', 'credentials')
-  all_base_videos = configuration.get_all_base_videos()
+  all_base_videos = configuration.get_all_bases()
 
   # Assert
   assert len(all_base_videos) == 2

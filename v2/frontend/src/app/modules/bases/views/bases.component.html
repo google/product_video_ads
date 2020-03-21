@@ -22,7 +22,7 @@
 
         <div class="added_item" *ngFor="let base of bases | async" >
             <p (click)="choose_base(base)">{{base.title}}</p>
-            <a href="{{base.url}}" target="_blank">Download base video</a>
+            <a href="{{base.url}}" target="_blank">Download base</a>
             <p style="cursor: pointer" (click)="delete_base(base)">
                 <mat-icon aria-hidden="false" aria-label="delete icon" title="Delete">delete</mat-icon>
             </p>
@@ -43,7 +43,7 @@
             </mat-form-field>
 
             <div class="form-group">
-                <input #base_file type="file" id="file" accept=".mp4">
+                <input #base_file type="file" id="file" accept=".mp4,.png,.jpg">
             </div>
 
             <button mat-stroked-button (click)="create_base(base_title.value, base_file.files[0])">Create!</button>

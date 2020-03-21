@@ -45,8 +45,16 @@ export class BasessComponents implements OnInit {
     this.video_url = ''
     this.seconds = 0.0
   }
+
+  is_video_base(file : string) {
+    return file.endsWith('.mp4')
+  }
   
   choose_base(base : Base) {
+
+    if (!this.is_video_base(base.file))
+      return
+
     this.base = base
     this.video_url = base.url
   }
@@ -114,9 +122,18 @@ export class BasessComponents implements OnInit {
       })
 
       this.facade.add_base(title, file.name, response.id).then(response => {
+
         this._snackBar.open("Created: " + response['status'], 'OK', {
           duration: 2000
         })
+
+        // Handle default time to images
+        if (!this.is_video_base(file.name)) {
+          this.base = this.facade.bases.filter(b => b.title == title)[0]
+          this.base.products.push({start_time: 0, end_time: 0})
+          this.finish()
+        }
+
       })
     }).catch(err => {
       this._snackBar.open("Fail: " + err, 'OK', {

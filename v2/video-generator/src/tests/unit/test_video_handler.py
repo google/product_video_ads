@@ -43,7 +43,7 @@ def test_handling_configuration_preview(campaigns_with_preview, base_videos,
   # Arrange
   mock_configuration = Mock()
   mock_configuration.get_campaign_config.return_value = campaigns_with_preview
-  mock_configuration.get_all_base_videos.return_value = base_videos
+  mock_configuration.get_all_bases.return_value = base_videos
   mock_configuration.get_base_config.return_value = base_config
 
   video_id = 't3YQ8H'
@@ -68,7 +68,7 @@ def test_handling_configuration(campaigns, base_videos, base_config):
   # Arrange
   mock_configuration = Mock()
   mock_configuration.get_campaign_config.return_value = campaigns
-  mock_configuration.get_all_base_videos.return_value = base_videos
+  mock_configuration.get_all_bases.return_value = base_videos
   mock_configuration.get_base_config.return_value = base_config
 
   video_id = 't3YQ8H'
@@ -93,7 +93,7 @@ def test_handling_invalid_configuration():
   mock_configuration.get_campaign_config.return_value = [
       ['', 'Base2', VideoHandler.HANDLED_STATUS[0]]
   ]
-  mock_configuration.get_all_base_videos.return_value = {}
+  mock_configuration.get_all_bases.return_value = {}
   mock_configuration.get_base_config.return_value = {}
 
   mock_processor = Mock()

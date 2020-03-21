@@ -16,15 +16,23 @@
 
 import os
 import time
+import log
 from authentication.cloud_storage_token import CloudStorageToken as CredsStorage
 from authentication.token_auth import TokenAuth
 from configuration.spreadsheet_configuration import SpreadsheetConfiguration as Configuration
-import log
 from storage.drive_storage_handler import DriveStorageHandler as StorageHandler
-from uploader.youtube_upload import YoutubeUploader as Uploader
-from video.video_generator import VideoGenerator as VideoGenerator
-from video.video_handler import VideoHandler as VideoHandler
+
+# Handle "events" from configuration
+from configuration.event_handler import EventHandler as EventHandler
+
+# Handles image processing
+from image.image_processor import ImageProcessor as ImageProcessor
+from image.image_generator import ImageGenerator as ImageGenerator
+
+# Handles video processing
 from video.video_processor import VideoProcessor as VideoProcessor
+from video.video_generator import VideoGenerator as VideoGenerator
+from uploader.youtube_upload import YoutubeUploader as Uploader
 
 logger = log.getLogger()
 
@@ -58,10 +66,11 @@ def main():
   # Dependencies
   configuration = Configuration(spreadsheet_id, credentials)
   storage = StorageHandler(configuration.get_drive_folder(), credentials)
-  processor = VideoProcessor(storage, VideoGenerator(), Uploader(credentials))
+  video_processor = VideoProcessor(storage, VideoGenerator(), Uploader(credentials))
+  image_processor = ImageProcessor(storage, ImageGenerator())
 
   # Handler acts as facade
-  handler = VideoHandler(configuration, processor)
+  handler = EventHandler(configuration, video_processor, image_processor)
 
   while True:
 

@@ -63,9 +63,16 @@
   <div [hidden]="!video_url">
     
     <div id="video">
-      <video #vd1 *ngIf="video_url" class="video" (canplay)="on_video_loaded(vd1)" muted>
-        <source [src]="video_url" type="video/mp4">
+
+      <div *ngIf="is_video">
+        <video #vd1 *ngIf="video_url" class="video" (canplay)="on_video_loaded(vd1)" muted>
+          <source [src]="video_url" type="video/mp4">
         </video>
+      </div>
+
+      <div *ngIf="!is_video">
+        <img #vd1 *ngIf="video_url" (load)="on_image_loaded(vd1)" [src]="video_url"/>
+      </div>
         
         <!-- Items on screen -->
         <div *ngFor="let el of text_elements">
