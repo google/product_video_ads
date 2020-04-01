@@ -23,7 +23,7 @@ SPREADSHEET_ID=1yqn2zyCCIluXUEmlMcvCgWxQdTPTaAuherozaFjJzFQ
 #read SPREADSHEET_ID
 
 echo 'Bucket Name:'
-BUCKET_NAME=video-generator
+BUCKET_NAME=video-generator-test-123
 #read BUCKET_NAME
 
 if [[ "$(docker images -q video-generator:latest 2> /dev/null)" == "" ]]; then

@@ -73,7 +73,7 @@ export class VideoFacade {
                     let new_config = {...config}
                     
                     if (new_config.type == 'product')
-                    new_config.key = product_keys[i]
+                        new_config.key = product_keys[i]
                     
                     new_config.start_time = base.products[i].start_time
                     new_config.end_time = base.products[i].end_time
@@ -111,14 +111,15 @@ export class VideoFacade {
             return this.videoService.add_production_video(final_configs, base.title, campaign)
         }
         
-        get_available_groups_for_base() : Map<string, Product[]> {
+        get_available_groups_for_base(base_title : string) : Map<string, Product[]> {
             
             const groups : Map<string, Product[]> = new Map<string, Product[]>()
-            
+            const offer_types = this.offerTypeService.offer_types.filter(o => o.base == base_title).map(o => o.title)
+
             for(let product of this.productsService.products) {
                 
-                if (!product.group)
-                continue
+                if (!product.group || offer_types.indexOf(product.offer_type) < 0)
+                    continue
                 
                 const group_products = groups.get(product.group) || []
                 group_products.push(product)
@@ -133,7 +134,7 @@ export class VideoFacade {
             const offer_types = this.offerTypeService.offer_types.filter(o => o.title == offer_type_title && o.base == base_title)
             
             if (offer_types.length == 0)
-            return []
+                return []
             
             return offer_types[0].configs
         }

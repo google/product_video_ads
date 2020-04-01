@@ -72,6 +72,7 @@ export class VideoCampaignsComponent implements OnInit {
       this.product_keys = new Array(base.products.length)
 
       this.base = base
+      this.mode = ''
     }
 
     select_single_video_mode() {
@@ -79,7 +80,7 @@ export class VideoCampaignsComponent implements OnInit {
     }
 
     select_bulk_video_mode() {
-      this.product_groups = this.facade.get_available_groups_for_base()
+      this.product_groups = this.facade.get_available_groups_for_base(this.base.title)
       this.mode = 'bulk'
     }
 

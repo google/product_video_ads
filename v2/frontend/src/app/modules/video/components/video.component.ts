@@ -67,6 +67,7 @@ export class VideoComponent implements OnInit {
       this.product_keys = new Array(base.products.length)
 
       this.base = base
+      this.mode = ''
     }
 
     select_single_video_mode() {
@@ -74,7 +75,7 @@ export class VideoComponent implements OnInit {
     }
 
     select_bulk_video_mode() {
-      this.product_groups = this.facade.get_available_groups_for_base()
+      this.product_groups = this.facade.get_available_groups_for_base(this.base.title)
       this.mode = 'bulk'
     }
 
@@ -96,6 +97,15 @@ export class VideoComponent implements OnInit {
         this.selected_groups.delete(group)
     }
 
+    check_all(element) {
+
+      this.selected_groups.clear()
+
+      if (element.checked)
+        for (let group of this.product_groups.keys())
+          this.selected_groups.add(group)
+    }
+
     create_bulk() {
 
       for(let group of this.selected_groups) {
@@ -111,7 +121,7 @@ export class VideoComponent implements OnInit {
         this.add_video()
       }
 
-      this._snackBar.open('Created ' + this.selected_groups.size + ' videos!', 'OK', { duration: 4000 })
+      this._snackBar.open('Videos scheduled for creation!', 'OK', { duration: 4000 })
     }
 
     update_video() {
