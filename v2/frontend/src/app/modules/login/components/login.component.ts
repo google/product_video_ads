@@ -17,6 +17,7 @@
 import { Component, OnInit } from '@angular/core';
 import { LoginFacade } from '../login.facade';
 import { Observable } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -38,12 +39,17 @@ export class LoginComponent implements OnInit {
   sheet_id : Observable<string>
   drive_folder : Observable<string>
 
-  constructor(private loginFacade : LoginFacade) {}
+  constructor(private loginFacade : LoginFacade, private route : ActivatedRoute) {}
 
   ngOnInit() {
     this.ready = this.loginFacade.ready
     this.sheet_id = this.loginFacade.sheet_id
     this.drive_folder = this.loginFacade.drive_folder
+
+    const query_sheey_id = this.route.snapshot.queryParamMap.get('sheet_id')
+
+    if (query_sheey_id)
+      this.login(query_sheey_id)
   }
 
   login(sheet_id) {

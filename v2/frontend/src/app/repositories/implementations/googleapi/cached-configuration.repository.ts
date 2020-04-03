@@ -48,11 +48,13 @@ export class CachedConfigurationRepository extends ConfigurationRepository {
     }
 
     async load_assets() : Promise<Asset[]> {
-        return (await this.load_data<Asset[]>(environment.local_storage_keys.static_assets, super.load_assets.bind(this)))
+        return await super.load_assets()
+        // return (await this.load_data<Asset[]>(environment.local_storage_keys.static_assets, super.load_assets.bind(this)))
     }
 
     async load_products() : Promise<Product[]> {
-        return (await this.load_data<Product[]>(environment.local_storage_keys.products, super.load_products.bind(this)))
+        return await super.load_products()
+        // return (await this.load_data<Product[]>(environment.local_storage_keys.products, super.load_products.bind(this)))
     }
 
     async load_videos() : Promise<Video[]> {
