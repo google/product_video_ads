@@ -26,6 +26,7 @@ import { ActivatedRoute } from '@angular/router';
           [ready]='ready | async'
           [sheet_id]='sheet_id | async'
           [drive_folder]='drive_folder | async'
+          [sheet_text]='sheet_text'
           (onlogin)='login($event)'
           (onlogout)='logout()'
           (onreload)='reload()'>
@@ -39,6 +40,8 @@ export class LoginComponent implements OnInit {
   sheet_id : Observable<string>
   drive_folder : Observable<string>
 
+  sheet_text : string = ''
+
   constructor(private loginFacade : LoginFacade, private route : ActivatedRoute) {}
 
   ngOnInit() {
@@ -46,10 +49,10 @@ export class LoginComponent implements OnInit {
     this.sheet_id = this.loginFacade.sheet_id
     this.drive_folder = this.loginFacade.drive_folder
 
-    const query_sheey_id = this.route.snapshot.queryParamMap.get('sheet_id')
+    const query_sheet_id = this.route.snapshot.queryParamMap.get('sheet_id')
 
-    if (query_sheey_id)
-      this.login(query_sheey_id)
+    if (query_sheet_id)
+      this.sheet_text = query_sheet_id
   }
 
   login(sheet_id) {

@@ -28,13 +28,14 @@ export class LoginPresentation {
   @Input() ready : number
   @Input() sheet_id : string
   @Input() drive_folder : string
+  @Input() sheet_text : string
 
   @Output() onlogin = new EventEmitter<string>()
   @Output() onlogout = new EventEmitter()
   @Output() onreload = new EventEmitter()
 
-  login(sheet_id) {
-    this.onlogin.emit(sheet_id)
+  login() {
+    this.onlogin.emit(this.sheet_text)
   }
 
   logout() {

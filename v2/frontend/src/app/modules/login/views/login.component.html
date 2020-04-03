@@ -33,9 +33,9 @@
 
     <span><b>Insert your spreadsheet ID to begin:</b></span>
     <br/>
-    <input #sheet type="text" size="45" (keyup)="0">
+    <input type="text" size="45" (keyup)="0" [value]="sheet_text">
     <br/>
-    <input type="button" [disabled]="!sheet.value" value="Start" (click)="login(sheet.value)"/>
+    <input type="button" [disabled]="!sheet_text" value="Start" (click)="login(sheet_text)"/>
   </div>
 
   <!-- Spinner waiting for APIs to return -->
