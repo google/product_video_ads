@@ -15,6 +15,9 @@ export const environment = {
 
   sheet_id: 'sheet_id',
 
+  template_drive_folder: '1fG2pUo5obYJDkZmyoxhjVc_h9-WuW5Xr',
+  template_sheet_id: '1yqn2zyCCIluXUEmlMcvCgWxQdTPTaAuherozaFjJzFQ',
+
   local_storage_keys: {
     products: 'products',
     static_assets: 'static_assets',

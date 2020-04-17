@@ -45,4 +45,8 @@ export class LoginFacade {
     reload() {
         this.loginService.reload()
     }
+
+    generate_new() {
+        this.loginService.generate_new()
+    }
 }

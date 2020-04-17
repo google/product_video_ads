@@ -14,16 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-gsutil cp -r gs://product-video-ads/frontend/dist .
+gsutil -m cp -r gs://product-video-ads/frontend/dist .
 gsutil cp gs://product-video-ads/frontend/app.yaml app.yaml
 
-echo 'Create a OAuth client ID credential with type Web'
-echo 'Add authorized URI https://your-cloud-project-name.appspot.com, replacing your-cloud-project-name'
-echo "Also create an API Key to be used on Web frontend"
-echo 'When done, press enter to continue...'
-read
+echo -n 'Type the project name: '
+read CLOUD_PROJECT_NAME
 
-echo -n 'Type the Client ID: '
+gcloud config set project $CLOUD_PROJECT_NAME
+gcloud config list
+
+echo 'Enabling some needed APIs...'
+gcloud services enable drive.googleapis.com
+gcloud services enable sheets.googleapis.com
+
+echo 'Installing Web Frontend on App Engine...'
+
+echo -n 'Type the (OAuth Web) Client ID: '
 read FRONTEND_CLIENT_ID
 export FRONTEND_CLIENT_ID=$FRONTEND_CLIENT_ID
 
@@ -36,3 +42,4 @@ envsubst < dist/assets/js/env.js.orig > dist/assets/js/env.js
 rm dist/assets/js/env.js.orig
 
 gcloud app deploy
+gcloud app browse

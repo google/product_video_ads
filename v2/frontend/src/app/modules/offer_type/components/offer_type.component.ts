@@ -89,6 +89,8 @@ export class OfferTypeComponent implements OnInit {
     this.offer_type = {...offer_type}
     this.choose_base(this.bases.filter(b => b.title == offer_type.base)[0])
     this.locked_name = true
+
+    window.addEventListener('scroll', this.block_scroll)
   }
 
   copy_type(offer_type : OfferType) {
@@ -147,9 +149,11 @@ export class OfferTypeComponent implements OnInit {
       y_ratio: video.videoHeight/HEIGHT
     }
 
-    console.log(this.video_pos)
-
     this.load_elements_on_video()
+  }
+
+  block_scroll() {
+    window.scrollTo(0,0)
   }
 
   play_pause() {
@@ -331,6 +335,10 @@ export class OfferTypeComponent implements OnInit {
     private drop_event(event) {
       
       const id = event.dataTransfer.getData("text/plain")
+
+      if (!id)
+        return
+
       const x = event.clientX - this.video_pos.x
       const y = event.clientY - this.video_pos.y
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop
@@ -344,8 +352,6 @@ export class OfferTypeComponent implements OnInit {
       // Element saved
       const element = this.elements.filter(e => e.id == id)[0]
     
-    //  console.log(element)
-
       // Adjust on align
       let align_adjust = 0
       
@@ -427,6 +433,10 @@ export class OfferTypeComponent implements OnInit {
       }
 
       this.offer_type.configs = []
+
+      setTimeout(() => {
+        window.removeEventListener('scroll', this.block_scroll)
+      }, 1000)
     }
     
     private delete_element(event) {

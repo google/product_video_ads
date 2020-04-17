@@ -105,4 +105,23 @@ export class LoginService {
         this.repository.clear_cache()
         this.emit_status_event(-1)
     }
+
+    async generate_new() {
+
+        this.emit_status_event(0)
+
+        const generated_sheet_id = await this.googleApi.copy_spreadsheet(environment.template_sheet_id)
+        console.log('New copied sheet_id: ' + generated_sheet_id)
+
+        const generated_drive_folder = await this.googleApi.copy_drive_folder(environment.template_drive_folder, 'PVA')
+        console.log('New copied drive folder: ' + generated_drive_folder)
+
+        // Set drive folder ID to new spreadsheet
+        await this.googleApi.save_values([{
+            range: environment.configuration.drive_folder,
+            values: [[generated_drive_folder]]
+          }], generated_sheet_id)
+
+        this.login(generated_sheet_id)
+    }
 }

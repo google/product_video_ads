@@ -16,6 +16,14 @@
 
 PROJECT_NAME=video-generator:latest
 
+echo 'About to install Video Generator on Kubernetes Engine...'
+
+echo -n 'Type the project name: '
+read CLOUD_PROJECT_NAME
+
+gcloud config set project $CLOUD_PROJECT_NAME
+gcloud config list
+
 # Enable APIs
 echo 'Enabling APIs...'
 gcloud services enable drive.googleapis.com
@@ -26,7 +34,8 @@ gcloud services enable container.googleapis.com
 
 # Create cluster
 echo 'Creating cluster video-generator-cluster on Google Kubernetes Engine...'
-gcloud container clusters create video-generator-cluster --num-nodes=1 \
+gcloud container clusters create video-generator-cluster \
+--num-nodes=1 \
 --zone us-west1-a \
 --no-enable-autoupgrade \
 --scopes=https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/youtube.upload,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/devstorage.read_write
@@ -57,13 +66,13 @@ echo -n 'Type the spreadsheet ID: '
 read SPREADSHEET_ID
 export SPREADSHEET_ID=$SPREADSHEET_ID
 
-echo 'Create a OAuth client ID credential with type Other, then press enter to continue...'
+echo 'Create a OAuth client ID credential with type Other/Desktop, then press enter to continue...'
 read
 
 # Generate auth token
 gsutil cp gs://product-video-ads/video-generator/authenticator.py authenticator.py
-pip install google-auth-oauthlib==0.4.0
-python authenticator.py
+pip3 install google-auth-oauthlib==0.4.0
+python3 authenticator.py
 
 # Crete bucket for token
 BUCKET_NAME=$(echo "${SPREADSHEET_ID}-token" | tr '[:upper:]' '[:lower:]')

@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { LoginFacade } from '../login.facade';
 
 @Component({
@@ -23,7 +23,7 @@ import { LoginFacade } from '../login.facade';
   styleUrls: ['../views/login.component.scss'],
   providers: [ LoginFacade ]
 })
-export class LoginPresentation {
+export class LoginPresentation implements OnInit {
 
   @Input() ready : number
   @Input() sheet_id : string
@@ -33,9 +33,16 @@ export class LoginPresentation {
   @Output() onlogin = new EventEmitter<string>()
   @Output() onlogout = new EventEmitter()
   @Output() onreload = new EventEmitter()
+  @Output() ongeneratenew = new EventEmitter()
+
+  sheet : string
+
+  ngOnInit() {
+    this.sheet = this.sheet_text
+  }
 
   login() {
-    this.onlogin.emit(this.sheet_text)
+    this.onlogin.emit(this.sheet)
   }
 
   logout() {
@@ -44,5 +51,9 @@ export class LoginPresentation {
 
   reload() {
     this.onreload.emit()
+  }
+
+  generate_one() {
+    this.ongeneratenew.emit()
   }
 }

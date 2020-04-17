@@ -14,27 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-echo -n 'Type the project name: '
-read CLOUD_PROJECT_NAME
-
-gcloud config set project $CLOUD_PROJECT_NAME
-gcloud config list
-
-sleep 10
-
 # Install frontend
-echo 'Installing Web Frontend on App Engine...'
 gsutil cp gs://product-video-ads/frontend/install-cloud.sh install-frontend.sh
-
-echo 'Enabling some needed APIs...'
-gcloud services enable drive.googleapis.com
-gcloud services enable sheets.googleapis.com
-
 sh install-frontend.sh
 
 # Install video generator
-echo 'About to install Video Generator on Kubernetes Engine...'
-echo "Obtain a sheet ID before moving forward: https://$CLOUD_PROJECT_NAME.appspot.com"
-read
 gsutil cp gs://product-video-ads/video-generator/install-cloud.sh install-video-generator.sh
 sh install-video-generator.sh

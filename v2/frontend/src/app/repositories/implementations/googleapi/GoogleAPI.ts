@@ -20,6 +20,8 @@ import { environment } from 'environments/environment'
 @Injectable({providedIn: 'root'})
 export class GoogleAPI {
   
+  FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder'
+
   private gapi : any
   private sheet_id : string
   
@@ -82,16 +84,18 @@ export class GoogleAPI {
     return response.result.values
   }
   
-  async save_values(data : Array<any>) : Promise<any> {
+  async save_values(data : Array<any>, sheet? : string) : Promise<any> {
     
+    sheet = sheet || this.sheet_id
+
     // Clear values first
     await this.gapi.client.sheets.spreadsheets.values.batchClear({
-      spreadsheetId: this.sheet_id,  
+      spreadsheetId: sheet,  
       ranges: data.map(d => d.range)
     })
     
     return this.gapi.client.sheets.spreadsheets.values.batchUpdate({
-      spreadsheetId: this.sheet_id,  
+      spreadsheetId: sheet,  
       resource: {
         data: data,
         valueInputOption: 'RAW'
@@ -166,5 +170,56 @@ export class GoogleAPI {
         })
       }
     })
+  }
+
+  /** Copy drive folder and spreadsheet for first time **/
+  async copy_spreadsheet(sheet_id : string) {
+
+    const response = await this.gapi.client.drive.files.copy({
+      fileId: sheet_id,
+      fields: 'id'
+    })
+
+    return response.result.id
+  }
+
+  async copy_drive_folder(folder_id : string, name : string, parent_folder_id? : string) {
+
+    // Create new folder
+    const response = await this.gapi.client.drive.files.create({
+      resource: {
+        'name': name,
+        'parents': parent_folder_id ? [parent_folder_id] : [],
+        'mimeType': 'application/vnd.google-apps.folder'
+      },
+      fields: 'id'
+    })
+
+    const response_folder_id = response.result.id
+
+    // Copy all folders and files
+    const resp = await this.gapi.client.drive.files.list({
+      q: "'" + folder_id + "' in parents and trashed = false",
+      fields: 'files(id, mimeType, name)'
+    })
+      
+    resp.result.files.forEach(async f => {
+
+      if (f.mimeType == this.FOLDER_MIME_TYPE)
+        this.copy_drive_folder(f.id, f.name, response.result.id)
+      else {
+
+        console.log('creating ' + f.name + ' inside ' + response_folder_id)
+
+        const r = await this.gapi.client.drive.files.copy({
+          fileId: f.id,
+          parents: [response_folder_id]
+        })
+
+        console.log(r)
+      }
+    })
+
+    return response_folder_id
   }
 }

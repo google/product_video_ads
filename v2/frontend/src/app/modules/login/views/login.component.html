@@ -24,18 +24,22 @@
   <!-- Input to insert spreadsheet ID -->
   <div *ngIf="ready == -1">
 
-    <h2>Steps to use this solution:</h2>
+    <div>
+      <span><b>Insert your spreadsheet ID to login:</b></span>
+      <br/>
+      <input type="text" size="45" (keyup)="0" [(ngModel)]="sheet">
+      <br/>
+      <input type="button" value="Start" (click)="login()"/>
+    </div>
 
-    <p>1. Create a drive folder, and inside it, create three folders: <b>base_videos, fonts and preview</b></p>
-    <p>2. Make a copy of <a href="https://docs.google.com/spreadsheets/d/1piL-0-LrbpZZJ9xG1IY6ZOhktYvQ96hgQnPK4Y4tVac/edit#gid=6031590" target="_blank">this</a> spreadsheet</p>
-    <p>3. On field <b>DriveConfigFolder</b> insert the ID of your folder created on step 1</p>
-    <p>4. To begin, insert your spreadsheet ID bellow and you're good to go!</p>
+    <br/>
 
-    <span><b>Insert your spreadsheet ID to begin:</b></span>
-    <br/>
-    <input type="text" size="45" (keyup)="0" [value]="sheet_text">
-    <br/>
-    <input type="button" [disabled]="!sheet_text" value="Start" (click)="login(sheet_text)"/>
+    <div>
+      <span><b>Or if it's your first time:</b></span>
+      <br/>
+
+      <button (click)="generate_one()">Generate new one</button>
+    </div>
   </div>
 
   <!-- Spinner waiting for APIs to return -->

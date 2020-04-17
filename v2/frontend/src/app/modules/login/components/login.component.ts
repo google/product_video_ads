@@ -29,7 +29,8 @@ import { ActivatedRoute } from '@angular/router';
           [sheet_text]='sheet_text'
           (onlogin)='login($event)'
           (onlogout)='logout()'
-          (onreload)='reload()'>
+          (onreload)='reload()'
+          (ongeneratenew)='generate_new()'>
       </login-view>
   `,
   providers: [ LoginFacade ]
@@ -55,8 +56,8 @@ export class LoginComponent implements OnInit {
       this.sheet_text = query_sheet_id
   }
 
-  login(sheet_id) {
-    this.loginFacade.login(sheet_id)
+  login(sheet) {
+    this.loginFacade.login(sheet)
       .catch(e => alert('Fail to load:' + e))
   }
 
@@ -66,5 +67,9 @@ export class LoginComponent implements OnInit {
 
   reload() {
     this.loginFacade.reload()
+  }
+
+  generate_new() {
+    this.loginFacade.generate_new()
   }
 }

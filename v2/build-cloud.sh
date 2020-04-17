@@ -17,7 +17,6 @@
 gsutil cp install.sh gs://product-video-ads/
 
 gsutil cp logo.png gs://product-video-ads/
-gsutil acl ch -u AllUsers:R gs://product-video-ads/logo.png
-
 gsutil cp bar.png gs://product-video-ads/
-gsutil acl ch -u AllUsers:R gs://product-video-ads/bar.png
+
+gsutil iam ch allUsers:objectViewer gs://product-video-ads
