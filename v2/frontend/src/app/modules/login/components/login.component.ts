@@ -58,7 +58,6 @@ export class LoginComponent implements OnInit {
 
   login(sheet) {
     this.loginFacade.login(sheet)
-      .catch(e => alert('Fail to load:' + e))
   }
 
   logout() {

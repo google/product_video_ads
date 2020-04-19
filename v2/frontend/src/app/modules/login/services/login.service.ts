@@ -50,19 +50,15 @@ export class LoginService {
                 private googleApi : GoogleAPI,
                 private repository : CachedConfigurationRepository) {
         
-        // Load sheet ID from cache
-        this._sheet_id.next(localStorage.getItem(environment.sheet_id))
-        
         // Load and authenticate Google API
-        googleApi.load(this.sheet_id, this.load.bind(this))
+        googleApi.load(this.on_login.bind(this))
     }
     
-    private async load() : Promise<string> {
+    private async load(sheet_id) : Promise<string> {
     
-        if (this.sheet_id == null || !this.googleApi.is_logged_in()) {
-            this.emit_status_event(-1)
-            return
-        }
+        // Set received sheet
+        this._sheet_id.next(sheet_id)
+        this.googleApi.sheet_id = sheet_id
 
         // Loading...
         this.emit_status_event(0)
@@ -70,7 +66,6 @@ export class LoginService {
         try {
             // Brief validation to check if sheet exists
             this._drive_folder.next(await this.repository.load_drive_folder())
-
             this.emit_status_event(1)
         } catch (e) {
             this.emit_status_event(-1)
@@ -84,19 +79,27 @@ export class LoginService {
     private emit_status_event(status) {
         this.ngZone.run(() => this._ready.next(status))
     }
+
+    on_login() : void {
+
+        // Load sheet ID from cache
+        const loaded_sheet = localStorage.getItem(environment.sheet_id)
+
+        if (loaded_sheet) {
+            this.load(loaded_sheet)
+        } else {
+            this.emit_status_event(-1)
+        }
+    }
     
-    login(sheet_id) : Promise<string> {
-
-        this._sheet_id.next(sheet_id)
+    login(sheet_id) : void{
         localStorage.setItem(environment.sheet_id, sheet_id)
-
-        this.googleApi.login(sheet_id)
-        return this.load()
+        this.load(sheet_id)
     }
 
     reload() {
         this.repository.clear_cache()
-        this.load()
+        this.load(this.sheet_id)
     }
     
     logout() {

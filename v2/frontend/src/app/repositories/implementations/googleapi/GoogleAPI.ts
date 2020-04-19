@@ -23,11 +23,9 @@ export class GoogleAPI {
   FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder'
 
   private gapi : any
-  private sheet_id : string
+  public sheet_id : string
   
-  load(sheet_id : string, callback : Function) {
-    
-    this.sheet_id = sheet_id
+  load(on_login : Function) {
     
     // Callback called when GAPI loaded
     window['googleSDKLoaded'] = () => {
@@ -45,12 +43,17 @@ export class GoogleAPI {
           scope: environment.scopes
         }).then(() => {
           
+          // Gets logged in email
           // console.log(gapi.auth2.getAuthInstance().currentUser.get())
 
           // Listen for sign-in state changes
-          gapi.auth2.getAuthInstance().isSignedIn.listen(callback)
+          gapi.auth2.getAuthInstance().isSignedIn.listen(on_login)
           
-          callback()
+          // If it's already logged in
+          if (this.gapi.auth2.getAuthInstance().isSignedIn.get())
+            on_login()
+          else
+            this.gapi.auth2.getAuthInstance().signIn()
         })
       })
     }
@@ -62,15 +65,6 @@ export class GoogleAPI {
       js.src = "https://apis.google.com/js/api.js?onload=googleSDKLoaded";
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'google-jssdk'));
-  }
-  
-  is_logged_in() {
-    return this.gapi.auth2.getAuthInstance().isSignedIn.get()
-  }
-  
-  login(sheet_id : string) {
-    this.sheet_id = sheet_id
-    this.gapi.auth2.getAuthInstance().signIn()
   }
   
   /*** Spreadsheet ***/

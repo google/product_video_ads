@@ -34,8 +34,8 @@ export class LoginFacade {
         return this.loginService.drive_folder$
     }
 
-    login(sheet_id) : Promise<string> {
-        return this.loginService.login(sheet_id)
+    login(sheet_id) {
+        this.loginService.login(sheet_id)
     }
 
     logout() {
