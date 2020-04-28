@@ -30,12 +30,4 @@ export class ProductsFacade {
     get products() {
         return this.productService.products$
     }
-
-    add_product(values : Array<string>) {
-        // TODO: IMPLEMENT
-    }
-    
-    delete_product(id : number) {
-        this.productService.delete_product(id)
-    }
 }

@@ -98,9 +98,17 @@ export class OfferTypeComponent implements OnInit {
     this.move_step(2)
   }
 
-  delete_type(offer_type) {
-    this.facade.delete_offer_type(offer_type.title, offer_type.base)
-    this.save()
+  delete_type(offer_type : OfferType) {
+
+    this._snackBar.open('Confirm ' + offer_type.title + ' deletion?', 'Confirm', {
+      duration: 4000
+    }).onAction().subscribe(() => {
+      this.facade.delete_offer_type(offer_type.title, offer_type.base).then((res) => {
+        this._snackBar.open('Deleted (' + res['status'] + ')', 'OK', {
+          duration: 2000
+        })
+      })
+    })
   }
   
   /*********** Video controls **********/
@@ -517,13 +525,10 @@ export class OfferTypeComponent implements OnInit {
 
           const status = response['status']
 
-          this._snackBar.open("Saved: " + status, 'OK', {
-            duration: 2000
-          })
-
-          //if (status == 200)
-          //  this.router.navigate(['/videos'])
-          
+          if (status == 200)
+            window.location.replace('offer_types')
+          else
+            this._snackBar.open("Error (" + status + ')', 'OK', { duration: 10000 })
         })
       }
     }

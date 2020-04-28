@@ -17,54 +17,91 @@
 <h2 class="main_title">Configure Ad Campaign</h2>
 <div class="inner_content">
 
-  <!-- Videos already created -->
-  <h2>Videos Campaigns:</h2>
-  <button mat-stroked-button (click)="update_video()">Update</button>
+    <!-- Shows generated videos and logs, if there's any -->
+    <div *ngIf="(videos | async).length > 0">
 
-  <br/><br/>
+      <!-- Videos already created -->
+      <mat-expansion-panel expanded="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <b>Videos Ads</b>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+    
+        <!-- Content -->
+        <button mat-stroked-button (click)="update_video()">Update</button>
 
-  <div style="display: inline-block; margin-right: 1%;" *ngFor="let video of videos | async">
+        <br/><br/>
 
-    <span class="added_item" *ngIf="video.generated_video && ['Running', 'Video Ready'].indexOf(video.status) >= 0" >
-      <iframe width="300" height="200" 
-        [src]="sanitizer.bypassSecurityTrustResourceUrl(yt_url + video.generated_video)" frameborder="0" 
-        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
-      </iframe>
-    </span>
+        <div style="display: inline-block; margin-right: 1%;" *ngFor="let video of videos | async">
 
-      <span class="added_item" *ngIf="video.status == 'On'">
-        Generating latest video...
-      </span>
+          <span class="added_item" *ngIf="video.generated_video && ['Running', 'Video Ready'].indexOf(video.status) >= 0" >
+            <iframe width="300" height="200" 
+              [src]="sanitizer.bypassSecurityTrustResourceUrl(yt_url + video.generated_video)" frameborder="0" 
+              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+            </iframe>
+          </span>
 
+            <span class="added_item" *ngIf="video.status == 'On'">
+              <br/>
+              <mat-icon aria-hidden="false" aria-label="access_time icon">access_time</mat-icon>
+              <p>Generating video...</p>
+            </span>
+          </div>
+        </mat-expansion-panel>
+
+        <br/>
+
+        <!-- Logs from video generator -->
+        <mat-expansion-panel expanded="false">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <b>Video Generator Logs</b>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+      
+          <!-- Content -->
+          <button mat-stroked-button (click)="update_logs()">Update</button>
+
+          <br/><br/>
+
+          <div class="log-line" *ngFor="let log of logs | async">
+            <span>{{log}}</span>
+          </div>
+
+        </mat-expansion-panel>
     </div>
 
     <!-- Choose base video to configure -->
     <div>
-      <h2>Select base to use:</h2>
+      <h3>Select base to use:</h3>
       <mat-spinner *ngIf="(bases | async).length == 0"></mat-spinner>
 
       <div class="added_item" *ngFor="let base of bases | async " (click)="choose_base(base)">
-        <p>{{base.title}}</p>
+        <p><b>{{base.title}}</b></p>
+        <p>{{base.products.length}} product(s)</p>
       </div>
     </div>
 
     <!-- Configure if it's preview or bulk creation -->
     <div *ngIf="base">
-      <h2>Select how do you want to create:</h2>
+      <h3>What do you want to do?</h3>
 
       <div class="added_item" (click)="select_single_video_mode()">
-        <p>Single video</p>
+        <mat-icon aria-hidden="false" aria-label="video_label icon" title="video_label">video_label</mat-icon>
+        <p>Create <b>one</b><br/>single video</p>
       </div>
 
       <div class="added_item" (click)="select_bulk_video_mode()">
-        <p>Bulk creation</p>
+        <mat-icon aria-hidden="false" aria-label="video_library icon" title="video_library">video_library</mat-icon>
+        <p>Create <b>multiple</b><br/>videos in bulk</p>
       </div>
     </div>
 
     <!-- Configure single video -->
     <div *ngIf="mode=='single'">
 
-      <h2>The base "{{base.title}}" needs {{base.products.length}} products:</h2>
+      <h3>The base "{{base.title}}" needs {{base.products.length}} product(s):</h3>
 
       <div class="added_item" *ngFor="let c of configs; let i = index; trackBy: indexTracker">
 
@@ -73,7 +110,7 @@
           <mat-label>Offer Type</mat-label>
           <mat-select [(ngModel)]="configs[i]">
             <mat-option *ngFor="let type of (offer_types | async | filterOfferTypes: base.title)" [value]="type.configs">
-              {{type.title}} - {{type.configs.length}} itens
+              {{type.title}}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -85,7 +122,7 @@
           <mat-label>Product</mat-label>
           <mat-select [(ngModel)]="product_keys[i]">
             <mat-option *ngFor="let product of products | async" [value]="product.id">
-              {{product.id}}) {{product.values['Title']}}
+              {{product.id}} - {{product.values['Title']}}
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -97,25 +134,25 @@
       <!-- Account -->
       <mat-form-field class="example-full-width">
         <mat-label>Account</mat-label>
-        <input [(ngModel)]="campaign.account" matInput>
+        <input [(ngModel)]="campaign.account" placeholder="123-456-7890" matInput>
       </mat-form-field>
 
       <!-- Campaign -->
       <mat-form-field class="example-full-width">
         <mat-label>Campaign</mat-label>
-        <input [(ngModel)]="campaign.campaign" matInput>
+        <input [(ngModel)]="campaign.campaign" placeholder="Created Campaign Name" matInput>
       </mat-form-field>
 
       <!-- URL -->
       <mat-form-field class="example-full-width">
         <mat-label>URL (after click)</mat-label>
-        <input [(ngModel)]="campaign.url" matInput>
+        <input [(ngModel)]="campaign.url" placeholder="https://google.com" matInput>
       </mat-form-field>
 
       <!-- Call to Action -->
       <mat-form-field class="example-full-width">
         <mat-label>Call To Action (button text)</mat-label>
-        <input [(ngModel)]="campaign.call_to_action" matInput>
+        <input [(ngModel)]="campaign.call_to_action" placeholder="Check it" matInput>
       </mat-form-field>
 
       <!-- AdGroup Type -->
@@ -135,7 +172,7 @@
       <!-- Target: location -->
       <mat-form-field class="example-full-width">
         <mat-label>Location</mat-label>
-        <input [(ngModel)]="campaign.target_location" matInput>
+        <input [(ngModel)]="campaign.target_location" placeholder="1234,5678,9087" matInput>
       </mat-form-field>
 
       <!-- Target: age
@@ -158,7 +195,7 @@
     <!-- Configure bulk video creation -->
     <div *ngIf="mode=='bulk'">
 
-      <h2>Select product group to create video for "{{base.title}}":</h2>
+      <h3>Select product groups to create videos:</h3>
 
       <!-- Product Group -->
       <section *ngFor="let group of product_groups | keyvalue">
@@ -171,25 +208,25 @@
           <!-- Account -->
           <mat-form-field class="example-full-width">
             <mat-label>Account</mat-label>
-            <input [(ngModel)]="selected_groups.get(group.key).account" matInput>
+            <input [(ngModel)]="selected_groups.get(group.key).account" placeholder="123-456-7890" matInput>
           </mat-form-field>
 
           <!-- Campaign -->
           <mat-form-field class="example-full-width">
             <mat-label>Campaign</mat-label>
-            <input [(ngModel)]="selected_groups.get(group.key).campaign" matInput>
+            <input [(ngModel)]="selected_groups.get(group.key).campaign" placeholder="Created Campaign Name" matInput>
           </mat-form-field>
 
           <!-- URL -->
           <mat-form-field class="example-full-width">
             <mat-label>URL (after click)</mat-label>
-            <input [(ngModel)]="selected_groups.get(group.key).url" matInput>
+            <input [(ngModel)]="selected_groups.get(group.key).url" placeholder="https://google.com" matInput>
           </mat-form-field>
 
           <!-- Call to Action -->
           <mat-form-field class="example-full-width">
             <mat-label>Call To Action (button text)</mat-label>
-            <input [(ngModel)]="selected_groups.get(group.key).call_to_action" matInput>
+            <input [(ngModel)]="selected_groups.get(group.key).call_to_action" placeholder="Check Now" matInput>
           </mat-form-field>
 
           <!-- AdGroup Type -->
@@ -209,7 +246,7 @@
           <!-- Target: location -->
           <mat-form-field class="example-full-width">
             <mat-label>Location</mat-label>
-            <input [(ngModel)]="selected_groups.get(group.key).target_location" matInput>
+            <input [(ngModel)]="selected_groups.get(group.key).target_location" placeholder="1234,5678,9087" matInput>
           </mat-form-field>
 
           <!-- Target: age

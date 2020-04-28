@@ -17,61 +17,99 @@
 <h2 class="main_title">Preview Videos</h2>
 <div class="inner_content">
 
+  <!-- Shows generated videos and logs, if there's any -->
+  <div *ngIf="(videos | async).length > 0">
+
     <!-- Videos already created -->
-    <h2>Videos:</h2>
-    <button mat-stroked-button (click)="update_video()">Update</button>
+    <mat-expansion-panel expanded="false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <b>Videos</b>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+  
+      <!-- Content -->
+      <button mat-stroked-button (click)="update_video()">Update</button>
 
-    <br/><br/>
+      <br/><br/>
 
-    <div style="display: inline-block; margin-right: 1%;" *ngFor="let video of videos | async">
+      <div style="display: inline-block; margin-right: 1%;" *ngFor="let video of videos | async">
 
-      <span class="added_item" *ngIf="video.generated_video && video.status == 'Not Started'" >
-        
-        <video *ngIf="is_video(video)" width="300" height="200" controls>
-            <source [src]="drive_url + video.generated_video" type="video/mp4">
-        </video>
+        <span class="added_item" *ngIf="video.generated_video && video.status == 'Not Started'" >
+          
+          <video *ngIf="is_video(video)" width="250" height="150" controls>
+              <source [src]="drive_url + video.generated_video" type="video/mp4">
+          </video>
 
-        <a *ngIf="!is_video(video)" [href]="drive_url + video.generated_video">
-          <img width="300" height="200" [src]="drive_url + video.generated_video"/>
-        </a>
-        <span style="cursor: pointer" (click)="delete_video(video)">
-          <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
+          <a *ngIf="!is_video(video)" [href]="drive_url + video.generated_video">
+            <img width="300" height="200" [src]="drive_url + video.generated_video"/>
+          </a>
+          
+          <span style="cursor: pointer" (click)="delete_video(video)">
+            <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
+          </span>
         </span>
-      </span>
 
-      <span class="added_item" *ngIf="video.status == 'Preview'">
-        Generating latest video...
-      </span>
+        <span class="added_item" *ngIf="video.status == 'Preview'">
+          <br/>
+          <mat-icon aria-hidden="false" aria-label="access_time icon">access_time</mat-icon>
+          <p>Generating video...</p>
+        </span>
+      </div>
+    </mat-expansion-panel>
 
-    </div>
+    <br/>
+
+    <!-- Logs from video generator -->
+    <mat-expansion-panel expanded="false">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <b>Video Generator Logs</b>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+  
+      <!-- Content -->
+      <button mat-stroked-button (click)="update_logs()">Update</button>
+
+      <br/><br/>
+
+      <div class="log-line" *ngFor="let log of logs | async">
+        <span>{{log}}</span>
+      </div>
+
+    </mat-expansion-panel>
+  </div>
 
   <!-- Choose base video to configure -->
   <div>
-    <h2>Select base to use:</h2>
+    <h3>Select base to use:</h3>
     <mat-spinner *ngIf="(bases$ | async).length == 0"></mat-spinner>
 
     <div class="added_item" *ngFor="let base of bases$ | async " (click)="choose_base(base)">
-      <p>{{base.title}}</p>
+      <p><b>{{base.title}}</b></p>
+      <p>{{base.products.length}} product(s)</p>
     </div>
   </div>
 
   <!-- Configure if it's preview or bulk creation -->
   <div *ngIf="base">
-      <h2>Select how do you want to create:</h2>
+      <h3>What do you want to do?</h3>
 
       <div class="added_item" (click)="select_single_video_mode()">
-        <p>Single creation</p>
+        <mat-icon aria-hidden="false" aria-label="video_label icon" title="video_label">video_label</mat-icon>
+        <p>Create <b>one</b><br/>single video</p>
       </div>
 
       <div class="added_item" (click)="select_bulk_video_mode()">
-        <p>Bulk creation</p>
+        <mat-icon aria-hidden="false" aria-label="video_library icon" title="video_library">video_library</mat-icon>
+        <p>Create <b>multiple</b><br/>videos in bulk</p>
       </div>
   </div>
 
   <!-- Configure single video -->
   <div *ngIf="mode=='single'">
 
-    <h2>The base "{{base.title}}" needs {{base.products.length}} products:</h2>
+    <h3>The base "{{base.title}}" needs {{base.products.length}} product(s):</h3>
 
     <div class="added_item" *ngFor="let c of configs; let i = index; trackBy: indexTracker">
 
@@ -80,7 +118,7 @@
         <mat-label>Offer Type</mat-label>
         <mat-select [(ngModel)]="configs[i]">
           <mat-option *ngFor="let type of (offer_types | async | filterOfferTypes: base.title)" [value]="type.configs">
-            {{type.title}} - {{type.configs.length}} itens
+            {{type.title}}
           </mat-option>
         </mat-select>
       </mat-form-field>
@@ -92,7 +130,7 @@
         <mat-label>Product</mat-label>
         <mat-select [(ngModel)]="product_keys[i]">
           <mat-option *ngFor="let product of products | async" [value]="product.id">
-            {{product.id}}) {{product.values['Title']}}
+            {{product.id}} - {{product.values['Title']}}
           </mat-option>
         </mat-select>
       </mat-form-field>
@@ -107,7 +145,7 @@
     <!-- Configure bulk video creation -->
     <div *ngIf="mode=='bulk'">
 
-        <h2>Select product group for "{{base.title}}":</h2>
+        <h3>Select product groups to create videos:</h3>
 
         <mat-checkbox class="example-margin" (change)="check_all($event)">
           <b>Check All</b>

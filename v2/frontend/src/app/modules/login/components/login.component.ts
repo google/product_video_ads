@@ -29,7 +29,6 @@ import { ActivatedRoute } from '@angular/router';
           [sheet_text]='sheet_text'
           (onlogin)='login($event)'
           (onlogout)='logout()'
-          (onreload)='reload()'
           (ongeneratenew)='generate_new()'>
       </login-view>
   `,
@@ -62,10 +61,6 @@ export class LoginComponent implements OnInit {
 
   logout() {
     this.loginFacade.logout()
-  }
-
-  reload() {
-    this.loginFacade.reload()
   }
 
   generate_new() {

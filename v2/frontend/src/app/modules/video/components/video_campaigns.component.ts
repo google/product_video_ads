@@ -46,6 +46,7 @@ export class VideoCampaignsComponent implements OnInit {
   products : Observable<Product[]>
   offer_types : Observable<OfferType[]>
   videos : Observable<Video[]>
+  logs : Observable<string[]>
 
   product_groups : Map<string, Product[]>
   selected_groups : Map<string, any> = new Map<string, any>()
@@ -60,11 +61,14 @@ export class VideoCampaignsComponent implements OnInit {
   constructor(private facade : VideoFacade, public sanitizer: DomSanitizer, private _snackBar: MatSnackBar) {
       this.offer_types = this.facade.offer_types$
       this.videos = this.facade.videos
+      this.logs = this.facade.logs
     }
     
     ngOnInit() {
       this.bases = this.facade.bases$
       this.products = this.facade.products
+
+      this.facade.reload_products()
     }
     
     choose_base(base : Base) {
@@ -91,7 +95,6 @@ export class VideoCampaignsComponent implements OnInit {
     add_video(product_keys, configs, campaign_configs) {
       this.facade.add_production_video(configs, this.base, product_keys, campaign_configs).then(response => {
         this.mode = ''
-        this._snackBar.open('Saved ' + response['status'], 'OK', { duration: 2000 })
       })
     }
 
@@ -107,18 +110,27 @@ export class VideoCampaignsComponent implements OnInit {
       for(let [group, campaign_configs] of this.selected_groups.entries()) {
 
         const sorted_products = this.product_groups.get(group).sort((a, b) => a.position - b.position)
-
         const product_keys = sorted_products.map(p => p.id)
         const configs = sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type, this.base.title))
-
-        this.add_video(product_keys, configs, campaign_configs)
+        
+        // Check how many videos should be created for that group
+        for (let video = 0; video < product_keys.length; video+=this.base.products.length) {
+          this.add_video(
+            product_keys.slice(video, video + this.base.products.length),
+            configs.slice(video, video + this.base.products.length),
+            campaign_configs)
+        }
       }
 
-      this._snackBar.open('Created ' + this.selected_groups.size + ' videos!', 'OK', { duration: 4000 })
+      this._snackBar.open('Scheduled for creation (check videos section above)', 'OK', { duration: 4000 })
     }
 
     update_video() {
       this.facade.update_videos()
+    }
+
+    update_logs() {
+      this.facade.update_logs()
     }
 
     delete_video(video : Video) {

@@ -57,7 +57,11 @@ export class VideoFacade {
         get videos() {
             return this.videoService.videos$
         }
-        
+
+        get logs() {
+            return this.videoService.logs$
+        }
+
         private add_video(configs : Array<Config>, base : Base, product_keys : any) {
             
             let final_configs = []
@@ -142,8 +146,16 @@ export class VideoFacade {
         update_videos() {
             this.videoService.update_videos()
         }
+
+        update_logs() {
+            this.videoService.update_logs()
+        }
+
+        reload_products() : void {
+            this.productsService.reload_products()
+        }
         
         delete_video(generated_video : string) {
-            this.videoService.delete_video(generated_video)
+            return this.videoService.delete_video(generated_video)
         }
     }

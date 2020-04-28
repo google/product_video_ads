@@ -18,27 +18,41 @@
 <div class="inner_content">
 
     <div *ngIf="!video">
-        <h2>Select base to configure:</h2>
+        <h2>Your available bases:</h2>
 
         <div class="added_item" *ngFor="let base of bases | async" >
-            <p (click)="choose_base(base)">{{base.title}}</p>
-            <a href="{{base.url}}" target="_blank">Download base</a>
-            <p style="cursor: pointer" (click)="delete_base(base)">
-                <mat-icon aria-hidden="false" aria-label="delete icon" title="Delete">delete</mat-icon>
-            </p>
+
+            <p><b>{{base.title}}</b></p>
+
+            <!-- Configure timings -->
+            <button mat-stroked-button color="primary" (click)="choose_base(base)">
+                <mat-icon aria-hidden="false" aria-label="edit icon" title="Edit">edit</mat-icon>
+                Configure Timings
+            </button>
+            <br/>
+            <!-- Download base file -->
+            <a mat-stroked-button color="primary" href="{{base.url}}">
+                <mat-icon aria-hidden="false" aria-label="arrow_downward icon" title="arrow_downward">arrow_downward</mat-icon>
+                Download base file
+            </a>
+            <br/>
+            <!-- Delete base -->
+            <button mat-stroked-button color="warn" (click)="delete_base(base)">
+                <mat-icon aria-hidden="false" aria-label="edit icon" title="Delete">delete</mat-icon>
+                Delete base
+            </button>
         </div>
-
-        <br/>
-
-        <button mat-stroked-button (click)="new_base=true">Create new</button>
 
         <br/><br/>
 
+        <button mat-stroked-button (click)="new_base=true">Create new base</button>
+
         <div *ngIf="new_base">
+
             <h2>Create new base:</h2>
 
             <mat-form-field class="example-full-width">
-                <mat-label>Title</mat-label>
+                <mat-label>Base Title</mat-label>
                 <input #base_title matInput>
             </mat-form-field>
 
@@ -46,7 +60,9 @@
                 <input #base_file type="file" id="file" accept=".mp4,.png,.jpg">
             </div>
 
-            <button mat-stroked-button (click)="create_base(base_title.value, base_file.files[0])">Create!</button>
+            <br/>
+
+            <button mat-stroked-button (click)="create_base(base_title.value, base_file.files[0])">Create base</button>
         </div>
     </div>
 
@@ -55,6 +71,12 @@
 
     <!-- Configure chosen base video -->
     <div [hidden]="!video">
+
+        <h2>How to configure timings?</h2>
+
+        <p>You need to tell at which second each product "enters" and "leaves" the video.</p>
+        <p>You'll end up with same number of positions as number of products you'll use in this base.</p>
+        <p>It's only needed to configure this timings once per base video, then you can generate multiple videos from it.</p>
 
         <video #vd1 *ngIf="video_url" class="video" (canplay)="on_video_loaded(vd1)" muted>
             <source [src]="video_url" type="video/mp4">
@@ -88,7 +110,7 @@
                 <input [(ngModel)]="product.end_time" type="number" matInput >
             </mat-form-field>
 
-            <button mat-stroked-button (click)="add_product()">Add</button>
+            <button mat-stroked-button (click)="add_product()">Add Position</button>
 
             <br/>
 
@@ -104,7 +126,7 @@
 
             <br/><br/>
 
-            <button mat-stroked-button (click)="finish()">Save</button>
-
+            <button mat-stroked-button (click)="finish()">Save Timings</button>
+            <a style="margin-left: 1%;" mat-stroked-button href="bases">Cancel</a>
         </div>
 </div>

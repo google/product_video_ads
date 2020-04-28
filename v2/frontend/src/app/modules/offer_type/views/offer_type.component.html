@@ -20,11 +20,11 @@
   <!-- First screen: choose to edit or create new -->
   <div *ngIf="step == 1">
     
-    <h2>Choose type to edit or create new one</h2>
+    <h2>Your available offer types:</h2>
     
     <div class="added_item" *ngFor="let offer of offer_types | async">
       
-      <p>{{offer.title}}</p>
+      <p><b>{{offer.title}}</b></p>
       <p>({{offer.base}})</p>
       
       <span style="cursor: pointer" (click)="edit_type(offer)" >
@@ -40,9 +40,9 @@
       </span>
     </div>
     
-    <br/>
+    <br/><br/>
     
-    <button mat-stroked-button (click)="move_step(2)">Create New</button>
+    <button mat-stroked-button (click)="move_step(2)">Create new offer type</button>
   </div>
   
   <!-- Second screen: select base to create new -->
@@ -56,13 +56,23 @@
     </div>
   </div>
   
-  <!-- Spinner -->
-  <mat-spinner style="position: absolute" *ngIf="video_url && !video"></mat-spinner>
-  
   <!-- Configure chosen base video -->
   <div [hidden]="!video_url">
     
-    <div id="video">
+      <h2>How to configure offer type?</h2>
+
+      <p>This is where you place elements like images and texts on your video.</p>
+      <p>Drag and Drop elements to position them on video. Use double-click to delete elements.</p>
+      <p>"Product" elements are dynamic and replaced when generating video during next step.</p>
+      <p>Values you choose under "Products" elements are just examples texts/images.</p>
+      <p>"Assets" elements are static and fixed, so will stay as you see here.</p>
+
+      <br/>
+
+      <!-- Spinner -->
+      <mat-spinner style="position: absolute" *ngIf="video_url && !video"></mat-spinner>
+  
+      <div id="video">
 
       <div *ngIf="is_video">
         <video #vd1 *ngIf="video_url" class="video" (canplay)="on_video_loaded(vd1)" muted>
@@ -117,7 +127,7 @@
       </mat-form-field>
       
       <!-- Add New Items -->
-      <h2>Add New Item (double-click to delete)</h2>
+      <h2>Add new element to video:</h2>
       
       <!-- Choose type -->
       <mat-form-field>
@@ -229,8 +239,6 @@
       <br/><br/>
       
       <button mat-stroked-button (click)="finish()">Save</button>
-      
-      
-      
-    </div>
+      <a style="margin-left: 1%;" mat-stroked-button href="offer_types">Cancel</a>
   </div>
+</div>

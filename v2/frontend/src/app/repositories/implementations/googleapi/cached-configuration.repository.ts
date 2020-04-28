@@ -48,13 +48,19 @@ export class CachedConfigurationRepository extends ConfigurationRepository {
     }
 
     async load_assets() : Promise<Asset[]> {
+        // Not cached
         return await super.load_assets()
         // return (await this.load_data<Asset[]>(environment.local_storage_keys.static_assets, super.load_assets.bind(this)))
     }
 
     async load_products() : Promise<Product[]> {
+        // Not cached
         return await super.load_products()
         // return (await this.load_data<Product[]>(environment.local_storage_keys.products, super.load_products.bind(this)))
+    }
+
+    async load_logs() : Promise<string[]> {
+        return await super.load_logs()
     }
 
     async load_videos() : Promise<Video[]> {
@@ -74,11 +80,6 @@ export class CachedConfigurationRepository extends ConfigurationRepository {
     async save_assets(assets: Asset[]): Promise<any> {
         this.save_to_cache(environment.local_storage_keys.static_assets, assets)
         return super.save_assets(assets)
-    }
-
-    async save_products(products: Product[]): Promise<any> {
-        this.save_to_cache(environment.local_storage_keys.products, products)
-        return super.save_products(products)
     }
 
     async save_offer_type(offer_types: OfferType[]): Promise<any> {

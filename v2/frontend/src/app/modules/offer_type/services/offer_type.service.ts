@@ -63,6 +63,7 @@ export class OfferTypeService {
     delete_offer_type(title : string, base : string) {
         console.log('Deleting offer type...')
         this._offer_types.next(this.offer_types.filter(o => o.title != title || o.base != base))
+        return this.save()
     }
 
     save() {

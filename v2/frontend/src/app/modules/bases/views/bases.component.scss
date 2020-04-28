@@ -10,9 +10,13 @@ mat-form-field, input {
   padding: 1%;
   margin: 0 1% 1% 0;
   text-align: center;
-  cursor: pointer;
   box-shadow: 2px 2px 2px 2px #888888;
   border-radius: 5px;
+}
+
+.added_item .mat-stroked-button {
+  width: 100%;
+  margin-bottom: 5%;
 }
 
 #seconds {

@@ -25,6 +25,8 @@ import { LoginService } from 'app/modules/login/services/login.service'
 })
 export class ProductService {
 
+    private is_ready : boolean = false
+
     private readonly _products = new BehaviorSubject<Product[]>([])
     
     /** Published state to application **/
@@ -37,21 +39,19 @@ export class ProductService {
     constructor(private productsRepository : CachedConfigurationRepository, loginService : LoginService) {
         loginService.ready$.subscribe(async ready => {
 
-            if (ready == 1)
-                this._products.next(await this.productsRepository.load_products())
+            if (ready == 1) {
+                this.is_ready = true
+                this.load_products()
+            }
         })
     }
 
-    /** Actions **/
-    add_product(product : Product) : Promise<any> {
-        const next_id = Math.max(...this.products.map(p => p.id)) + 1
-        product.id = next_id
-        this._products.next([...this.products, product])
-        return this.productsRepository.save_products(this.products)
+    private async load_products() {
+        if (this.is_ready)
+            this._products.next(await this.productsRepository.load_products())
     }
-        
-    delete_product(id : number) : Promise<any> {
-        this._products.next(this.products.filter(p => p.id != id))
-        return this.productsRepository.save_products(this.products)
+
+    public reload_products() : void {
+        this.load_products()
     }
 }

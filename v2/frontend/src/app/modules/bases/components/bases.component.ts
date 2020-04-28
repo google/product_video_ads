@@ -100,9 +100,14 @@ export class BasessComponents implements OnInit {
   }
 
   delete_base(base : Base) {
-    this.facade.delete_base(base.title).then(response => {
-      this._snackBar.open("Base deleted status: " + response.status, 'OK', {
-        duration: 2000
+
+    this._snackBar.open('Confirm ' + base.title + ' deletion?', 'Confirm', {
+      duration: 4000,
+    }).onAction().subscribe(() => {
+      this.facade.delete_base(base.title).then(response => {
+        this._snackBar.open("Base deleted (" + response.status + ')', 'OK', {
+          duration: 2000
+        })
       })
     })
   }
@@ -117,13 +122,9 @@ export class BasessComponents implements OnInit {
 
     this.facade.upload_base_file(file).then(response => {
 
-      this._snackBar.open("Uploaded successfuly!", 'OK', {
-        duration: 2000
-      })
-
       this.facade.add_base(title, file.name, response.id).then(response => {
 
-        this._snackBar.open("Created: " + response['status'], 'OK', {
+        this._snackBar.open("Uploaded successfuly (" + response['status'] + ')', 'OK', {
           duration: 2000
         })
 
@@ -133,7 +134,6 @@ export class BasessComponents implements OnInit {
           this.base.products.push({start_time: 0, end_time: 0})
           this.finish()
         }
-
       })
     }).catch(err => {
       this._snackBar.open("Fail: " + err, 'OK', {
@@ -146,7 +146,7 @@ export class BasessComponents implements OnInit {
 
     this.facade.update_products(this.base)
     
-    this._snackBar.open("Saving base", 'OK', {
+    this._snackBar.open("Saving base configuration...", 'OK', {
       duration: 2000,
     })
     
@@ -154,13 +154,12 @@ export class BasessComponents implements OnInit {
       
       const status = response['status']
       
-      this._snackBar.open("Saved: " + status, 'OK', {
+      this._snackBar.open("Saved (" + status + ')', 'OK', {
         duration: 2000
       })
       
       if (status == 200)
-        this.router.navigate(['/offer_types'])
+        window.location.replace('bases')
     })
   }
-
 }

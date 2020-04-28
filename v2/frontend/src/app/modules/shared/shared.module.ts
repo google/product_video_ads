@@ -31,6 +31,7 @@ import { FormsModule } from '@angular/forms';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatCardModule} from '@angular/material/card';
+import {MatExpansionModule} from '@angular/material/expansion'
 
 @NgModule({
   declarations: [],
@@ -64,7 +65,8 @@ import {MatCardModule} from '@angular/material/card';
     MatSnackBarModule,
     MatDialogModule,
     MatCheckboxModule,
-    MatCardModule
+    MatCardModule,
+    MatExpansionModule
   ]
 })
 export class SharedModule { }

@@ -97,11 +97,6 @@ export class LoginService {
         this.load(sheet_id)
     }
 
-    reload() {
-        this.repository.clear_cache()
-        this.load(this.sheet_id)
-    }
-    
     logout() {
         this._sheet_id.next('')
         localStorage.removeItem(environment.sheet_id)

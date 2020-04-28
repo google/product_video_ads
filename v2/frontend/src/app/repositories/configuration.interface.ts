@@ -23,6 +23,7 @@ import { Base } from 'app/models/base';
 export interface ConfigurationInterface {
 
     load_drive_folder() : Promise<string>
+    load_logs() : Promise<string[]>
 
     upload_base_file(file : File) : Promise<any>
     load_fonts() : Promise<object>
@@ -34,7 +35,6 @@ export interface ConfigurationInterface {
     save_assets(assets : Asset[]) : Promise<any>
 
     load_products() : Promise<Product[]>
-    save_products(products : Product[]) : Promise<any>
 
     load_offer_types() : Promise<OfferType[]>
     save_offer_types(bases : OfferType[]) : Promise<any>

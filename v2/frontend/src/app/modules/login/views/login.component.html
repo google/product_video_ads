@@ -15,9 +15,8 @@
 -->
 
 <h2 class="main_title">Log In</h2>
-<div class="inner_content">
 
-  <img id="pva_logo" src="assets/images/pva.png"/>
+<div class="inner_content">
 
   <h1>Welcome to Product Video Ads</h1>
 
@@ -28,17 +27,15 @@
       <span><b>Insert your spreadsheet ID to login:</b></span>
       <br/>
       <input type="text" size="45" (keyup)="0" [(ngModel)]="sheet">
-      <br/>
-      <input type="button" value="Start" (click)="login()"/>
+      <input type="button" value="Login" (click)="login()"/>
     </div>
 
     <br/>
 
     <div>
-      <span><b>Or if it's your first time:</b></span>
+      <span><b>If it's your first time, go ahead and:</b></span>
       <br/>
-
-      <button (click)="generate_one()">Generate new one</button>
+      <button (click)="generate_one()">Generate new Sheet ID</button>
     </div>
   </div>
 
@@ -50,24 +47,29 @@
   <!-- Logged in -->
   <div *ngIf="ready == 1">
 
-    <p>
+    <p id="sheet_container">
       <b>Sheet ID:</b> {{sheet_id}}
+    </p>
 
-      <br/>
-
+    <p class="details">
       Your configuration spreadsheet is 
       <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}">here</a>
-
-      <br/>
-
-      Your drive folder is 
+      and drive folder is 
       <a target="_blank" href="https://drive.google.com/corp/drive/u/0/folders/{{drive_folder}}">here</a>
     </p>
 
-    <!--p>There you can create <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}/edit#gid=1565524886">bases</a>, update <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}/edit#gid=1670058881">products</a> and <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}/edit#gid=1412792783">static assets</a></p>
-    <p>Make sure to upload your bases and fonts to your <a target="_blank" href="https://drive.google.com/corp/drive/u/0/folders/{{drive_folder}}">drive folder</a></p-->
+    <h3>To begin generating videos, move on tabs and follow steps:</h3>
+
+    <ol>
+      <li><b>Products:</b> register your products assets (images and texts)</li>
+      <li><b>Bases:</b> upload a base video and define start/end moments to each product</li>
+      <li><b>Offer Types:</b> tell us which elements should be displayed on screen</li>
+      <li><b>Preview:</b> finally, generate a preview video uploaded to Drive using product, base and offer type</li>
+      <li><b>Video Ads:</b> Ready to go live? Same as preview but uploaded to YouTube</li>
+      <li><b>After upload to YouTube</b>, your AdsScript will automatically setup Video Ads inside Google Ads account</li>
+    </ol>
 
     <button mat-stroked-button color="warn" (click)="logout()">Logout</button>
-    <button mat-stroked-button color="warn" (click)="reload()">Reload</button>
   </div>
+  
 </div>

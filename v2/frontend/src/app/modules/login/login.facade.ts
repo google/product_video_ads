@@ -42,10 +42,6 @@ export class LoginFacade {
         this.loginService.logout()
     }
 
-    reload() {
-        this.loginService.reload()
-    }
-
     generate_new() {
         this.loginService.generate_new()
     }

@@ -44,7 +44,7 @@ export class GoogleAPI {
         }).then(() => {
           
           // Gets logged in email
-          // console.log(gapi.auth2.getAuthInstance().currentUser.get())
+          //console.log(gapi.auth2.getAuthInstance().currentUser.get())
 
           // Listen for sign-in state changes
           gapi.auth2.getAuthInstance().isSignedIn.listen(on_login)

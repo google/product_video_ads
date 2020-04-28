@@ -38,6 +38,7 @@ export class VideoComponent implements OnInit {
   products : Observable<Product[]>
   offer_types : Observable<OfferType[]>
   videos : Observable<Video[]>
+  logs : Observable<string[]>
 
   product_groups : Map<string, Product[]>
   selected_groups : Set<string> = new Set<string>()
@@ -51,11 +52,14 @@ export class VideoComponent implements OnInit {
   constructor(private facade : VideoFacade, private _snackBar: MatSnackBar) {
       this.offer_types = this.facade.offer_types$
       this.videos = this.facade.videos
+      this.logs = this.facade.logs
     }
     
     ngOnInit() {
       this.bases$ = this.facade.bases$
       this.products = this.facade.products
+
+      this.facade.reload_products()
     }
 
     is_video(video : Video) {
@@ -84,10 +88,8 @@ export class VideoComponent implements OnInit {
     }
     
     add_video() {
-      this.facade.add_preview_video(this.configs, this.base, this.product_keys).then(response => {
-        this.mode = ''
-        this._snackBar.open('Saved ' + response['status'], 'OK', { duration: 2000 })
-      })
+      this.facade.add_preview_video(this.configs, this.base, this.product_keys)
+      .then(response => { this.mode = '' })
     }
 
     check_group(element, group) {
@@ -111,25 +113,43 @@ export class VideoComponent implements OnInit {
       for(let group of this.selected_groups) {
 
         const sorted_products = this.product_groups.get(group).sort((a, b) => a.position - b.position)
+        const product_keys = sorted_products.map(p => p.id)
+        const configs = sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type, this.base.title))
+        
+        // Check how many videos should be created for that group
+        for (let video = 0; video < product_keys.length; video+=this.base.products.length) {
 
-        this.product_keys = sorted_products.map(p => p.id)
-        this.configs = sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type, this.base.title))
+          this.product_keys = product_keys.slice(video, video + this.base.products.length)
+          this.configs = configs.slice(video, video + this.base.products.length)
 
-        //console.log(JSON.stringify(this.product_keys))
-        //console.log(JSON.stringify(this.configs))
-
-        this.add_video()
+          this.add_video()
+        }
       }
 
-      this._snackBar.open('Videos scheduled for creation!', 'OK', { duration: 4000 })
+      this._snackBar.open('Scheduled for creation (check videos section above)', 'OK', { duration: 4000 })
     }
 
     update_video() {
       this.facade.update_videos()
     }
 
+    update_logs() {
+      this.facade.update_logs()
+    }
+
     delete_video(video : Video) {
-      this.facade.delete_video(video.generated_video)
+
+      const video_name = video.generated_video || 'being generated'
+
+      this._snackBar.open('Confirm deletion of video ' + video_name + '?', 'Confirm', {
+        duration: 4000,
+      }).onAction().subscribe(() => {
+        this.facade.delete_video(video.generated_video).then(response => {
+          this._snackBar.open("Video deleted (" + response.status + ')', 'OK', {
+            duration: 2000
+          })
+        })
+      })
     }
     
     indexTracker(index: number, value: any) {

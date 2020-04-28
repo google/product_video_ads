@@ -26,19 +26,27 @@ import { Campaign } from 'app/models/campaign'
 export class VideoService {
 
     private readonly _videos = new BehaviorSubject<Video[]>([])
-    
+    private readonly _logs = new BehaviorSubject<string[]>([])
+
     /** Published state to application **/
     readonly videos$ = this._videos.asObservable()
+    readonly logs$ = this._logs.asObservable()
 
     get videos() {
         return [...this._videos.getValue()]
     }
 
+    get logs() {
+        return [...this._logs.getValue()]
+    }
+
     constructor(private repository : CachedConfigurationRepository, loginService : LoginService) {
         loginService.ready$.subscribe(async ready => {
-            if (ready == 1)
-                this._videos.next(await this.repository.load_videos())
-            
+
+            if (ready == 1) {
+                this.update_videos()
+                this.update_logs()
+            }
         })
     }
 
@@ -57,6 +65,10 @@ export class VideoService {
 
     async update_videos() {
         this._videos.next(await this.repository.load_videos())
+    }
+
+    async update_logs() {
+        this._logs.next(await this.repository.load_logs())
     }
 
     delete_video(generated_video : string) {

@@ -29,6 +29,10 @@ export class ConfigurationRepository implements ConfigurationInterface {
 
     constructor(public googleApi : GoogleAPI) {}
 
+    async load_logs() : Promise<string[]> {
+        return (await this.googleApi.get_values(environment.configuration.logs_range)).reverse()
+    }
+
     async load_fonts(): Promise<object> {
         
         const drive_folder = await this.load_drive_folder()
@@ -133,20 +137,6 @@ export class ConfigurationRepository implements ConfigurationInterface {
         })
       
         return this.googleApi.save_values(data)
-    }
-
-    async save_products(products: Product[]): Promise<any> {
-        
-        // TODO: IMPLEMENT
-        
-        /*const data = []
-  
-        data.push({
-          range: environment.configuration.product_range,
-          values: products.map(Product.to_product_array)
-        })
-      
-        return this.googleApi.save_values(data)*/
     }
 
     async save_offer_types(offer_types: OfferType[]): Promise<any> {

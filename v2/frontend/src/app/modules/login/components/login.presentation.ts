@@ -32,7 +32,6 @@ export class LoginPresentation implements OnInit {
 
   @Output() onlogin = new EventEmitter<string>()
   @Output() onlogout = new EventEmitter()
-  @Output() onreload = new EventEmitter()
   @Output() ongeneratenew = new EventEmitter()
 
   sheet : string
@@ -47,10 +46,6 @@ export class LoginPresentation implements OnInit {
 
   logout() {
     this.onlogout.emit()
-  }
-
-  reload() {
-    this.onreload.emit()
   }
 
   generate_one() {

@@ -60,7 +60,7 @@ export class OfferTypeFacade {
     }
 
     delete_offer_type(title : string, base : string) {
-        this.offerTypeService.delete_offer_type(title, base)
+        return this.offerTypeService.delete_offer_type(title, base)
     }
 
     add_offer_type(offer_type : OfferType) {

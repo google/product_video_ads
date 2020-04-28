@@ -42,16 +42,24 @@ class SpreadsheetConfiguration(object):
                      spreadsheet_id)
 
     # Add log handler to write to configuration spreadsheet
-    def log_callback(message):
-      self.write_log(message)
+    def log_callback(message, position):
+      self.write_log(message, position)
 
     trix_handler = SpreadsheetHandler(log_callback)
     trix_handler.setFormatter(self.logger.handlers[0].formatter)
     self.logger.addHandler(trix_handler)
     self.logger.info('Spreadsheet log handler configured')
 
-  def write_log(self, message):
+  def write_log(self, message, position):
 
+    # Clear first
+    if position == 1:
+      self.sheet.values().clear(
+        spreadsheetId=self.spreadsheet_id,
+        range='Generator!A:A',
+      ).execute()
+
+    # Append log line
     self.sheet.values().append(
         spreadsheetId=self.spreadsheet_id,
         range='Generator!A:A',
