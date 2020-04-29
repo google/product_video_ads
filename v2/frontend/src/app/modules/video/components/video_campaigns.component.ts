@@ -91,8 +91,13 @@ export class VideoCampaignsComponent implements OnInit {
     is_all_filled() {
       return !this.configs.includes(undefined) && !this.product_keys.includes(undefined)
     }
+
+    add_single_video(product_keys, configs, campaign_configs) {
+      this.add_video(product_keys, configs, campaign_configs)
+      this._snackBar.open('Single video scheduled (check videos section above)', 'OK', { duration: 4000 })
+    }
     
-    add_video(product_keys, configs, campaign_configs) {
+    private add_video(product_keys, configs, campaign_configs) {
       this.facade.add_production_video(configs, this.base, product_keys, campaign_configs).then(response => {
         this.mode = ''
       })

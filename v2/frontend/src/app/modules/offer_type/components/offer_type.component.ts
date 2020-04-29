@@ -71,6 +71,8 @@ export class OfferTypeComponent implements OnInit {
     this.loaded_fonts = new Set()
     this.offer_type = new OfferType('Untitled', '', [])
     this.config = new Config()
+
+    this.facade.update_products()
   }
 
   move_step(step) {

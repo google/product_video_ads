@@ -86,8 +86,13 @@ export class VideoComponent implements OnInit {
     is_all_filled() {
       return !this.configs.includes(undefined) && !this.product_keys.includes(undefined)
     }
+
+    add_single_video() {
+      this.add_video()
+      this._snackBar.open('Single video scheduled (check videos section above)', 'OK', { duration: 4000 })
+    }
     
-    add_video() {
+    private add_video() {
       this.facade.add_preview_video(this.configs, this.base, this.product_keys)
       .then(response => { this.mode = '' })
     }

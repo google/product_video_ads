@@ -19,7 +19,7 @@ CREDENTIALS_FOLDER=$(pwd)/credentials
 #CREDENTIALS_FOLDER=/Users/rgodoy/credentials
 
 echo 'SPREADSHEET_ID: '
-SPREADSHEET_ID=1lT7diZwzHnTDEhFKgRWpuYQL_nujcwbmEBsf8VyBRps
+SPREADSHEET_ID=1xVFWkPyh635Hn8LWAwUHU6hb0Nq6hentB9x3IGRF_uI
 #read SPREADSHEET_ID
 
 echo 'Bucket Name:'

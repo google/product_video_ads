@@ -17,7 +17,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import urllib
+import requests
+import shutil
+import imghdr
+import os
 import log
 
 def convert_configs_to_format(configs, products_data, storage):
@@ -106,12 +109,22 @@ def _wrap_text(text, charaters_per_line):
 def convert_image_overlay(config, field_value, storage):
 
   # Tries to retrieve image extension
-  name_extension = field_value.split('/')[-1].split('.')
-  extension = 'jpg' if len(name_extension) < 2 else name_extension[1]
+  tmp_file_name = 'img.tmp'
+
+  # Downloads image
+  r = requests.get(field_value, stream = True)
+  r.raw.decode_content = True
+    
+  # Open a local file with wb ( write binary ) permission.
+  with open(tmp_file_name,'wb') as f:
+    shutil.copyfileobj(r.raw, f)
+
+  # Find out file's extension
+  extension = imghdr.what(tmp_file_name) or 'jpg'
 
   # Save product image to image folder
   image_path = storage.get_absolute_path(config['type'] + str(config['key']) + '.' + extension)
-  urllib.urlretrieve(field_value, image_path)
+  os.rename(tmp_file_name, image_path)
 
   return {
       'x': float(config['x']),

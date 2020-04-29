@@ -546,6 +546,11 @@ class FFMPEGGenerator(object):
 
         #include_args += ['-analyzeduration', '2147483647', '-probesize', '2147483647']
         include_args += ['-i']
+
+        # Convert all images to PNG to avoid problems
+        #filename_png = filename + '.png'
+        #self.convert_to_png(filename, filename_png, self.ffmpeg_executable)
+
         include_cmd += include_args + ['%s' % (filename)]
 
       # treats video overlays
@@ -588,6 +593,19 @@ class FFMPEGGenerator(object):
     args += [output_image]
 
     self.logger.info('Running ffmpeg with args:')
+    self.logger.info(' '.join(args))
+
+    # Returns results or raises an exception
+    try:
+      return subprocess.check_output(args, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+      raise VideoGenerationError(' '.join(args), e.output)
+
+  def convert_to_png(self, input_file, output_file, executable='ffmpeg'):
+
+    args = [executable, '-i', input_file, output_file]
+
+    self.logger.info('Running ffmpeg to convert image with args:')
     self.logger.info(' '.join(args))
 
     # Returns results or raises an exception

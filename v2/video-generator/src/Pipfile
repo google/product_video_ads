@@ -14,6 +14,7 @@ flask = "*"
 google-cloud-storage = "*"
 pytest = "*"
 pytest-mock = "*"
+requests = "*"
 
 [requires]
 python_version = "2.7"

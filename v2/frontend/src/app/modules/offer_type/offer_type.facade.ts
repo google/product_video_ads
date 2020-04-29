@@ -67,6 +67,11 @@ export class OfferTypeFacade {
         this.offerTypeService.add_offer_type(offer_type)
     }
 
+    update_products() {
+        this.assetsService.reload_assets()
+        this.productsService.reload_products()
+    }
+
     save() {
         return this.offerTypeService.save()
     }

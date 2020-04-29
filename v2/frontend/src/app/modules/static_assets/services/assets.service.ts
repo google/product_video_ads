@@ -25,6 +25,8 @@ import { Asset } from 'app/models/asset'
 })
 export class AssetsService {
     
+    private is_ready : boolean = false
+
     private readonly _assets = new BehaviorSubject<Asset[]>([])
     
     /** Published state to application **/
@@ -36,19 +38,30 @@ export class AssetsService {
 
     constructor(private repository : CachedConfigurationRepository, loginService : LoginService) {
         loginService.ready$.subscribe(async ready => {
-            if (ready == 1)
-                this._assets.next(await this.repository.load_assets())
+            if (ready == 1) {
+                this.load_assets()
+                this.is_ready = true
+            }
         })
     }
 
     /** Actions **/
+    async load_assets() {
+        if (this.is_ready)
+            this._assets.next(await this.repository.load_assets())
+    }
+
+    reload_assets() {
+        this.load_assets()
+    }
+
     add_asset(asset : Asset) : Promise<any> {
         const next_id = Math.max(...this.assets.map(p => p.id)) + 1
         asset.id = next_id
         this._assets.next([...this.assets, asset])
         return this.repository.save_assets(this.assets)
     }
-        
+
     delete_asset(id : number) : Promise<any> {
         this._assets.next(this.assets.filter(a => a.id != id))
         return this.repository.save_assets(this.assets)
