@@ -112,7 +112,9 @@ def convert_image_overlay(config, field_value, storage):
   tmp_file_name = 'img.tmp'
 
   # Downloads image
-  r = requests.get(field_value, stream = True)
+  headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+
+  r = requests.get(field_value, stream=True, headers=headers, timeout=20)
   r.raw.decode_content = True
     
   # Open a local file with wb ( write binary ) permission.
