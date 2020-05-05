@@ -35,6 +35,7 @@ export class LoginPresentation implements OnInit {
   @Output() ongeneratenew = new EventEmitter()
 
   sheet : string
+  step = 0;
 
   ngOnInit() {
     this.sheet = this.sheet_text
@@ -51,4 +52,17 @@ export class LoginPresentation implements OnInit {
   generate_one() {
     this.ongeneratenew.emit()
   }
+
+  setStep(index: number) {
+    this.step = index;
+  }
+
+  nextStep() {
+    this.step++;
+  }
+
+  prevStep() {
+    this.step--;
+  }
+
 }
