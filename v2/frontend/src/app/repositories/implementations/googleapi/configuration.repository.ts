@@ -29,11 +29,19 @@ export class ConfigurationRepository implements ConfigurationInterface {
 
     constructor(public googleApi : GoogleAPI) {}
 
+    async upload_font(file: File): Promise<any> {
+
+        const drive_folder = await this.load_drive_folder()
+        const folders = await this.googleApi.list_files_from_folder(drive_folder, '')
+
+        return this.googleApi.upload_file(file, folders['fonts'])
+    }
+
     async load_logs() : Promise<string[]> {
         return (await this.googleApi.get_values(environment.configuration.logs_range)).reverse()
     }
 
-    async load_fonts(): Promise<object> {
+    async load_fonts(): Promise<Map<string, any>> {
         
         const drive_folder = await this.load_drive_folder()
         const fonts = (await this.googleApi.list_files_from_folder(drive_folder, 'fonts')) || []

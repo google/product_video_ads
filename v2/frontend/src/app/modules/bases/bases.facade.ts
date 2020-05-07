@@ -15,18 +15,15 @@
 */
 
 import { Injectable } from '@angular/core';
-import { LoginService } from '../login/services/login.service';
 import { BasesService } from './services/bases.service';
 import { Base } from 'app/models/base';
+import { FontsService } from './services/fonts.service';
 
 @Injectable()
 export class BasesFacade {
     
-    constructor(private loginService : LoginService, private service : BasesService) {}
-
-    get ready() {
-        return this.loginService.ready$
-    }
+    constructor(private service : BasesService,
+                private fontService : FontsService) {}
 
     get bases$() {
         return this.service.bases$
@@ -34,6 +31,10 @@ export class BasesFacade {
 
     get bases() {
         return this.service.bases
+    }
+
+    get fonts$() {
+        return this.fontService.fonts$
     }
 
     update_products(base : Base) {
@@ -50,6 +51,14 @@ export class BasesFacade {
 
     delete_base(title : string) : Promise<any> {
         return this.service.delete_base(title)
+    }
+
+    upload_font(file : File) : Promise<any> {
+        return this.fontService.upload_font(file)
+    }
+
+    reload_fonts() : Promise<any> {
+        return this.fontService.reload_fonts()
     }
 
     save() {

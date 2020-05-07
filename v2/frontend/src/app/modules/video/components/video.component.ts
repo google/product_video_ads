@@ -63,7 +63,8 @@ export class VideoComponent implements OnInit {
     }
 
     is_video(video : Video) {
-      return this.facade.bases.filter(b => b.title == video.base_video)[0].file.endsWith('mp4')
+      const video_base = this.facade.bases.filter(b => b.title == video.base_video)[0]
+      return video_base && video_base.file.endsWith('mp4')
     }
     
     choose_base(base : Base) {

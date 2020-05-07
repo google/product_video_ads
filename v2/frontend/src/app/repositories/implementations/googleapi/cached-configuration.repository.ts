@@ -17,7 +17,6 @@
 import { Injectable } from '@angular/core';
 import { ConfigurationRepository } from './configuration.repository';
 import { environment } from 'environments/environment';
-import { Product } from 'app/models/product';
 import { Video } from 'app/models/video';
 import { OfferType } from 'app/models/offertype';
 import { Asset } from 'app/models/asset';
@@ -31,12 +30,12 @@ export class CachedConfigurationRepository extends ConfigurationRepository {
             .forEach(key => localStorage.removeItem(key))
     }
 
-    async load_fonts(): Promise<object> {
-        return (await this.load_data<object>(environment.local_storage_keys.fonts, super.load_fonts.bind(this)))
-    }
+    async load_fonts(evict : boolean = false): Promise<Map<string, any>> {
 
-    async upload_base_file(file : File) : Promise<any> {
-        return super.upload_base_file(file)
+        if (evict)
+            localStorage.removeItem(environment.local_storage_keys.fonts)
+
+        return (await this.load_data<Map<string, any>>(environment.local_storage_keys.fonts, super.load_fonts.bind(this)))
     }
 
     async load_bases(): Promise<Base[]> {
@@ -45,26 +44,6 @@ export class CachedConfigurationRepository extends ConfigurationRepository {
 
     async load_offer_types(): Promise<OfferType[]> {
         return (await this.load_data<OfferType[]>(environment.local_storage_keys.offer_types, super.load_offer_types.bind(this)))
-    }
-
-    async load_assets() : Promise<Asset[]> {
-        // Not cached
-        return await super.load_assets()
-        // return (await this.load_data<Asset[]>(environment.local_storage_keys.static_assets, super.load_assets.bind(this)))
-    }
-
-    async load_products() : Promise<Product[]> {
-        // Not cached
-        return await super.load_products()
-        // return (await this.load_data<Product[]>(environment.local_storage_keys.products, super.load_products.bind(this)))
-    }
-
-    async load_logs() : Promise<string[]> {
-        return await super.load_logs()
-    }
-
-    async load_videos() : Promise<Video[]> {
-        return await super.load_videos()
     }
 
     async load_drive_folder() : Promise<string> {

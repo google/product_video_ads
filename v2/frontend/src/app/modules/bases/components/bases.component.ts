@@ -29,6 +29,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class BasessComponents implements OnInit {
   
   new_base = false
+  new_font = false
   bases : Observable<Base[]>
   base : Base
   seconds : any
@@ -37,7 +38,7 @@ export class BasessComponents implements OnInit {
   video_duration
   video_url
   
-  constructor(private router: Router, private facade : BasesFacade, private _snackBar : MatSnackBar) {
+  constructor(private router: Router, public facade : BasesFacade, private _snackBar : MatSnackBar) {
     this.bases = facade.bases$
   }
   
@@ -51,10 +52,6 @@ export class BasessComponents implements OnInit {
   }
   
   choose_base(base : Base) {
-
-    if (!this.is_video_base(base.file))
-      return
-
     this.base = base
     this.video_url = base.url
   }
@@ -138,6 +135,34 @@ export class BasessComponents implements OnInit {
     }).catch(err => {
       this._snackBar.open("Fail: " + err, 'OK', {
         duration: 4000
+      })
+    }) 
+  }
+
+  add_font(file : File) {
+
+    this.new_font = false
+
+    this._snackBar.open("Uploading font...", 'OK', {
+      duration: 10000,
+    })
+
+    this.facade.upload_font(file).then(response => {
+
+      this._snackBar.open("Uploaded successfuly (" + response['name'] + ')', 'OK', {
+        duration: 2000
+      })
+
+      // Reload all fonts
+      this.facade.reload_fonts().then(response => {
+        this._snackBar.open("Fonts reloaded", 'OK', {
+          duration: 2000
+        })
+      })
+
+    }).catch(err => {
+      this._snackBar.open("Fail: " + err, 'OK', {
+        duration: 40000
       })
     }) 
   }

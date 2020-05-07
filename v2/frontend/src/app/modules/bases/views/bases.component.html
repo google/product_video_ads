@@ -25,7 +25,7 @@
             <p><b>{{base.title}}</b></p>
 
             <!-- Configure timings -->
-            <button mat-stroked-button color="primary" (click)="choose_base(base)">
+            <button *ngIf="this.is_video_base(base.file)" mat-stroked-button color="primary" (click)="choose_base(base)">
                 <mat-icon aria-hidden="false" aria-label="edit icon" title="Edit">edit</mat-icon>
                 Configure Timings
             </button>
@@ -46,6 +46,7 @@
         <br/><br/>
 
         <button mat-stroked-button (click)="new_base=true">Create new base</button>
+        <button mat-stroked-button style="margin-left: 1%;" (click)="new_font=true">Add new font</button>
 
         <div *ngIf="new_base">
 
@@ -63,6 +64,26 @@
             <br/>
 
             <button mat-stroked-button (click)="create_base(base_title.value, base_file.files[0])">Create base</button>
+        </div>
+
+        <div *ngIf="new_font">
+
+            <h2>Fonts added:</h2>
+            <ul>
+                <li *ngFor="let font of facade.fonts$ | async | keyvalue">
+                    {{font.key}}
+                </li>
+            </ul>
+
+            <h2>Add new font:</h2>
+
+            <div class="form-group">
+                <input #font_file type="file" id="file" accept=".ttf">
+            </div>
+
+            <br/>
+
+            <button mat-stroked-button (click)="add_font(font_file.files[0])">Add Font</button>
         </div>
     </div>
 

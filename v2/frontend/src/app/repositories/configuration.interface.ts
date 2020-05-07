@@ -25,9 +25,10 @@ export interface ConfigurationInterface {
     load_drive_folder() : Promise<string>
     load_logs() : Promise<string[]>
 
-    upload_base_file(file : File) : Promise<any>
-    load_fonts() : Promise<object>
+    upload_font(file : File) : Promise<any>
+    load_fonts() : Promise<Map<string, any>>
 
+    upload_base_file(file : File) : Promise<any>
     load_bases() : Promise<Base[]>
     save_bases(bases : Base[]) : Promise<any>
 

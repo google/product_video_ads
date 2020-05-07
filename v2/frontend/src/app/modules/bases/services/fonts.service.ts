@@ -18,52 +18,34 @@ import { Injectable } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
 import { CachedConfigurationRepository } from 'app/repositories/implementations/googleapi/cached-configuration.repository'
 import { LoginService } from 'app/modules/login/services/login.service'
-import { Asset } from 'app/models/asset'
+import { environment } from 'environments/environment'
 
 @Injectable({
     providedIn: 'root'
 })
-export class AssetsService {
+export class FontsService {
     
-    private is_ready : boolean = false
-
-    private readonly _assets = new BehaviorSubject<Asset[]>([])
+    private readonly _fonts = new BehaviorSubject<Map<string, any>>(null)
     
     /** Published state to application **/
-    readonly assets$ = this._assets.asObservable()
+    readonly fonts$ = this._fonts.asObservable()
 
-    get assets() {
-        return [...this._assets.getValue()]
+    get fonts() {
+        return {...this._fonts.getValue()}
     }
 
     constructor(private repository : CachedConfigurationRepository, loginService : LoginService) {
         loginService.ready$.subscribe(async ready => {
-            if (ready == 1) {
-                this.is_ready = true
-                this.load_assets()
-            }
+            if (ready == 1)
+                this._fonts.next(await repository.load_fonts())
         })
     }
 
-    /** Actions **/
-    async load_assets() {
-        if (this.is_ready)
-            this._assets.next(await this.repository.load_assets())
+    upload_font(file : File) : Promise<any> {
+        return this.repository.upload_font(file)
     }
 
-    reload_assets() {
-        this.load_assets()
-    }
-
-    add_asset(asset : Asset) : Promise<any> {
-        const next_id = Math.max(...this.assets.map(p => p.id)) + 1
-        asset.id = next_id
-        this._assets.next([...this.assets, asset])
-        return this.repository.save_assets(this.assets)
-    }
-
-    delete_asset(id : number) : Promise<any> {
-        this._assets.next(this.assets.filter(a => a.id != id))
-        return this.repository.save_assets(this.assets)
+    async reload_fonts() : Promise<any> {
+        return this._fonts.next(await this.repository.load_fonts(true))
     }
 }

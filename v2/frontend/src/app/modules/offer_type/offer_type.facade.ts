@@ -21,6 +21,7 @@ import { ProductService } from '../products/services/product.service';
 import { OfferType } from 'app/models/offertype';
 import { AssetsService } from '../static_assets/services/assets.service';
 import { BasesService } from '../bases/services/bases.service';
+import { FontsService } from '../bases/services/fonts.service';
 
 @Injectable()
 export class OfferTypeFacade {
@@ -29,6 +30,7 @@ export class OfferTypeFacade {
                 private offerTypeService : OfferTypeService,
                 private assetsService : AssetsService,
                 private basesService : BasesService,
+                private fontsService : FontsService,
                 private productsService : ProductService) {}
 
     get ready$() {
@@ -40,7 +42,7 @@ export class OfferTypeFacade {
     }
 
     get fonts() {
-        return this.offerTypeService.fonts
+        return this.fontsService.fonts
     }
 
     get offer_types$() {
@@ -51,8 +53,14 @@ export class OfferTypeFacade {
         return this.productsService.products
     }
 
-    get product_headers() {
-        return this.products.length > 0 ? Object.keys(this.products[0].values) : []
+    get product_headers() : Array<string> {
+
+        const headers = new Set<string>()
+
+        for (let product of this.products)
+            Object.keys(product.values).forEach(headers.add, headers)
+
+        return [...headers]
     }
 
     get assets() {

@@ -56,6 +56,7 @@ export class OfferTypeComponent implements OnInit {
 
   constructor(public facade : OfferTypeFacade, private router: Router, private _snackBar: MatSnackBar) {
     this.offer_types = this.facade.offer_types$
+    
     this.facade.bases.subscribe(bases => {
       this.bases = bases
     })
@@ -201,6 +202,7 @@ export class OfferTypeComponent implements OnInit {
   }
 
   select_field(field) {
+
     if (this.config.type == 'product') {
 
       this.contents = this.facade.products.map(p => { 
@@ -210,7 +212,7 @@ export class OfferTypeComponent implements OnInit {
       this.contents = this.facade.assets.map(a => { return {'id': a.id, 'value': a[field] || ''} })
     }
 
-    this.contents = this.contents.filter(a => a.value != '')
+    this.contents = this.contents.filter(a => a.value != undefined)
   }
 
   select_example(content) {

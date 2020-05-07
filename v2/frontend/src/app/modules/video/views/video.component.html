@@ -18,7 +18,7 @@
 <div class="inner_content">
 
   <!-- Shows generated videos and logs, if there's any -->
-  <div *ngIf="(videos | async).length > 0">
+  <div *ngIf="(videos | async).length > 0 && (bases$ | async).length > 0">
 
     <!-- Videos already created -->
     <mat-expansion-panel expanded="false">

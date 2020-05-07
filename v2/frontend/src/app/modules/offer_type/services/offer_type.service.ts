@@ -26,19 +26,13 @@ export class OfferTypeService {
 
     private readonly _offer_types = new BehaviorSubject<OfferType[]>([])
     private readonly _bases = new BehaviorSubject<object>({})
-    private readonly _fonts = new BehaviorSubject<object>({})
 
     /** Published state to application **/
     readonly offer_types$ = this._offer_types.asObservable()
     readonly bases$ = this._bases.asObservable()
-    readonly fonts$ = this._fonts.asObservable()
 
     get bases() {
         return {...this._bases.getValue()}
-    }
-
-    get fonts() {
-        return {...this._fonts.getValue()}
     }
 
     get offer_types() {
@@ -50,7 +44,6 @@ export class OfferTypeService {
             if (ready == 1) {
                 this._offer_types.next(await repository.load_offer_types())
                 this._bases.next(await repository.load_bases())
-                this._fonts.next(await repository.load_fonts())
             }
         })
     }
