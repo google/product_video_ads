@@ -150,6 +150,8 @@ export class OfferTypeComponent implements OnInit {
 
     var rect = video.getBoundingClientRect();
 
+    //const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+
     // To calculate elements positions relative
     this.video_pos = {
       x: rect.left, 
@@ -159,6 +161,8 @@ export class OfferTypeComponent implements OnInit {
       x_ratio: video.videoWidth/WIDTH,
       y_ratio: video.videoHeight/HEIGHT
     }
+
+    console.log(this.video_pos)
 
     this.load_elements_on_video()
   }
