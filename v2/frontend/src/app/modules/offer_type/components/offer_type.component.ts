@@ -80,7 +80,7 @@ export class OfferTypeComponent implements OnInit {
     
     if (!this.locked_name)
       this.offer_types.pipe(first()).subscribe(ots => {
-        this.offer_type.title += ' ' + ots.length
+        this.offer_type.title += ' ' + (ots.length + 1)
       })
     
     this.offer_type.base = base.title

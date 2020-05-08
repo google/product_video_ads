@@ -42,31 +42,33 @@ export class DraggableElementComponent implements AfterViewInit {
 
     private element_position_to_style() {
 
-        if (!this.element.needs_screen_adjust)
-          return
+        if (this.element.needs_screen_adjust) {
 
-        // Adjust on align
-        let align_adjust = 0
-          
-        if (this.element.align == 'center')
-          align_adjust = this.html_element.nativeElement.offsetWidth/2
-  
-        if (this.element.align == 'right')
-          align_adjust = this.html_element.nativeElement.offsetWidth
-  
-        // Position on screen 
-        this.element.left = ((parseInt(this.element.x) - align_adjust) / this.video_pos.x_ratio) + this.video_pos.offset_x + 'px'
-        this.element.top =  (parseInt(this.element.y) / this.video_pos.y_ratio) + this.video_pos.offset_y + 'px';
-      
-        // Resize to screen
-        if (this.element.view_type == 'image') {
-          this.element.width /= this.video_pos.x_ratio
-          this.element.height /= this.video_pos.y_ratio
-        }
+          // Adjust on align
+          let align_adjust = 0
+            
+          if (this.element.align == 'center')
+            align_adjust = this.html_element.nativeElement.offsetWidth/2
     
-        this.element.size /= this.video_pos.x_ratio
+          if (this.element.align == 'right')
+            align_adjust = this.html_element.nativeElement.offsetWidth
+    
+          // Position on screen 
+          this.element.left = ((parseInt(this.element.x) - align_adjust) / this.video_pos.x_ratio) + this.video_pos.offset_x + 'px'
+          this.element.top =  (parseInt(this.element.y) / this.video_pos.y_ratio) + this.video_pos.offset_y + 'px';
+        
+          // Resize to screen
+          if (this.element.view_type == 'image') {
+            this.element.width /= this.video_pos.x_ratio
+            this.element.height /= this.video_pos.y_ratio
+          }
+      
+          this.element.size /= this.video_pos.x_ratio
+
+          this.element.needs_screen_adjust = false
+        }
   
-        this.element.needs_screen_adjust = false
+        this.html_element.nativeElement.style.visibility = 'visible'
         this.cd.detectChanges()
     }
 }

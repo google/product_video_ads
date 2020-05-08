@@ -33,32 +33,34 @@
 
       <br/><br/>
 
-      <div style="display: inline-block; margin-right: 1%;" *ngFor="let video of videos | async">
+      <span *ngFor="let video of videos | async">
 
-        <span class="added_item" *ngIf="video.generated_video && video.status == 'Not Started'" >
+        <div *ngIf="video.generated_video && video.status == 'Not Started'" class="added_item video_box" >
           
-          <video *ngIf="is_video(video)" width="250" height="150" controls>
+          <video *ngIf="is_video(video)" width="200" height="150" controls>
               <source [src]="drive_url + video.generated_video" type="video/mp4">
           </video>
 
           <a *ngIf="!is_video(video)" [href]="drive_url + video.generated_video">
             <img width="300" height="200" [src]="drive_url + video.generated_video"/>
           </a>
+
+          <br/>
           
           <span style="cursor: pointer" (click)="delete_video(video)">
             <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
           </span>
-        </span>
+        </div>
 
-        <span class="added_item" *ngIf="video.status == 'Preview'">
-          <br/>
+        <div class="added_item video_box" *ngIf="video.status == 'Preview'">
           <mat-icon aria-hidden="false" aria-label="access_time icon">access_time</mat-icon>
           <p>Generating video...</p>
           <span style="cursor: pointer" (click)="delete_video(video)">
             <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
           </span>
-        </span>
-      </div>
+        </div>
+
+      </span>
     </mat-expansion-panel>
 
     <br/>
@@ -88,25 +90,25 @@
     <h3>Select base to use:</h3>
     <mat-spinner *ngIf="(bases$ | async).length == 0"></mat-spinner>
 
-    <div class="added_item" *ngFor="let base of bases$ | async " (click)="choose_base(base)">
-      <p><b>{{base.title}}</b></p>
-      <p>{{base.products.length}} product(s)</p>
+    <div class="added_item" [ngClass]="{'selected_box': base && base.title == b.title}" *ngFor="let b of bases$ | async " (click)="choose_base(b)">
+      <p><b>{{b.title}}</b></p>
+      <p>{{b.products.length}} product(s)</p>
     </div>
   </div>
 
   <!-- Configure if it's preview or bulk creation -->
   <div *ngIf="base">
-      <h3>What do you want to do?</h3>
+    <h3>What do you want to do?</h3>
 
-      <div class="added_item" (click)="select_single_video_mode()">
-        <mat-icon aria-hidden="false" aria-label="video_label icon" title="video_label">video_label</mat-icon>
-        <p>Create <b>one</b><br/>single video</p>
-      </div>
+    <div class="added_item" [ngClass]="{'selected_box': mode == 'single'}" (click)="select_single_video_mode()">
+      <mat-icon aria-hidden="false" aria-label="video_label icon" title="video_label">video_label</mat-icon>
+      <p>Create <b>one</b><br/>single video</p>
+    </div>
 
-      <div class="added_item" (click)="select_bulk_video_mode()">
-        <mat-icon aria-hidden="false" aria-label="video_library icon" title="video_library">video_library</mat-icon>
-        <p>Create <b>multiple</b><br/>videos in bulk</p>
-      </div>
+    <div class="added_item" [ngClass]="{'selected_box': mode == 'bulk'}" (click)="select_bulk_video_mode()">
+      <mat-icon aria-hidden="false" aria-label="video_library icon" title="video_library">video_library</mat-icon>
+      <p>Create <b>multiple</b><br/>videos in bulk</p>
+    </div>
   </div>
 
   <!-- Configure single video -->

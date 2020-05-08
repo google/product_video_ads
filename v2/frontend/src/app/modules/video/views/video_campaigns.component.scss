@@ -8,6 +8,16 @@
     border-radius: 5px;
 }
 
+.video_box {
+    display: inline-block; 
+    margin: 0.5%;
+    padding: 0.5%;
+}
+
+.selected_box {
+    background-color: rgba(0, 200, 0, 0.3);
+}
+
 .campaign_config {
     margin: 2%;
 }
