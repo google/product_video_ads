@@ -50,6 +50,7 @@ export class OfferTypeComponent implements OnInit {
   locked_name = false
   seconds : any
   is_video : boolean
+  mouse_pos = {x: 0, y: 0}
   video
   video_url
   video_pos
@@ -92,8 +93,6 @@ export class OfferTypeComponent implements OnInit {
     this.offer_type = {...offer_type}
     this.choose_base(this.bases.filter(b => b.title == offer_type.base)[0])
     this.locked_name = true
-
-    window.addEventListener('scroll', this.block_scroll)
   }
 
   copy_type(offer_type : OfferType) {
@@ -120,18 +119,17 @@ export class OfferTypeComponent implements OnInit {
     this.video = img
 
     var rect = img.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop
 
     // To calculate elements positions relative
     this.video_pos = {
       x: rect.left, 
-      y: rect.top,
+      y: rect.top + scrollTop,
       offset_x: img.offsetLeft,
       offset_y: img.offsetTop,
       x_ratio: 1,
       y_ratio: 1
     }
-
-    console.log(this.video_pos)
 
     this.load_elements_on_video()
   }
@@ -150,25 +148,19 @@ export class OfferTypeComponent implements OnInit {
 
     var rect = video.getBoundingClientRect();
 
-    //const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop
 
     // To calculate elements positions relative
     this.video_pos = {
       x: rect.left, 
-      y: rect.top,
+      y: rect.top + scrollTop,
       offset_x: video.offsetLeft,
       offset_y: video.offsetTop,
       x_ratio: video.videoWidth/WIDTH,
       y_ratio: video.videoHeight/HEIGHT
     }
 
-    console.log(this.video_pos)
-
     this.load_elements_on_video()
-  }
-
-  block_scroll() {
-    window.scrollTo(0,0)
   }
 
   play_pause() {
@@ -237,10 +229,11 @@ export class OfferTypeComponent implements OnInit {
       ...product
     }
 
-    setTimeout(() => {
-      this.add_events(element)
-    }, 1000)
-    
+    this.elements.push(element)
+
+    document.body.addEventListener('dragover', this.drag_over, false)
+    document.body.addEventListener('drop', this.drop_event.bind(this), false)
+
     return element
   }
 
@@ -285,7 +278,7 @@ export class OfferTypeComponent implements OnInit {
     }
     
     // Bind from view
-    create_image(product?) {
+    public create_image(product?) {
       
       const current_product = product ? product : this.config
       const element = this.create_element(current_product)
@@ -323,23 +316,7 @@ export class OfferTypeComponent implements OnInit {
       return words
     }
 
-    // View events to elements added
-    private add_events(element) {
-      
-      const el = document.getElementById(element.id)
-      
-      el.addEventListener('dragstart', this.drag_start, false)
-      el.addEventListener('dblclick', this.delete_element.bind(this), false)
-      
-      document.body.addEventListener('dragover', this.drag_over,false)
-      document.body.addEventListener('drop', this.drop_event.bind(this), false)
-
-      el.style.visibility = 'visible'
-
-      this.elements.push(element)
-    }
-
-    private drag_start(event) {
+    public drag_start(event) {
       event.dataTransfer.setData("text/plain", event.target.id)
     }
     
@@ -449,13 +426,9 @@ export class OfferTypeComponent implements OnInit {
       }
 
       this.offer_type.configs = []
-
-      setTimeout(() => {
-        window.removeEventListener('scroll', this.block_scroll)
-      }, 1000)
     }
     
-    private delete_element(event) {
+    public delete_element(event) {
       
       event.preventDefault();
       

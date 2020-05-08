@@ -90,6 +90,8 @@
           id="{{el.id}}"
           innerHTML={{el.content}}
           draggable="true"
+          (dragstart)="drag_start($event)"
+          (dblclick)="delete_element($event)"
           [ngStyle]="{
             'color': el.color,
             'font-size': el.size + 'px',
@@ -97,8 +99,7 @@
             'text-align': el.align,
             'position': 'absolute',
             'line-height': el.size * 1.2 + 'px',
-            'transform': 'rotate(' + el.angle + 'deg)',
-            'visibility': 'hidden'
+            'transform': 'rotate(' + el.angle + 'deg)'
           }"
           >{{el.content}}</div>
         </div>
@@ -110,10 +111,11 @@
           width={{el.width}}
           height={{el.height}}
           draggable="true"
+          (dragstart)="drag_start($event)"
+          (dblclick)="delete_element($event)"
           [ngStyle]="{
             'position': 'absolute',
-            'transform': 'rotate(' + el.angle + 'deg)',
-            'visibility': 'hidden'
+            'transform': 'rotate(' + el.angle + 'deg)'
           }"/>
         </div>
       </div>
