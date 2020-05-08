@@ -15,7 +15,7 @@
 -->
 
 <h2 class="main_title">Offer Types</h2>
-<div class="inner_content">
+<div class="inner_content" (drop)="drop_event($event)" (dragover)="drag_over($event)">
   
   <!-- First screen: choose to edit or create new -->
   <div *ngIf="step == 1">
@@ -85,14 +85,17 @@
       </div>
         
         <!-- Items on screen -->
-        <div *ngFor="let el of text_elements">
-          <div
+        <div *ngFor="let el of elements">
+
+          <div *ngIf="el.view_type == 'text'"
           id="{{el.id}}"
           innerHTML={{el.content}}
           draggable="true"
           (dragstart)="drag_start($event)"
           (dblclick)="delete_element($event)"
           [ngStyle]="{
+            'top': el.top,
+            'left': el.left,
             'color': el.color,
             'font-size': el.size + 'px',
             'font-family': el.font_family,
@@ -100,12 +103,11 @@
             'position': 'absolute',
             'line-height': el.size * 1.2 + 'px',
             'transform': 'rotate(' + el.angle + 'deg)'
-          }"
-          >{{el.content}}</div>
+          }">
+          {{el.content}}
         </div>
         
-        <div *ngFor="let el of image_elements">
-          <img
+        <img *ngIf="el.view_type == 'image'"
           id="{{el.id}}"
           src={{el.content}}
           width={{el.width}}
@@ -114,10 +116,13 @@
           (dragstart)="drag_start($event)"
           (dblclick)="delete_element($event)"
           [ngStyle]="{
+            'top': el.top,
+            'left': el.left,
             'position': 'absolute',
             'transform': 'rotate(' + el.angle + 'deg)'
           }"/>
-        </div>
+
+          {{element_position_to_style(el)}}
       </div>
       
       <br><br>

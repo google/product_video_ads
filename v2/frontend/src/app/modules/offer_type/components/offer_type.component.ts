@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { OfferTypeFacade } from '../offer_type.facade';
 import { Observable } from 'rxjs';
@@ -22,6 +22,7 @@ import { OfferType } from 'app/models/offertype';
 import { Config } from 'app/models/config';
 import { Router } from '@angular/router';
 import { Base } from 'app/models/base';
+import { first } from 'rxjs/operators'
 import * as UUID from 'uuid/v4'
 
 @Component({
@@ -33,7 +34,6 @@ import * as UUID from 'uuid/v4'
 export class OfferTypeComponent implements OnInit {
   
   types : Array<string> = ['product', 'asset']
-  
   step : number
   offer_types : Observable<OfferType[]>
   bases : Array<Base>
@@ -44,18 +44,14 @@ export class OfferTypeComponent implements OnInit {
   contents : Array<any>
   content : any
   elements : Array<any>
-  text_elements : Array<any>
-  image_elements : Array<any>
   loaded_fonts : Set<string>
   locked_name = false
-  seconds : any
   is_video : boolean
-  mouse_pos = {x: 0, y: 0}
   video
   video_url
   video_pos
 
-  constructor(public facade : OfferTypeFacade, private router: Router, private _snackBar: MatSnackBar) {
+  constructor(public facade : OfferTypeFacade, private router: Router, private _snackBar: MatSnackBar, private cd: ChangeDetectorRef) {
     this.offer_types = this.facade.offer_types$
     
     this.facade.bases.subscribe(bases => {
@@ -65,14 +61,11 @@ export class OfferTypeComponent implements OnInit {
 
   ngOnInit() {
     this.elements = []
-    this.image_elements = []
-    this.text_elements = []
     this.step = 1 
     this.video_url = ''
-    this.seconds = 0.0
     this.loaded_fonts = new Set()
-    this.offer_type = new OfferType('Untitled', '', [])
     this.config = new Config()
+    this.offer_type = new OfferType('OfferType', '', [])
 
     this.facade.update_products()
   }
@@ -82,7 +75,14 @@ export class OfferTypeComponent implements OnInit {
   }
 
   choose_base(base : Base) {
+
     this.video_url = base.url
+    
+    if (!this.locked_name)
+      this.offer_types.pipe(first()).subscribe(ots => {
+        this.offer_type.title += ' ' + ots.length
+      })
+    
     this.offer_type.base = base.title
     this.is_video = base.file.endsWith('.mp4')
     this.example_time = base.products[0]
@@ -91,8 +91,8 @@ export class OfferTypeComponent implements OnInit {
 
   edit_type(offer_type : OfferType) {
     this.offer_type = {...offer_type}
-    this.choose_base(this.bases.filter(b => b.title == offer_type.base)[0])
     this.locked_name = true
+    this.choose_base(this.bases.filter(b => b.title == offer_type.base)[0])
   }
 
   copy_type(offer_type : OfferType) {
@@ -113,8 +113,7 @@ export class OfferTypeComponent implements OnInit {
     })
   }
   
-  /*********** Video controls **********/
-  on_image_loaded(img) {
+  public on_image_loaded(img) {
 
     this.video = img
 
@@ -134,7 +133,7 @@ export class OfferTypeComponent implements OnInit {
     this.load_elements_on_video()
   }
 
-  on_video_loaded(video) {
+  public on_video_loaded(video) {
     
     const adjust = video.videoWidth / 800
 
@@ -163,32 +162,9 @@ export class OfferTypeComponent implements OnInit {
     this.load_elements_on_video()
   }
 
-  play_pause() {
-    
-    if (this.video.paused)
-      this.video.play()
-    else
-      this.video.pause()
-    
-    this.seconds = this.video.currentTime.toFixed(1)
-  }
-  
-  go_to_second() {
-    this.video.currentTime = this.seconds
-  }
-  
-  go_seconds_back(seconds_pace) {
-    this.seconds = (parseFloat(this.seconds) - seconds_pace).toFixed(1)
-    this.go_to_second()
-  }
-  
-  go_seconds_forward(seconds_pace) {
-    this.seconds = (parseFloat(this.seconds) + seconds_pace).toFixed(1)
-    this.go_to_second()
-  }
-
   /*********** Element choosing controls **********/
   select_type(type) {
+
     if (type == 'product')
       this.fields = this.facade.product_headers
     else
@@ -231,9 +207,6 @@ export class OfferTypeComponent implements OnInit {
 
     this.elements.push(element)
 
-    document.body.addEventListener('dragover', this.drag_over, false)
-    document.body.addEventListener('drop', this.drop_event.bind(this), false)
-
     return element
   }
 
@@ -242,6 +215,8 @@ export class OfferTypeComponent implements OnInit {
     
     const current_product = product ? product : this.config
     const element = this.create_element(current_product)
+
+    element.view_type = 'text'
 
     // Load font for this text, if not loaded yet
     const font_name = current_product.font.split('.')[0]
@@ -272,8 +247,6 @@ export class OfferTypeComponent implements OnInit {
       current_product['width'])
       .join('<br/>')
       
-      this.text_elements.push(element)
-
       return element
     }
     
@@ -283,7 +256,7 @@ export class OfferTypeComponent implements OnInit {
       const current_product = product ? product : this.config
       const element = this.create_element(current_product)
       
-      this.image_elements.push(element)
+      element.view_type = 'image'
 
       return element
     }
@@ -320,12 +293,12 @@ export class OfferTypeComponent implements OnInit {
       event.dataTransfer.setData("text/plain", event.target.id)
     }
     
-    private drag_over(event) {
+    public drag_over(event) {
       event.preventDefault();
       return false;
     }
     
-    private drop_event(event) {
+    public drop_event(event) {
       
       const id = event.dataTransfer.getData("text/plain")
 
@@ -339,12 +312,12 @@ export class OfferTypeComponent implements OnInit {
       // Element on screen
       const dm = document.getElementById(id)
 
-      dm.style.left = (this.video_pos.offset_x + x - dm.offsetWidth/2) + 'px';
-      dm.style.top = (this.video_pos.offset_y + y - dm.offsetHeight/2 + scrollTop) + 'px';
-
       // Element saved
       const element = this.elements.filter(e => e.id == id)[0]
     
+      element.left = (this.video_pos.offset_x + x - dm.offsetWidth/2) + 'px';
+      element.top = (this.video_pos.offset_y + y - dm.offsetHeight/2 + scrollTop) + 'px';
+
       // Adjust on align
       let align_adjust = 0
       
@@ -361,40 +334,42 @@ export class OfferTypeComponent implements OnInit {
       return false
     }
 
-    private element_position_to_style(element, interval) {
+    public element_position_to_style(element) {
 
-      setTimeout(() => {
+      if (!element.needs_screen_adjust)
+        return
 
-        const dm = document.getElementById(element.id)
+      if (this.is_image(element.content)) {
+        element.width /= this.video_pos.x_ratio
+        element.height /= this.video_pos.y_ratio
+      }
+  
+      element.size /= this.video_pos.x_ratio
 
-        if (this.is_image(element.content)) {
-          element.width /= this.video_pos.x_ratio
-          element.height /= this.video_pos.y_ratio
-        }
+      const dm = document.getElementById(element.id)
 
-        element.size /= this.video_pos.x_ratio
-
-        // Adjust on align
-        let align_adjust = 0
+      // Adjust on align
+      let align_adjust = 0
         
-        if (element.align == 'center')
-          align_adjust = dm.offsetWidth/2
+      if (element.align == 'center')
+        align_adjust = dm.offsetWidth/2
 
-        if (element.align == 'right')
-          align_adjust = dm.offsetWidth
+      if (element.align == 'right')
+        align_adjust = dm.offsetWidth
 
-        dm.style.left = ((parseInt(element.x) - align_adjust) / this.video_pos.x_ratio) + this.video_pos.offset_x + 'px'
-        dm.style.top =  (parseInt(element.y) / this.video_pos.y_ratio) + this.video_pos.offset_y + 'px';
+      element.left = ((parseInt(element.x) - align_adjust) / this.video_pos.x_ratio) + this.video_pos.offset_x + 'px'
+      element.top =  (parseInt(element.y) / this.video_pos.y_ratio) + this.video_pos.offset_y + 'px';
+    
+      element.needs_screen_adjust = false
 
-      }, interval)
+      this.cd.detectChanges()
     }
     
     load_elements_on_video() {
 
       // Go to video position
-      if (this.example_time && this.seconds != this.example_time['start_time']) {
-        this.seconds = this.example_time['start_time']
-        this.go_to_second()
+      if (this.example_time && this.video.currentTime != this.example_time['start_time']) {
+        this.video.currentTime = this.example_time['start_time']
       }
 
       // Add all elements on screen
@@ -422,7 +397,7 @@ export class OfferTypeComponent implements OnInit {
             element = this.create_text({...c, content})
         }
 
-        this.element_position_to_style(element, 500)
+        element.needs_screen_adjust = true
       }
 
       this.offer_type.configs = []
@@ -436,36 +411,33 @@ export class OfferTypeComponent implements OnInit {
       
       // Delete from screen
       this.elements = this.elements.filter(e => e.id != id)
-      this.text_elements = this.text_elements.filter(e => e.id != id)
-      this.image_elements = this.image_elements.filter(e => e.id != id)
       
       return false;
     }
     
     private add_elements_to_configs() {
       
-      // Add all texts
-      for (let e of this.text_elements) {
-        this.offer_type.configs.push(new Config(
-          e.key,
-          e.type,
-          e.field,
-          parseInt(e.x),
-          parseInt(e.y),
-          0,//this.offer_type.start_time,
-          0,//this.offer_type.end_time,
-          e.font,
-          e.color,
-          Math.floor(e.size * this.video_pos.x_ratio),
-          e.width,
-          0,
-          e.align,
-          e.angle
-        ))
-      }
-
-      // Add all images
-      for (let e of this.image_elements) {
+      for (let e of this.elements) {
+        // Add texts
+        if (e.view_type == 'text')
+          this.offer_type.configs.push(new Config(
+            e.key,
+            e.type,
+            e.field,
+            parseInt(e.x),
+            parseInt(e.y),
+            0,//this.offer_type.start_time,
+            0,//this.offer_type.end_time,
+            e.font,
+            e.color,
+            Math.floor(e.size * this.video_pos.x_ratio),
+            e.width,
+            0,
+            e.align,
+            e.angle
+          ))
+        else
+      // Add images
         this.offer_type.configs.push(new Config(
           e.key,
           e.type,
@@ -491,25 +463,25 @@ export class OfferTypeComponent implements OnInit {
       this.facade.add_offer_type(this.offer_type)
     }
 
-      finish() {
-        this.add_elements_to_configs()
-        this.save()
-      }
-      
-      save() {
-
-        this._snackBar.open("Saving...", 'OK', {
-          duration: 2000,
-        })
-
-        this.facade.save().then(response => {
-
-          const status = response['status']
-
-          if (status == 200)
-            window.location.replace('offer_types')
-          else
-            this._snackBar.open("Error (" + status + ')', 'OK', { duration: 10000 })
-        })
-      }
+    finish() {
+      this.add_elements_to_configs()
+      this.save()
     }
+      
+    save() {
+
+      this._snackBar.open("Saving...", 'OK', {
+        duration: 2000,
+      })
+
+      this.facade.save().then(response => {
+
+        const status = response['status']
+
+        if (status == 200)
+          window.location.replace('offer_types')
+        else
+          this._snackBar.open("Error (" + status + ')', 'OK', { duration: 10000 })
+      })
+    }
+  }
