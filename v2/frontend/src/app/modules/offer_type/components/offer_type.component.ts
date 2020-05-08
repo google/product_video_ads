@@ -162,7 +162,6 @@ export class OfferTypeComponent implements OnInit {
     this.load_elements_on_video()
   }
 
-  /*********** Element choosing controls **********/
   select_type(type) {
 
     if (type == 'product')
@@ -334,37 +333,6 @@ export class OfferTypeComponent implements OnInit {
       return false
     }
 
-    public element_position_to_style(element) {
-
-      if (!element.needs_screen_adjust)
-        return
-
-      if (this.is_image(element.content)) {
-        element.width /= this.video_pos.x_ratio
-        element.height /= this.video_pos.y_ratio
-      }
-  
-      element.size /= this.video_pos.x_ratio
-
-      const dm = document.getElementById(element.id)
-
-      // Adjust on align
-      let align_adjust = 0
-        
-      if (element.align == 'center')
-        align_adjust = dm.offsetWidth/2
-
-      if (element.align == 'right')
-        align_adjust = dm.offsetWidth
-
-      element.left = ((parseInt(element.x) - align_adjust) / this.video_pos.x_ratio) + this.video_pos.offset_x + 'px'
-      element.top =  (parseInt(element.y) / this.video_pos.y_ratio) + this.video_pos.offset_y + 'px';
-    
-      element.needs_screen_adjust = false
-
-      this.cd.detectChanges()
-    }
-    
     load_elements_on_video() {
 
       // Go to video position

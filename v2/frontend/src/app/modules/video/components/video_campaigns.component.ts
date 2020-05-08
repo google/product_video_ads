@@ -139,7 +139,18 @@ export class VideoCampaignsComponent implements OnInit {
     }
 
     delete_video(video : Video) {
-      this.facade.delete_video(video.generated_video)
+
+      const video_name = video.generated_video || 'being generated'
+
+      this._snackBar.open('Confirm deletion of video ' + video_name + '?', 'Confirm', {
+        duration: 4000,
+      }).onAction().subscribe(() => {
+        this.facade.delete_video(video.generated_video).then(response => {
+          this._snackBar.open("Video deleted (" + response.status + ')', 'OK', {
+            duration: 2000
+          })
+        })
+      })
     }
     
     indexTracker(index: number, value: any) {
