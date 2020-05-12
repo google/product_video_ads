@@ -357,7 +357,8 @@ export class OfferTypeComponent implements OnInit {
         } else {
 
           // Product
-          const content = this.facade.products.filter(p => p.id == c.key)[0].values[c.field]
+          const current_product = this.facade.products.filter(p => p.id == c.key)[0] || this.facade.products[0]
+          const content = current_product.values[c.field]
 
           if (this.is_image(content))
             element = this.create_image({...c, content})
