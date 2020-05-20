@@ -18,6 +18,7 @@ import { Component, OnInit } from '@angular/core';
 import { LoginFacade } from '../login.facade';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login',
@@ -42,7 +43,7 @@ export class LoginComponent implements OnInit {
 
   sheet_text : string = ''
 
-  constructor(private loginFacade : LoginFacade, private route : ActivatedRoute) {}
+  constructor(private loginFacade : LoginFacade, private route : ActivatedRoute, private _snackBar: MatSnackBar) {}
 
   ngOnInit() {
     this.ready = this.loginFacade.ready
@@ -64,6 +65,10 @@ export class LoginComponent implements OnInit {
   }
 
   generate_new() {
-    this.loginFacade.generate_new()
+    this.loginFacade.generate_new().then(response => {
+      if (!response) {
+        this._snackBar.open("The user does not have access to the PVA Template or there was an error trying to read the spreasheet. Please contact the admin.", 'OK', { duration: 10000 })
+      } 
+    });
   }
 }
