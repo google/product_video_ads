@@ -216,4 +216,24 @@ export class GoogleAPI {
 
     return response_folder_id
   }
+
+  /* Check if logged user has access to the PVA Template spreadsheet before creating a copy */
+  async has_spreadsheet_access(sheet_id : string) {
+    try {
+      // try to read something from the trix, if the user does not have access, the catch will get the error
+      const response = await this.gapi.client.sheets.spreadsheets.values.get({
+        spreadsheetId: sheet_id,
+        range: 'Configuration!B4'
+      });
+      return this.is_valid_response(response, "range")
+    } catch {
+      console.log("The user does NOT have access to PVA Template spreadsheet.");
+      return false
+    }
+  }
+
+  is_valid_response(response : any, spec_field : string) {
+    return response !== undefined && response.hasOwnProperty("status") && response.status == 200 && response.hasOwnProperty("result") && response.result.hasOwnProperty(spec_field)
+  }
+
 }

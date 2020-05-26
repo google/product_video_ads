@@ -43,6 +43,6 @@ export class LoginFacade {
     }
 
     generate_new() {
-        this.loginService.generate_new()
+        return this.loginService.generate_new()
     }
 }
