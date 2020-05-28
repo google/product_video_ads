@@ -197,10 +197,12 @@ export class GoogleAPI {
       fields: 'files(id, mimeType, name)'
     })
       
-    resp.result.files.forEach(async f => {
+    for (let i = 0; i < resp.result.files.length; i++) {
+
+      let f = resp.result.files[i]
 
       if (f.mimeType == this.FOLDER_MIME_TYPE)
-        this.copy_drive_folder(f.id, f.name, response.result.id)
+        await this.copy_drive_folder(f.id, f.name, response.result.id)
       else {
 
         console.log('creating ' + f.name + ' inside ' + response_folder_id)
@@ -212,7 +214,7 @@ export class GoogleAPI {
 
         console.log(r)
       }
-    })
+    }
 
     return response_folder_id
   }
