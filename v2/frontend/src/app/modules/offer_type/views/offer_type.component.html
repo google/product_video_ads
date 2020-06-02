@@ -101,7 +101,7 @@
         <mat-label>Title</mat-label>
         <input [(ngModel)]="offer_type.title" matInput [disabled]="locked_name">
       </mat-form-field>
-      
+
       <!-- Add New Items -->
       <h2>Add new element to video:</h2>
       
@@ -211,6 +211,15 @@
           <button mat-stroked-button (click)="create_image()">Insert Image</button>
         </div>
       </div>
+
+      <h2>Position:</h2>
+
+        <p>This position is to visualization only.<br/>You can assign each product to each position when creating the video on next step.</p>
+
+        <div class="added_item" *ngFor="let product of base_products_timings; let i = index" [ngClass]="{'selected_box': product.chosen}" (click)="choose_position(product)" style="min-width: 0">
+            <p>Position {{i + 1}}</p>
+            <p>{{product.start_time}}s - {{product.end_time}}s</p>
+        </div>
       
       <br/><br/>
       

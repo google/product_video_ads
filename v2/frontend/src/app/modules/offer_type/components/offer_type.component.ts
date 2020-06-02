@@ -39,13 +39,13 @@ export class OfferTypeComponent implements OnInit {
   bases : Array<Base>
   offer_type : OfferType
   config : any = {}
-  example_time = {}
   fields : Array<string>
   contents : Array<any>
   content : any
   elements : Array<any>
   loaded_fonts : Set<string>
   locked_name = false
+  base_products_timings = []
   is_video : boolean
   video
   video_url
@@ -77,6 +77,7 @@ export class OfferTypeComponent implements OnInit {
   choose_base(base : Base) {
 
     this.video_url = base.url
+    this.base_products_timings = base.products
     
     if (!this.locked_name)
       this.offer_types.pipe(first()).subscribe(ots => {
@@ -85,7 +86,6 @@ export class OfferTypeComponent implements OnInit {
     
     this.offer_type.base = base.title
     this.is_video = base.file.endsWith('.mp4')
-    this.example_time = base.products[0]
     this.move_step(3)
   }
 
@@ -333,11 +333,18 @@ export class OfferTypeComponent implements OnInit {
       return false
     }
 
+    choose_position(product) {
+      console.log('Setting video position to ' + product['start_time'])
+      this.video.currentTime = product['start_time']
+      this.base_products_timings.forEach(p => p['chosen'] = false)
+      product['chosen'] = true
+    }
+
     load_elements_on_video() {
 
       // Go to video position
-      if (this.example_time && this.video.currentTime != this.example_time['start_time']) {
-        this.video.currentTime = this.example_time['start_time']
+      if (this.base_products_timings.length > 0 && this.video.currentTime == 0) {
+        this.choose_position(this.base_products_timings[0])
       }
 
       // Add all elements on screen
@@ -436,7 +443,7 @@ export class OfferTypeComponent implements OnInit {
       this.add_elements_to_configs()
       this.save()
     }
-      
+
     save() {
 
       this._snackBar.open("Saving...", 'OK', {
