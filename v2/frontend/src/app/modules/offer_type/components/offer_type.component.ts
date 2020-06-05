@@ -245,9 +245,14 @@ export class OfferTypeComponent implements OnInit {
       current_product['content'],
       current_product['width'])
       .join('<br/>')
+
+    // Insert the text in black color so it is always visible in the white background
+    // the selected color will be applied to the text when the element is dropped in the video.
+    element.color = "#000000";
+    element.config_color = this.config.color;
       
-      return element
-    }
+    return element
+  }
     
     // Bind from view
     public create_image(product?) {
@@ -310,7 +315,9 @@ export class OfferTypeComponent implements OnInit {
 
       // Element on screen
       const dm = document.getElementById(id)
-
+      // assign selected color for the text
+      dm.style.color = dm.getAttribute("data-config-color");
+      
       // Element saved
       const element = this.elements.filter(e => e.id == id)[0]
     

@@ -26,9 +26,9 @@ export class Config {
         public end_time : number = 0.0,
         public font : string = '',
         public color: string = '#000',
-        public size : number = 0,
-        public width : number = 0,
-        public height : number = 0,
+        public size : number = 20, // setting 20 as default so the text is visible if the user inserts it without changing values
+        public width : number = 20, // ssetting 20 as default so the text is visible if the user inserts it without changing values
+        public height : number = 20, // setting 20 as default so the image is visible if the user inserts it without changing values
         public align : string = 'center',
         public angle : number = 0
         ) {}

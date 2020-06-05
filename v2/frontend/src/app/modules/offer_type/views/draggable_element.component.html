@@ -5,7 +5,8 @@
      innerHTML={{element.content}} 
      draggable="true"
      (dragstart)="dragstart.emit($event)" 
-     (dblclick)="dblclick.emit($event)" 
+     (dblclick)="dblclick.emit($event)"
+     [attr.data-config-color]="element.config_color" 
      [ngStyle]="{
             'top': element.top,
             'left': element.left,

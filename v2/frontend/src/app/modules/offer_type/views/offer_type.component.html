@@ -66,15 +66,15 @@
       <p>"Product" elements are dynamic and replaced when generating video during next step.</p>
       <p>Values you choose under "Products" elements are just examples texts/images.</p>
       <p>"Assets" elements are static and fixed, so will stay as you see here.</p>
-
+      <p>The selected color for the inserted texts will be applied when the element is dragged and dropped in the video area.</p>
       <br/>
 
       <!-- Spinner -->
-      <mat-spinner style="position: absolute" *ngIf="video_url && !video"></mat-spinner>
+      <mat-spinner class="spinner-element" style="position: absolute" *ngIf="video_url && !video"></mat-spinner>
   
       <div id="video">
 
-      <div *ngIf="is_video">
+      <div *ngIf="is_video" class="video-container">
         <video #vd1 *ngIf="video_url" class="video" (canplay)="on_video_loaded(vd1)" muted>
           <source [src]="video_url" type="video/mp4">
         </video>
@@ -85,7 +85,7 @@
       </div>
         
       <!-- Items on screen -->
-      <div *ngFor="let el of elements">
+      <div *ngFor="let el of elements" class="items-on-screen-container">
         <app-draggable-element 
           [element]="el"
           [video_pos]="video_pos"

@@ -1,7 +1,5 @@
 mat-form-field, input {
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-bottom: 10px;
+    margin: 10px;
     font-size: 18px;
 }
 
@@ -27,3 +25,19 @@ mat-icon {
 #seconds {
     margin: 0 1% 0 1%;
 }
+
+.video-container {
+    border-style: solid;
+    width: 800px;
+    margin-bottom: 40px;
+}
+
+.spinner-element {
+    left: 390px;
+    top: 395px;
+}
+
+.items-on-screen-container {
+    margin-bottom: 50px;
+}
+
