@@ -248,8 +248,8 @@ export class OfferTypeComponent implements OnInit {
 
     // Insert the text in black color so it is always visible in the white background
     // the selected color will be applied to the text when the element is dropped in the video.
-    element.color = "#000000";
-    element.config_color = this.config.color;
+    element.color = product ? product.color : "#000000";
+    element.config_color = product ? product.color : this.config.color;
       
     return element
   }
@@ -320,6 +320,7 @@ export class OfferTypeComponent implements OnInit {
       
       // Element saved
       const element = this.elements.filter(e => e.id == id)[0]
+      element.color = element.config_color;
     
       element.left = (this.video_pos.offset_x + x - dm.offsetWidth/2) + 'px';
       element.top = (this.video_pos.offset_y + y - dm.offsetHeight/2 + scrollTop) + 'px';
