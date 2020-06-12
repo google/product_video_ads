@@ -23,7 +23,9 @@ import imghdr
 import os
 import log
 
-def convert_configs_to_format(configs, products_data, storage):
+logger = log.getLogger()
+
+def convert_configs_to_format(configs, products_data, storage, cloud_storage):
 
   image_overlays = []
   text_overlays = []
@@ -38,10 +40,9 @@ def convert_configs_to_format(configs, products_data, storage):
 
     field_value = product_data.get(config['field'])
 
-    # Handle image to be added to video
-    if field_value.lower().startswith('http'):
-      image_overlays.append(
-          convert_image_overlay(config, field_value, storage))
+    # Handle image to be added to video (http* or gs://*)
+    if field_value.lower().startswith('http') or field_value.lower().startswith('gs://'):
+      image_overlays.append(convert_image_overlay(config, field_value, storage, cloud_storage))
     # Then it must be a text column
     else:
       text_overlays.extend(convert_text_overlay(config, field_value, storage))
@@ -106,20 +107,15 @@ def _wrap_text(text, charaters_per_line):
   return words
 
 
-def convert_image_overlay(config, field_value, storage):
+def convert_image_overlay(config, field_value, storage, cloud_storage):
+
+  logger.debug('Downloading image %s...' % (field_value))
 
   # Tries to retrieve image extension
   tmp_file_name = 'img.tmp'
 
-  # Downloads image
-  headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-
-  r = requests.get(field_value, stream=True, headers=headers, timeout=20)
-  r.raw.decode_content = True
-    
-  # Open a local file with wb ( write binary ) permission.
-  with open(tmp_file_name,'wb') as f:
-    shutil.copyfileobj(r.raw, f)
+  # Download image from url to local temp file
+  _download_image_to_file(field_value, tmp_file_name, cloud_storage)
 
   # Find out file's extension
   extension = imghdr.what(tmp_file_name) or 'jpg'
@@ -139,3 +135,27 @@ def convert_image_overlay(config, field_value, storage):
       'start_time': float(config['start_time']),
       'end_time': float(config['end_time'])
   }
+
+
+def _download_image_to_file(url, tmp_file_name, cloud_storage):
+
+  # Special case to download from Google Cloud Storage
+  if url.startswith('gs://'):
+    first_slash_index = url.index('/', 5)
+
+    bucket = url[5:first_slash_index]
+    file_path = url[first_slash_index+1:]
+
+    cloud_storage.download_file_to_path(bucket, file_path, tmp_file_name)
+  
+  # Downloads image from https/https urls
+  else:
+  
+    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+
+    r = requests.get(url, stream=True, headers=headers, timeout=20)
+    r.raw.decode_content = True
+      
+    # Open a local file with wb ( write binary ) permission.
+    with open(tmp_file_name,'wb') as f:
+      shutil.copyfileobj(r.raw, f)

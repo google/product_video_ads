@@ -126,6 +126,20 @@ export class GoogleAPI {
     
     return response.body
   }
+
+  async download_gcs_file(url : string) : Promise<string> {
+
+    // Divisor index between bucket and object (skipping protocol)
+    const first_slash = url.indexOf('/', 5)
+
+    const response = await this.gapi.client.storage.objects.get({
+      bucket: url.substring(5, first_slash),
+      object: url.substring(first_slash + 1),
+      alt: 'media'
+    }) 
+
+    return response.body
+  }
   
   upload_file(file : File, folder_id : string) : Promise<any> {
     

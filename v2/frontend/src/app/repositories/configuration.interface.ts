@@ -39,6 +39,7 @@ export interface ConfigurationInterface {
 
     load_offer_types() : Promise<OfferType[]>
     save_offer_types(bases : OfferType[]) : Promise<any>
+    download_image_from_gcs(url : string) : Promise<string>
 
     load_videos() : Promise<Video[]>
     save_videos(videos : Video[]) : Promise<any>

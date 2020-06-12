@@ -130,7 +130,7 @@ export class OfferTypeComponent implements OnInit {
       y_ratio: 1
     }
 
-    this.load_elements_on_video()
+    this.load_elements_on_screen()
   }
 
   public on_video_loaded(video) {
@@ -159,7 +159,13 @@ export class OfferTypeComponent implements OnInit {
       y_ratio: video.videoHeight/HEIGHT
     }
 
-    this.load_elements_on_video()
+    // Go to video position first
+    if (this.video.currentTime == 0) {
+      this.choose_position(this.base_products_timings[0])
+      return
+    }
+
+    this.load_elements_on_screen()
   }
 
   select_type(type) {
@@ -183,7 +189,7 @@ export class OfferTypeComponent implements OnInit {
       this.contents = this.facade.assets.map(a => { return {'id': a.id, 'value': a[field] || ''} })
     }
 
-    this.contents = this.contents.filter(a => a.value != undefined)
+    this.contents = this.contents.filter(a => a.value != undefined).filter(a => a.value != '')
   }
 
   select_example(content) {
@@ -192,7 +198,7 @@ export class OfferTypeComponent implements OnInit {
   }
 
   is_image(content) {
-    return content && content.startsWith('http')
+    return content && (content.startsWith('http') || content.startsWith('gs://'))
   }
   
   private create_element(product) {
@@ -255,14 +261,36 @@ export class OfferTypeComponent implements OnInit {
   }
     
     // Bind from view
-    public create_image(product?) {
+    public async create_image(product?) {
       
       const current_product = product ? product : this.config
+
+      // Download image bytes if needed (if has security)
+      current_product.content = await this.download_image(current_product.content)
+
       const element = this.create_element(current_product)
       
       element.view_type = 'image'
 
       return element
+    }
+
+    private async download_image(url : string) {
+
+      const data_uri = 'data:image/{EXTENSION};base64,{DATA}'
+
+      // Only rule for now is download from GCS bucket
+      if (url.startsWith('gs://')) {
+        
+        const splits = url.split('.')
+
+        return data_uri.
+            replace('{EXTENSION}', splits[splits.length-1]).
+            replace('{DATA}', btoa(await this.facade.download_image_from_gcs(url)))
+      }
+
+      // Else, use url itself (for http*)
+      return url
     }
     
     private wrap_text(text, charaters_per_line) {
@@ -348,12 +376,7 @@ export class OfferTypeComponent implements OnInit {
       product['chosen'] = true
     }
 
-    load_elements_on_video() {
-
-      // Go to video position
-      if (this.base_products_timings.length > 0 && this.video.currentTime == 0) {
-        this.choose_position(this.base_products_timings[0])
-      }
+    async load_elements_on_screen() {
 
       // Add all elements on screen
       for(let c of this.offer_type.configs) {
@@ -366,7 +389,7 @@ export class OfferTypeComponent implements OnInit {
           const content = this.facade.assets.filter(a => a.id == c.key)[0][c.field]
 
           if (c.field == 'image')
-            element = this.create_image({...c, content})
+            element = await this.create_image({...c, content})
           else
             element = this.create_text({...c, content})
         } else {
@@ -376,7 +399,7 @@ export class OfferTypeComponent implements OnInit {
           const content = current_product.values[c.field]
 
           if (this.is_image(content))
-            element = this.create_image({...c, content})
+            element = await this.create_image({...c, content})
           else
             element = this.create_text({...c, content})
         }

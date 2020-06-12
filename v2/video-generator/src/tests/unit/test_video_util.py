@@ -1,7 +1,7 @@
 from mock import Mock, patch
 from pytest import fixture
 
-from video import util
+from ffmpeg import util
 
 
 def test_convert_text_overlay_for_title_multiline():

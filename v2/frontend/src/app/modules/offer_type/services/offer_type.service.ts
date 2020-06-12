@@ -59,6 +59,10 @@ export class OfferTypeService {
         return this.save()
     }
 
+    download_image_from_gcs(url : string) : Promise<string> {
+        return this.repository.download_image_from_gcs(url)
+     }
+
     save() {
         console.log('Saving offer types...')
         return this.repository.save_offer_type(this.offer_types)

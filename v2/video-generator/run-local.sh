@@ -14,14 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-CREDENTIALS_FOLDER=/usr/local/google/home/rgodoy/credentials
-
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
+CREDENTIALS_FOLDER=$(pwd)/credentials
+SPREADSHEET_ID=1X6yQMhE6l-XWZfMrZMd_iV4oCQqg-KvEK2BwZf07IzQ
+BUCKET_NAME=video-generator-test-123
+
 export GOOGLE_APPLICATION_CREDENTIALS=$CREDENTIALS_FOLDER/credentials.json
-export SPREADSHEET_ID=1p0mGUCP6nIeljP7Gd3hBpWFijfYvm1KC16cYmHxOweQ
-export BUCKET_NAME=video-generator
+export SPREADSHEET_ID=$SPREADSHEET_ID
+export BUCKET_NAME=$BUCKET_NAME
 
 cd src
 pipenv run python main.py

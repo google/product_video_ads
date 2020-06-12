@@ -9,8 +9,8 @@ export const environment = {
   client_id: '82003315421-v6572ba1g7brds0umk9ovt4dlm5td5oc.apps.googleusercontent.com',
   api_key: 'AIzaSyAoPm0dMN4dHptkGJuy4Aj1Y_Y_P1tIKdk',
   
-  discovery_docs: ["https://sheets.googleapis.com/$discovery/rest?version=v4", "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"],
-  scopes: "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive",
+  discovery_docs: ["https://sheets.googleapis.com/$discovery/rest?version=v4", "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest", "https://www.googleapis.com/discovery/v1/apis/storage/v1/rest"],
+  scopes: "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/devstorage.read_only",
   drive_file_prefix: 'https://drive.google.com/uc?export=download&id=',
 
   sheet_id: 'sheet_id',

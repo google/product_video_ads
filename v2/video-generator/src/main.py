@@ -17,9 +17,9 @@
 import os
 import time
 import log
-from authentication.cloud_storage_token import CloudStorageToken as CredsStorage
 from authentication.token_auth import TokenAuth
 from configuration.spreadsheet_configuration import SpreadsheetConfiguration as Configuration
+from storage.cloud_storage_handler import CloudStorageHandler as CloudStorageHandler
 from storage.drive_storage_handler import DriveStorageHandler as StorageHandler
 
 # Handle "events" from configuration
@@ -47,7 +47,7 @@ def main():
     print 'Please set environment variable SPREADSHEET_ID and BUCKET_NAME'
     exit(1)
 
-  authenticator = TokenAuth(CredsStorage(bucket_name))
+  authenticator = TokenAuth(bucket_name, CloudStorageHandler())
   credentials = None
 
   # Tries to retireve token from storage each 5 minutes
@@ -66,8 +66,9 @@ def main():
   # Dependencies
   configuration = Configuration(spreadsheet_id, credentials)
   storage = StorageHandler(configuration.get_drive_folder(), credentials)
-  video_processor = VideoProcessor(storage, VideoGenerator(), Uploader(credentials))
-  image_processor = ImageProcessor(storage, ImageGenerator())
+  cloud_storage = CloudStorageHandler(credentials)
+  video_processor = VideoProcessor(storage, VideoGenerator(), Uploader(credentials), cloud_storage)
+  image_processor = ImageProcessor(storage, ImageGenerator(), cloud_storage)
 
   # Handler acts as facade
   handler = EventHandler(configuration, video_processor, image_processor)

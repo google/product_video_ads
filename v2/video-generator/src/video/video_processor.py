@@ -26,10 +26,11 @@ class VideoProcessor():
 
   OUTPUT_VIDEO_FORMAT = '.mp4'
 
-  def __init__(self, storage, generator, uploader):
+  def __init__(self, storage, generator, uploader, cloud_storage):
     self.storage = storage
     self.generator = generator
     self.uploader = uploader
+    self.cloud_storage = cloud_storage
 
   def process_task(self, row, config, preview_only=False):
 
@@ -59,7 +60,6 @@ class VideoProcessor():
       logger.error([e, traceback.format_exc()])
       logger.error('Failed processing row: %s', {
           'row': row,
-          'products': config.get('product_ids'),
           'error_type': type(e).__name__,
           'error_string': str(e)
       })
@@ -69,7 +69,8 @@ class VideoProcessor():
     image_overlays, text_overlays = util.convert_configs_to_format(
         config['configs'],
         config['products_data'],
-        self.storage
+        self.storage,
+        self.cloud_storage
     )
 
     input_video = self.storage.get_absolute_path(config['base_file'])

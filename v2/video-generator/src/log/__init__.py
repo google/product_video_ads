@@ -19,7 +19,10 @@ formatter = logging.Formatter('%(asctime)s %(threadName)s: %(message)s')
 log = logging.getLogger('video-generator')
 
 # Root logger
-log.setLevel(logging.INFO)
+if os.environ.get('DEBUG'):
+  log.setLevel(logging.DEBUG)
+else:
+  log.setLevel(logging.INFO)
 
 # Console (important because it's read by stackdriver)
 handler = logging.StreamHandler()

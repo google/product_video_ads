@@ -19,7 +19,8 @@ CREDENTIALS_FOLDER=$(pwd)/credentials
 #CREDENTIALS_FOLDER=/Users/rgodoy/credentials
 
 echo 'SPREADSHEET_ID: '
-SPREADSHEET_ID=1xVFWkPyh635Hn8LWAwUHU6hb0Nq6hentB9x3IGRF_uI
+#SPREADSHEET_ID=1MJ-A7xuUakcf3x3nsoR0Kl9241MI0HSYdbXqEbRIwLw
+SPREADSHEET_ID=1X6yQMhE6l-XWZfMrZMd_iV4oCQqg-KvEK2BwZf07IzQ
 #read SPREADSHEET_ID
 
 echo 'Bucket Name:'
@@ -37,5 +38,4 @@ docker run --rm \
   -e BUCKET_NAME=$BUCKET_NAME \
   -v $CREDENTIALS_FOLDER:/credentials \
   --name video-generator \
-  -d \
   video-generator

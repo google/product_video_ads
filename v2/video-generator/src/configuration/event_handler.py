@@ -63,6 +63,8 @@ class EventHandler():
           'products_data': products_data
       }
 
+      logger.info('[Event Handler] Handling new creative with base %s' % base_file_name)
+
       # Choose the correct processor to do the job (image or video)
       if base_file_name and base_file_name.endswith('.mp4'):
         processor = self.video_processor

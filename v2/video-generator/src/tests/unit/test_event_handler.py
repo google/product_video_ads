@@ -1,14 +1,14 @@
 from mock import Mock, ANY
 from pytest import fixture
 
-from video.video_handler import VideoHandler
+from configuration.event_handler import EventHandler
 
 
 @fixture
 def campaigns():
   return [
-      ['1,2,3', 'Base1', VideoHandler.HANDLED_STATUS[0]],
-      ['1,2,3', 'Base1', VideoHandler.HANDLED_STATUS[0]],
+      ['1,2,3', 'Base1', EventHandler.HANDLED_STATUS[0]],
+      ['1,2,3', 'Base1', EventHandler.HANDLED_STATUS[0]],
       ['1,2', 'Base2', 'Not Handled Status']
   ]
 
@@ -16,7 +16,7 @@ def campaigns():
 @fixture
 def campaigns_with_preview():
   return [
-      ['1,2,3', 'Base1', VideoHandler.HANDLED_STATUS[0]],
+      ['1,2,3', 'Base1', EventHandler.HANDLED_STATUS[0]],
       ['1,2,3', 'Base1', 'Preview'],
       ['1,2', 'Base2', 'Not Handled Status']
   ]
@@ -46,11 +46,13 @@ def test_handling_configuration_preview(campaigns_with_preview, base_videos,
   mock_configuration.get_all_bases.return_value = base_videos
   mock_configuration.get_base_config.return_value = base_config
 
+  mock_image_processor = Mock()
+
   video_id = 't3YQ8H'
   mock_processor = Mock()
   mock_processor.process_task.side_effect = [None, video_id]
 
-  handler = VideoHandler(mock_configuration, mock_processor)
+  handler = EventHandler(mock_configuration, mock_processor, mock_image_processor)
 
   # Act
   handler.handle_configuration()
@@ -71,11 +73,13 @@ def test_handling_configuration(campaigns, base_videos, base_config):
   mock_configuration.get_all_bases.return_value = base_videos
   mock_configuration.get_base_config.return_value = base_config
 
+  mock_image_processor = Mock()
+
   video_id = 't3YQ8H'
   mock_processor = Mock()
   mock_processor.process_task.side_effect = [None, video_id]
 
-  handler = VideoHandler(mock_configuration, mock_processor)
+  handler = EventHandler(mock_configuration, mock_processor, mock_image_processor)
 
   # Act
   handler.handle_configuration()
@@ -91,17 +95,19 @@ def test_handling_invalid_configuration():
   # Arrange
   mock_configuration = Mock()
   mock_configuration.get_campaign_config.return_value = [
-      ['', 'Base2', VideoHandler.HANDLED_STATUS[0]]
+      ['', 'Base2', EventHandler.HANDLED_STATUS[0]]
   ]
   mock_configuration.get_all_bases.return_value = {}
   mock_configuration.get_base_config.return_value = {}
 
+  mock_image_processor = Mock()
   mock_processor = Mock()
 
-  handler = VideoHandler(mock_configuration, mock_processor)
+  handler = EventHandler(mock_configuration, mock_processor, mock_image_processor)
 
   # Act
   handler.handle_configuration()
 
   # Assert
-  mock_processor.process_task.assert_called_once()
+  mock_image_processor.process_task.assert_called_once()
+  mock_processor.process_task.assert_not_called()

@@ -24,9 +24,10 @@ logger = log.getLogger()
 
 class ImageProcessor():
 
-  def __init__(self, storage, generator):
+  def __init__(self, storage, generator, cloud_storage):
     self.storage = storage
     self.generator = generator
+    self.cloud_storage = cloud_storage
 
   def process_task(self, row, config, preview_only=False):
 
@@ -52,7 +53,6 @@ class ImageProcessor():
       logger.error([e, traceback.format_exc()])
       logger.error('Failed processing row: %s', {
           'row': row,
-          'products': config.get('product_ids'),
           'error_type': type(e).__name__,
           'error_string': str(e)
       })
@@ -62,7 +62,8 @@ class ImageProcessor():
     image_overlays, text_overlays = util.convert_configs_to_format(
         config['configs'],
         config['products_data'],
-        self.storage
+        self.storage,
+        self.cloud_storage
     )
 
     input_image = self.storage.get_absolute_path(config['base_file'])
