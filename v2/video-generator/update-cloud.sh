@@ -28,4 +28,8 @@ docker push $IMAGE_NAME
 
 IMAGE_NAME=$(docker inspect --format='{{index .RepoDigests 0}}' $IMAGE_NAME)
 
+gcloud container clusters get-credentials \
+--zone us-west1-a \
+video-generator-cluster
+
 kubectl set image deployment video-generator video-generator=$IMAGE_NAME
