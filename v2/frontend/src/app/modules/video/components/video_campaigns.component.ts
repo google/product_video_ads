@@ -114,14 +114,15 @@ export class VideoCampaignsComponent implements OnInit {
 
       for(let [group, campaign_configs] of this.selected_groups.entries()) {
 
-        const sorted_products = this.product_groups.get(group).sort((a, b) => a.position - b.position)
-        const product_keys = sorted_products.map(p => p.id)
-        const configs = sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type, this.base.title))
-        
+        const group_products = this.product_groups.get(group)
+        const configs = group_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type, this.base.title))
+
         // Check how many videos should be created for that group
-        for (let video = 0; video < product_keys.length; video+=this.base.products.length) {
+        for (let video = 0; video < group_products.length; video+=this.base.products.length) {
           this.add_video(
-            product_keys.slice(video, video + this.base.products.length),
+            group_products.slice(video, video + this.base.products.length)
+                          .sort((a, b) => a.position - b.position)
+                          .map(p => p.id),
             configs.slice(video, video + this.base.products.length),
             campaign_configs)
         }
