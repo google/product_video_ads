@@ -65,6 +65,6 @@ export class OfferTypeService {
 
     save() {
         console.log('Saving offer types...')
-        return this.repository.save_offer_type(this.offer_types)
+        return this.repository.save_offer_types(this.offer_types)
     }
 }

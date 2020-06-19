@@ -17,10 +17,6 @@
 import { Injectable } from '@angular/core';
 import { ConfigurationRepository } from './configuration.repository';
 import { environment } from 'environments/environment';
-import { Video } from 'app/models/video';
-import { OfferType } from 'app/models/offertype';
-import { Asset } from 'app/models/asset';
-import { Base } from 'app/models/base';
 
 @Injectable({providedIn: 'root'})
 export class CachedConfigurationRepository extends ConfigurationRepository {
@@ -36,39 +32,6 @@ export class CachedConfigurationRepository extends ConfigurationRepository {
             localStorage.removeItem(environment.local_storage_keys.fonts)
 
         return (await this.load_data<Map<string, any>>(environment.local_storage_keys.fonts, super.load_fonts.bind(this)))
-    }
-
-    async load_bases(): Promise<Base[]> {
-        return (await this.load_data<Base[]>(environment.local_storage_keys.bases, super.load_bases.bind(this)))
-    }
-
-    async load_offer_types(): Promise<OfferType[]> {
-        return (await this.load_data<OfferType[]>(environment.local_storage_keys.offer_types, super.load_offer_types.bind(this)))
-    }
-
-    async load_drive_folder() : Promise<string> {
-        const drive_folder = localStorage.getItem(environment.local_storage_keys.drive_folder)
-        return drive_folder != null ? drive_folder : super.load_drive_folder()
-    }
-
-    async save_bases(bases: Base[]): Promise<any> {
-        this.save_to_cache(environment.local_storage_keys.bases, bases)
-        return super.save_bases(bases)
-    }
-
-    async save_assets(assets: Asset[]): Promise<any> {
-        this.save_to_cache(environment.local_storage_keys.static_assets, assets)
-        return super.save_assets(assets)
-    }
-
-    async save_offer_type(offer_types: OfferType[]): Promise<any> {
-        this.save_to_cache(environment.local_storage_keys.offer_types, offer_types)
-        return super.save_offer_types(offer_types)
-    }
-
-    async save_videos(videos: Video[]): Promise<any> {
-        this.save_to_cache(environment.local_storage_keys.videos, videos)
-        return super.save_videos(videos)
     }
 
     private load_from_cache(key : string) {
