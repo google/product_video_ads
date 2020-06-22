@@ -43,8 +43,12 @@ export class BasessComponents implements OnInit {
   }
   
   ngOnInit() {
+    this.video = undefined
+    this.base = undefined
     this.video_url = ''
     this.seconds = 0.0
+
+    window.scrollTo(0, 0)
   }
 
   is_video_base(file : string) {
@@ -184,7 +188,7 @@ export class BasessComponents implements OnInit {
       })
       
       if (status == 200)
-        window.location.replace('bases')
+        this.ngOnInit()
     })
   }
 }

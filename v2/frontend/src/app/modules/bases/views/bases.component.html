@@ -20,6 +20,8 @@
     <div *ngIf="!video">
         <h2>Your available bases:</h2>
 
+        <mat-spinner *ngIf="(bases | async).length == 0"></mat-spinner>
+
         <div class="added_item" *ngFor="let base of bases | async" >
 
             <p><b>{{base.title}}</b></p>
@@ -88,6 +90,8 @@
     </div>
 
     <!-- Spinner -->
+    <br/>
+
     <mat-spinner *ngIf="video_url && !video"></mat-spinner>
 
     <!-- Configure chosen base video -->
@@ -148,6 +152,6 @@
             <br/><br/>
 
             <button mat-stroked-button (click)="finish()">Save Timings</button>
-            <a style="margin-left: 1%;" mat-stroked-button href="bases">Cancel</a>
+            <a style="margin-left: 1%;" mat-stroked-button (click)="ngOnInit()">Cancel</a>
         </div>
 </div>

@@ -21,23 +21,27 @@
   <div *ngIf="step == 1">
     
     <h2>Your available offer types:</h2>
+
+    <mat-spinner *ngIf="bases.length == 0"></mat-spinner>
     
-    <div class="added_item" *ngFor="let offer of offer_types | async">
-      
-      <p><b>{{offer.title}}</b></p>
-      <p>({{offer.base}})</p>
-      
-      <span style="cursor: pointer" (click)="edit_type(offer)" >
-        <mat-icon aria-hidden="false" aria-label="edit icon" title="Edit">edit</mat-icon>
-      </span>
-      
-      <span style="cursor: pointer" (click)="copy_type(offer)">
-        <mat-icon aria-hidden="false" aria-label="copy icon" title="Copy">file_copy</mat-icon>
-      </span>
-      
-      <span style="cursor: pointer" (click)="delete_type(offer)">
-        <mat-icon aria-hidden="false" aria-label="delete icon" title="Delete">delete</mat-icon>
-      </span>
+    <div *ngIf="bases.length > 0">
+      <div class="added_item" *ngFor="let offer of offer_types | async">
+        
+        <p><b>{{offer.title}}</b></p>
+        <p>({{offer.base}})</p>
+        
+        <span style="cursor: pointer" (click)="edit_type(offer)" >
+          <mat-icon aria-hidden="false" aria-label="edit icon" title="Edit">edit</mat-icon>
+        </span>
+        
+        <span style="cursor: pointer" (click)="copy_type(offer)">
+          <mat-icon aria-hidden="false" aria-label="copy icon" title="Copy">file_copy</mat-icon>
+        </span>
+        
+        <span style="cursor: pointer" (click)="delete_type(offer)">
+          <mat-icon aria-hidden="false" aria-label="delete icon" title="Delete">delete</mat-icon>
+        </span>
+      </div>
     </div>
     
     <br/><br/>
@@ -224,6 +228,6 @@
       <br/><br/>
       
       <button mat-stroked-button (click)="finish()">Save</button>
-      <a style="margin-left: 1%;" mat-stroked-button href="offer_types">Cancel</a>
+      <a style="margin-left: 1%;" mat-stroked-button (click)="ngOnInit()">Cancel</a>
   </div>
 </div>

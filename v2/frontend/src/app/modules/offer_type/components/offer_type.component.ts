@@ -65,8 +65,12 @@ export class OfferTypeComponent implements OnInit {
     this.video_url = ''
     this.loaded_fonts = new Set()
     this.config = new Config()
+    this.config.font = 'Ubuntu-Regular.ttf'
     this.offer_type = new OfferType('OfferType', '', [])
+    this.video = undefined
 
+    window.scrollTo(0, 0)
+    
     this.facade.update_products()
   }
 
@@ -486,7 +490,7 @@ export class OfferTypeComponent implements OnInit {
         const status = response['status']
 
         if (status == 200)
-          window.location.replace('offer_types')
+          this.ngOnInit()
         else
           this._snackBar.open("Error (" + status + ')', 'OK', { duration: 10000 })
       })
