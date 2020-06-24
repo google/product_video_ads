@@ -43,6 +43,7 @@ export class OfferTypeComponent implements OnInit {
   contents : Array<any>
   content : any
   elements : Array<any>
+  element_focused : any
   loaded_fonts : Set<string>
   locked_name = false
   base_products_timings = []
@@ -70,8 +71,44 @@ export class OfferTypeComponent implements OnInit {
     this.video = undefined
 
     window.scrollTo(0, 0)
+
+    // Bind arrow keys
+    document.addEventListener('keydown', event => {
+      this.control_focused_element(event)
+    })
     
     this.facade.update_products()
+  }
+
+  private control_focused_element(event) {
+
+    if (this.element_focused == undefined)
+      return
+
+    let x = 0, y = 0
+
+    switch (event.key) {
+
+      case 'ArrowUp': 
+        y=-1 
+        break;
+
+      case 'ArrowDown':
+        y=1
+          break;
+
+      case 'ArrowLeft':
+          x=-1
+          break;
+
+      case 'ArrowRight':
+          x=1
+    }
+
+    if (x != 0 || y != 0) {
+      this.move_element_to(this.element_focused, parseInt(this.element_focused.left), parseInt(this.element_focused.top))
+      event.preventDefault()
+    }
   }
 
   move_step(step) {
@@ -333,6 +370,11 @@ export class OfferTypeComponent implements OnInit {
       event.preventDefault();
       return false;
     }
+
+    public focus_element(id) {
+      event.preventDefault();
+      this.element_focused = this.elements.filter(e => e.id == id)[0]
+    }
     
     public drop_event(event) {
       
@@ -341,36 +383,44 @@ export class OfferTypeComponent implements OnInit {
       if (!id)
         return
 
-      const x = event.clientX - this.video_pos.x
-      const y = event.clientY - this.video_pos.y
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-
-      // Element on screen
-      const dm = document.getElementById(id)
-      // assign selected color for the text
-      dm.style.color = dm.getAttribute("data-config-color");
-      
-      // Element saved
+      // Retrieve element
       const element = this.elements.filter(e => e.id == id)[0]
-      element.color = element.config_color;
-    
-      element.left = (this.video_pos.offset_x + x - dm.offsetWidth/2) + 'px';
-      element.top = (this.video_pos.offset_y + y - dm.offsetHeight/2 + scrollTop) + 'px';
+
+      // Move element
+      this.move_element_to(element, event.clientX, event.clientY) 
+
+      // Assign selected color for the text
+      element.color = element.config_color
+
+      // Focus on this element
+      this.focus_element(id)
+
+      event.preventDefault()
+      return false
+    }
+
+    private move_element_to(element, raw_x, raw_y) {
+
+      console.log('Moving element ' + element.id + 'to ' + raw_x + '/' + raw_y)
+
+      const x = raw_x - this.video_pos.x
+      const y = raw_y - this.video_pos.y
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+      
+      element.left = (this.video_pos.offset_x + x - element.offsetWidth/2)
+      element.top = (this.video_pos.offset_y + y - element.offsetHeight/2 + scrollTop)
 
       // Adjust on align
       let align_adjust = 0
       
       if (element.align && element.align == 'left')
-        align_adjust = dm.offsetWidth/2
+        align_adjust = element.offsetWidth/2
 
       if (element.align && element.align == 'right')
-        align_adjust = -dm.offsetWidth/2
+        align_adjust = -element.offsetWidth/2
 
       element.x = ((x - align_adjust) * this.video_pos.x_ratio).toFixed(0)
-      element.y = ((y - dm.offsetHeight/2 + scrollTop) * this.video_pos.y_ratio).toFixed(0)
-      
-      event.preventDefault()
-      return false
+      element.y = ((y - element.offsetHeight/2 + scrollTop) * this.video_pos.y_ratio).toFixed(0)
     }
 
     choose_position(product) {

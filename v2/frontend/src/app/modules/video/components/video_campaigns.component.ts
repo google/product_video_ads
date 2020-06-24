@@ -119,12 +119,15 @@ export class VideoCampaignsComponent implements OnInit {
 
         // Check how many videos should be created for that group
         for (let video = 0; video < group_products.length; video+=this.base.products.length) {
+
+          let sorted_products = group_products.slice(video, video + this.base.products.length)
+                                              .sort((a, b) => a.position - b.position)
+
           this.add_video(
-            group_products.slice(video, video + this.base.products.length)
-                          .sort((a, b) => a.position - b.position)
-                          .map(p => p.id),
-            configs.slice(video, video + this.base.products.length),
-            campaign_configs)
+            sorted_products.map(p => p.id),
+            sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type, this.base.title)),
+            campaign_configs
+          )
         }
       }
 

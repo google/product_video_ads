@@ -6,10 +6,10 @@
      draggable="true"
      (dragstart)="dragstart.emit($event)" 
      (dblclick)="dblclick.emit($event)"
-     [attr.data-config-color]="element.config_color" 
+     (click)="singleclick.emit(element.id)"
      [ngStyle]="{
-            'top': element.top,
-            'left': element.left,
+            'top': element.top + 'px',
+            'left': element.left + 'px',
             'color': element.color,
             'font-size': element.size + 'px',
             'font-family': element.font_family,
@@ -31,10 +31,11 @@
      height={{element.height}}
      draggable="true" 
      (dragstart)="dragstart.emit($event)" 
-     (dblclick)="dblclick.emit($event)" 
+     (dblclick)="dblclick.emit($event)"
+     (click)="singleclick.emit(element.id)" 
      [ngStyle]="{
-            'top': element.top,
-            'left': element.left,
+            'top': element.top + 'px',
+            'left': element.left + 'px',
             'position': 'absolute',
             'z-index': 100,
             'transform': 'rotate(' + element.angle + 'deg)',

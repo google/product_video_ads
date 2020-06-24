@@ -30,6 +30,7 @@ export class DraggableElementComponent implements AfterViewInit {
 
     @Output() dragstart = new EventEmitter<any>()
     @Output() dblclick = new EventEmitter<any>()
+    @Output() singleclick = new EventEmitter<any>()
 
     @ViewChild('html_element', {static: false}) html_element : ElementRef;
     
@@ -41,6 +42,9 @@ export class DraggableElementComponent implements AfterViewInit {
     }
 
     private element_position_to_style() {
+
+        this.element.offsetWidth = this.html_element.nativeElement.clientWidth
+        this.element.offsetHeight = this.html_element.nativeElement.clientHeight
 
         if (this.element.needs_screen_adjust) {
 
@@ -54,8 +58,8 @@ export class DraggableElementComponent implements AfterViewInit {
             align_adjust = this.html_element.nativeElement.offsetWidth
     
           // Position on screen 
-          this.element.left = ((parseInt(this.element.x) - align_adjust) / this.video_pos.x_ratio) + this.video_pos.offset_x + 'px'
-          this.element.top =  (parseInt(this.element.y) / this.video_pos.y_ratio) + this.video_pos.offset_y + 'px';
+          this.element.left = ((parseInt(this.element.x) - align_adjust) / this.video_pos.x_ratio) + this.video_pos.offset_x
+          this.element.top =  (parseInt(this.element.y) / this.video_pos.y_ratio) + this.video_pos.offset_y
         
           // Resize to screen
           if (this.element.view_type == 'image') {
@@ -64,6 +68,9 @@ export class DraggableElementComponent implements AfterViewInit {
           }
       
           this.element.size /= this.video_pos.x_ratio
+
+          this.element.offsetWidth /= this.video_pos.x_ratio
+          this.element.offsetHeight /= this.video_pos.y_ratio
 
           this.element.needs_screen_adjust = false
         }

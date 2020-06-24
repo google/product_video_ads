@@ -119,16 +119,18 @@ export class VideoComponent implements OnInit {
       for(let group of this.selected_groups) {
 
         const group_products = this.product_groups.get(group)
-        const configs = group_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type, this.base.title))
         
         // Check how many videos should be created for that group
         for (let video = 0; video < group_products.length; video+=this.base.products.length) {
 
-          this.product_keys = group_products.slice(video, video + this.base.products.length)
-                                            .sort((a, b) => a.position - b.position)
-                                            .map(p => p.id)
+          let sorted_products = group_products.slice(video, video + this.base.products.length)
+                                              .sort((a, b) => a.position - b.position)
 
-          this.configs = configs.slice(video, video + this.base.products.length)
+          // Keys
+          this.product_keys = sorted_products.map(p => p.id)
+
+          // Offer Type Configs
+          this.configs = sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type, this.base.title))
 
           this.add_video()
         }
