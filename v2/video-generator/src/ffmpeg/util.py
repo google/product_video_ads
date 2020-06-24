@@ -121,7 +121,7 @@ def convert_image_overlay(config, field_value, storage, cloud_storage):
   extension = imghdr.what(tmp_file_name) or 'jpg'
 
   # Save product image to image folder
-  image_path = storage.get_absolute_path(config['type'] + str(config['key']) + str(config['field']).replace(' ', '') +  '.' + extension)
+  image_path = storage.get_absolute_path(config['type'] + str(config['key']) + str(config['field']) + '.' + extension)
   os.rename(tmp_file_name, image_path)
 
   return {

@@ -106,7 +106,12 @@ export class OfferTypeComponent implements OnInit {
     }
 
     if (x != 0 || y != 0) {
-      this.move_element_to(this.element_focused, parseInt(this.element_focused.left), parseInt(this.element_focused.top))
+
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+      const curr_x = this.element_focused.left + this.video_pos.x - this.video_pos.offset_x + this.element_focused.offsetWidth/2 
+      const curr_y = this.element_focused.top + this.video_pos.y - this.video_pos.offset_y + this.element_focused.offsetHeight/2 - scrollTop
+
+      this.move_element_to(this.element_focused, curr_x + x, curr_y + y)
       event.preventDefault()
     }
   }
@@ -407,9 +412,6 @@ export class OfferTypeComponent implements OnInit {
       const y = raw_y - this.video_pos.y
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop
       
-      element.left = (this.video_pos.offset_x + x - element.offsetWidth/2)
-      element.top = (this.video_pos.offset_y + y - element.offsetHeight/2 + scrollTop)
-
       // Adjust on align
       let align_adjust = 0
       
@@ -418,6 +420,9 @@ export class OfferTypeComponent implements OnInit {
 
       if (element.align && element.align == 'right')
         align_adjust = -element.offsetWidth/2
+
+      element.left = (this.video_pos.offset_x + x - element.offsetWidth/2)
+      element.top = (this.video_pos.offset_y + y - element.offsetHeight/2 + scrollTop)
 
       element.x = ((x - align_adjust) * this.video_pos.x_ratio).toFixed(0)
       element.y = ((y - element.offsetHeight/2 + scrollTop) * this.video_pos.y_ratio).toFixed(0)

@@ -94,6 +94,7 @@
           [element]="el"
           [video_pos]="video_pos"
           (dragstart)="drag_start($event)"
+          (dblclick)="delete_element($event)"
           (singleclick)="focus_element($event)">
         </app-draggable-element>
       </div>

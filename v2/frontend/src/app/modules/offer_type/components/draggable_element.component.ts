@@ -43,6 +43,7 @@ export class DraggableElementComponent implements AfterViewInit {
 
     private element_position_to_style() {
 
+        // Set offset according to element size
         this.element.offsetWidth = this.html_element.nativeElement.clientWidth
         this.element.offsetHeight = this.html_element.nativeElement.clientHeight
 
