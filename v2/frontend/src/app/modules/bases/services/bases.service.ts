@@ -62,6 +62,13 @@ export class BasesService {
         return this.repository.upload_base_file(file)
     }
 
+    update_file(base_title : string, file : string, id) {
+        const base = this.bases.filter(b => b.title == base_title)[0]
+        base.file = file
+        base.url = environment.drive_file_prefix + id
+        this._bases.next(this.bases)
+    }
+
     save() {
         return this.repository.save_bases(this.bases)
     }

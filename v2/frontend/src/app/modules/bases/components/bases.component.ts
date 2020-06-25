@@ -28,12 +28,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class BasessComponents implements OnInit {
   
-  new_base = false
-  new_font = false
+  new_base : boolean
+  new_font : boolean
+  is_edit_base_file : boolean
   bases : Observable<Base[]>
   base : Base
   seconds : any
-  product = {'start_time': 0.0, 'end_time': 0.0}
+  product : object
   video
   video_duration
   video_url
@@ -43,6 +44,10 @@ export class BasessComponents implements OnInit {
   }
   
   ngOnInit() {
+    this.new_base = false
+    this.new_font = false
+    this.is_edit_base_file = false
+    this.product = {'start_time': 0.0, 'end_time': 0.0}
     this.video = undefined
     this.base = undefined
     this.video_url = ''
@@ -90,6 +95,23 @@ export class BasessComponents implements OnInit {
   go_seconds_forward(seconds_pace) {
     this.seconds = (parseFloat(this.seconds) + seconds_pace).toFixed(1)
     this.go_to_second()
+  }
+
+  edit_file(base : Base) {
+    this.base = base
+    this.is_edit_base_file = true
+  }
+
+  edit_base_file(file : File) {
+
+    this._snackBar.open("Editing base file...", 'OK', {
+      duration: 10000,
+    })
+
+    this.facade.upload_base_file(file).then(response => {
+      this.facade.update_file(this.base.title, file.name, response.id)
+      this.save()
+    })
   }
 
   add_product() {
@@ -178,7 +200,12 @@ export class BasessComponents implements OnInit {
     this._snackBar.open("Saving base configuration...", 'OK', {
       duration: 2000,
     })
-    
+
+    this.save()
+  }
+
+  save() {
+
     this.facade.save().then(response => {
       
       const status = response['status']

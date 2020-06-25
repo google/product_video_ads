@@ -32,6 +32,12 @@
                 Configure Timings
             </button>
             <br/>
+            <!-- Edit video file -->
+            <button *ngIf="this.is_video_base(base.file)" mat-stroked-button color="primary" (click)="edit_file(base)">
+                <mat-icon aria-hidden="false" aria-label="autorenew icon" title="Edit">autorenew</mat-icon>
+                Edit video MP4 file
+            </button>
+            <br/>
             <!-- Download base file -->
             <a mat-stroked-button color="primary" href="{{base.url}}">
                 <mat-icon aria-hidden="false" aria-label="arrow_downward icon" title="arrow_downward">arrow_downward</mat-icon>
@@ -66,6 +72,24 @@
             <br/>
 
             <button mat-stroked-button (click)="create_base(base_title.value, base_file.files[0])">Create base</button>
+        </div>
+
+        <div *ngIf="is_edit_base_file">
+
+            <h2>Edit base file:</h2>
+
+            <mat-form-field class="example-full-width">
+                <mat-label>Base Title</mat-label>
+                <input value="{{base.title}}" disabled matInput>
+            </mat-form-field>
+
+            <div class="form-group">
+                <input #base_file type="file" id="file" accept=".mp4,.png,.jpg">
+            </div>
+
+            <br/>
+
+            <button mat-stroked-button (click)="edit_base_file(base_file.files[0])">Edit file</button>
         </div>
 
         <div *ngIf="new_font">

@@ -57,6 +57,10 @@ export class BasesFacade {
         return this.fontService.upload_font(file)
     }
 
+    update_file(base_title : string, file : string, url : string) {
+        this.service.update_file(base_title, file, url)
+    }
+
     reload_fonts() : Promise<any> {
         return this.fontService.reload_fonts()
     }

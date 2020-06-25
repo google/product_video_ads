@@ -217,18 +217,20 @@
         </div>
       </div>
 
-      <h2>Position:</h2>
+      <div *ngIf="video">
+        <h2>Position:</h2>
 
-        <p>This position is to visualization only.<br/>You can assign each product to each position when creating the video on next step.</p>
+          <p>This position is to visualization only.<br/>You can assign each product to each position when creating the video on next step.</p>
 
-        <div class="added_item" *ngFor="let product of base_products_timings; let i = index" [ngClass]="{'selected_box': product.chosen}" (click)="choose_position(product)" style="min-width: 0">
-            <p>Position {{i + 1}}</p>
-            <p>{{product.start_time}}s - {{product.end_time}}s</p>
-        </div>
+          <div class="added_item" *ngFor="let product of base_products_timings; let i = index" [ngClass]="{'selected_box': product.chosen}" (click)="choose_position(product)" style="min-width: 0">
+              <p>Position {{i + 1}}</p>
+              <p>{{product.start_time}}s - {{product.end_time}}s</p>
+          </div>
+      </div>
       
       <br/><br/>
       
-      <button mat-stroked-button (click)="finish()">Save</button>
+      <button mat-stroked-button [disabled]="locked_save" (click)="finish()">Save</button>
       <a style="margin-left: 1%;" mat-stroked-button (click)="ngOnInit()">Cancel</a>
   </div>
 </div>

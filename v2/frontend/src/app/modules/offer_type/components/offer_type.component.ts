@@ -45,7 +45,8 @@ export class OfferTypeComponent implements OnInit {
   elements : Array<any>
   element_focused : any
   loaded_fonts : Set<string>
-  locked_name = false
+  locked_name : boolean
+  locked_save : boolean
   base_products_timings = []
   is_video : boolean
   video
@@ -63,6 +64,8 @@ export class OfferTypeComponent implements OnInit {
   ngOnInit() {
     this.elements = []
     this.step = 1 
+    this.locked_name = false
+    this.locked_save = false
     this.video_url = ''
     this.loaded_fonts = new Set()
     this.config = new Config()
@@ -205,12 +208,6 @@ export class OfferTypeComponent implements OnInit {
       y_ratio: video.videoHeight/HEIGHT
     }
 
-    // Go to video position first
-    if (this.video.currentTime == 0) {
-      this.choose_position(this.base_products_timings[0])
-      return
-    }
-
     this.load_elements_on_screen()
   }
 
@@ -262,7 +259,7 @@ export class OfferTypeComponent implements OnInit {
   }
 
   // Bind from view
-  create_text(product?) {
+  async create_text(product?) {
     
     const current_product = product ? product : this.config
     const element = this.create_element(current_product)
@@ -435,7 +432,9 @@ export class OfferTypeComponent implements OnInit {
       product['chosen'] = true
     }
 
-    async load_elements_on_screen() {
+    load_elements_on_screen() {
+
+      console.log('Loading elements on screen...')
 
       // Add all elements on screen
       for(let c of this.offer_type.configs) {
@@ -448,9 +447,9 @@ export class OfferTypeComponent implements OnInit {
           const content = this.facade.assets.filter(a => a.id == c.key)[0][c.field]
 
           if (c.field == 'image')
-            element = await this.create_image({...c, content})
+            element = this.create_image({...c, content, needs_screen_adjust: true})
           else
-            element = this.create_text({...c, content})
+            element = this.create_text({...c, content, needs_screen_adjust: true})
         } else {
 
           // Product
@@ -458,12 +457,10 @@ export class OfferTypeComponent implements OnInit {
           const content = current_product.values[c.field]
 
           if (this.is_image(content))
-            element = await this.create_image({...c, content})
+            element = this.create_image({...c, content, needs_screen_adjust: true})
           else
-            element = this.create_text({...c, content})
+            element = this.create_text({...c, content, needs_screen_adjust: true})
         }
-
-        element.needs_screen_adjust = true
       }
 
       this.offer_type.configs = []
@@ -530,6 +527,9 @@ export class OfferTypeComponent implements OnInit {
     }
 
     finish() {
+
+      this.locked_save = true
+
       this.add_elements_to_configs()
       this.save()
     }
