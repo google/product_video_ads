@@ -24,7 +24,8 @@ class SpreadsheetConfiguration(object):
   # Configuration ranges
   BASE_VIDEOS_NAMED_RANGE = 'Bases'
   CAMPAIGN_NAMED_RANGE = 'ProductsBaseStatus'
-  PRODUCTS_NAMED_RANGE = 'ProductsCustom'
+  #PRODUCTS_NAMED_RANGE = 'ProductsCustom'
+  PRODUCTS_RANGE = 'Prices!A1:ZZ'
   ASSETS_NAMED_RANGE = 'Assets'
   STATUS_VIDEO_NAMED_RANGE = 'StatusVideoId'
   DRIVE_CONFIG_NAMED_RANGE = 'DriveConfigFolder'
@@ -126,7 +127,7 @@ class SpreadsheetConfiguration(object):
 
     # Load products
     products_config = dict()
-    prods = self.__get_named_range_values(self.PRODUCTS_NAMED_RANGE)
+    prods = self.__get_range_values(self.PRODUCTS_RANGE)
     header = prods.pop(0)[1:]
 
     for p in prods:
@@ -149,13 +150,14 @@ class SpreadsheetConfiguration(object):
     return self.__get_named_range_values(
         self.INTERVAL_IN_MINUTES_NAMED_RANGE)[0][0]
 
-  def __get_named_range_values(self, range_name):
-
-    range_a1_notation = self.__get_named_range_A1_notation(range_name)
-
+  def __get_range_values(self, range_a1_notation):
     return self.sheet.values().get(
         spreadsheetId=self.spreadsheet_id,
-        range=range_a1_notation['str']()).execute().get('values', [])
+        range=range_a1_notation).execute().get('values', [])
+
+  def __get_named_range_values(self, range_name):
+    range_a1_notation = self.__get_named_range_A1_notation(range_name)
+    return self.__get_range_values(range_a1_notation['str']())
 
   def __get_named_range_A1_notation(self, range_name):
 

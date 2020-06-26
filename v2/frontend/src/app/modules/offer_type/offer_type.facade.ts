@@ -71,8 +71,8 @@ export class OfferTypeFacade {
         return this.offerTypeService.download_image_from_gcs(url)
     }
 
-    delete_offer_type(title : string, base : string) {
-        return this.offerTypeService.delete_offer_type(title, base)
+    delete_offer_type(title : string, base : string) : void {
+        this.offerTypeService.delete_offer_type(title, base)
     }
 
     add_offer_type(offer_type : OfferType) {

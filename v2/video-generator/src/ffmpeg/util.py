@@ -58,6 +58,8 @@ def convert_text_overlay(config, field_value, storage):
   # Wrap long texts to many smaller texts
   words = _wrap_text(field_value, width)
 
+  logger.debug(config)
+
   # Create overlays to all lines broken down
   texts = []
 

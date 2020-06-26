@@ -47,8 +47,10 @@ export class ProductService {
     }
 
     private async load_products() {
-        if (this.is_ready)
+        if (this.is_ready) {
             this._products.next(await this.productsRepository.load_products())
+            console.log('Products loaded\n' + JSON.stringify(this.products))
+        }
     }
 
     public reload_products() : void {

@@ -35,6 +35,7 @@ docker run --rm \
   -e SPREADSHEET_ID=$SPREADSHEET_ID \
   -e GOOGLE_APPLICATION_CREDENTIALS='/credentials/credentials.json' \
   -e BUCKET_NAME=$BUCKET_NAME \
+  -e DEBUG=1 \
   -v $CREDENTIALS_FOLDER:/credentials \
   --name video-generator \
   video-generator
