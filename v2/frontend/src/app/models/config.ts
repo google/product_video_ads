@@ -30,7 +30,8 @@ export class Config {
         public width : number = 20, // ssetting 20 as default so the text is visible if the user inserts it without changing values
         public height : number = 20, // setting 20 as default so the image is visible if the user inserts it without changing values
         public align : string = 'center',
-        public angle : number = 0
+        public angle : number = 0,
+        public keep_ratio : boolean = false
         ) {}
         
     public static from_configs_array(config : any) : Config {

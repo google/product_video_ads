@@ -208,7 +208,8 @@ class FFMPEGGenerator(object):
                                else None),
                               ovr.get('fade_in_duration', 0.1),
                               ovr.get('fade_out_duration', 0.1),
-                              ovr.get('align', None))
+                              ovr.get('align', None),
+                              ovr.get('keep_ratio', None))
       retval.append(f)
 
       # makes current concat of overlays the one to concat next overlay
@@ -225,7 +226,7 @@ class FFMPEGGenerator(object):
 
   def _video_filter(self, input_stream, image_stream_index, x, y, width, height,
                     t_start, t_end, output_stream, angle, fade_in_duration,
-                    fade_out_duration, align):
+                    fade_out_duration, align, keep_ratio):
     """Generates a ffmeg filter specification for an image input.
 
     Args:
@@ -257,14 +258,22 @@ class FFMPEGGenerator(object):
     if align == 'right':
       x = '%s-overlay_w' % x
 
+    y = '%s+(%s-overlay_h)/2' % (y, height)
+
     if not width:
       width = '-1'
     if not height:
       height = '-1'
     #raise Exception(fade_effect)
-    #scale image
-    img = '%s format=rgba,scale=%s:%s %s;' % (image_str, width, height,
-                                              resize_str)
+
+    # Keep aspect ratio
+    if keep_ratio:
+      img = '%s format=rgba,scale=%s %s;' % (image_str, "'if(gt(a,w/h),w,-1)':'if(gt(a,w/h),-1,h)'".replace('w', str(width)).replace('h', str(height)), resize_str)
+    else:
+      #scale regular image
+      img = '%s format=rgba,scale=%s:%s %s;' % (image_str, width, height, resize_str)
+
+    self.logger.debug(img)
 
     if angle and str(angle) != '0':
       img += '%s rotate=%s*PI/180:' % (resize_str, angle)

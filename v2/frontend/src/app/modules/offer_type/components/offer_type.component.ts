@@ -381,6 +381,8 @@ export class OfferTypeComponent implements OnInit {
     public drop_event(event) {
       
       const id = event.dataTransfer.getData("text/plain")
+      
+      console.log('dropping ' + id)
 
       if (!id)
         return
@@ -497,7 +499,8 @@ export class OfferTypeComponent implements OnInit {
             e.width,
             0,
             e.align,
-            e.angle
+            e.angle,
+            false
           ))
         else
       // Add images
@@ -515,7 +518,8 @@ export class OfferTypeComponent implements OnInit {
           e.width * this.video_pos.x_ratio,
           e.height * this.video_pos.y_ratio,
           e.align,
-          e.angle
+          e.angle,
+          e.keep_ratio
         ))
       }
 

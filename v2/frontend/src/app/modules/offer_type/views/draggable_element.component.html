@@ -22,22 +22,30 @@
           }">
         </div>
 
-<img 
-    #html_element
-    *ngIf="element.view_type == 'image'" 
-     id="{{element.id}}" 
+<div
+  #html_element
+  *ngIf="element.view_type == 'image'" 
+  [ngStyle]="{
+    'top': element.top + 'px',
+    'left': element.left + 'px',
+    'width': element.width + 'px', 
+    'height': element.height + 'px',
+    'position': 'absolute',
+    'z-index': 100,
+    'transform': 'rotate(' + element.angle + 'deg)',
+    'border': '1px solid red',
+    'visibility': 'hidden'
+  }" >
+  <img 
+    id="{{element.id}}"
+    draggable="true" 
+    (dragstart)="dragstart.emit($event)" 
+    (dblclick)="dblclick.emit($event)"
+    (click)="singleclick.emit(element.id)" 
      src={{element.content}} 
-     width={{element.width}} 
-     height={{element.height}}
-     draggable="true" 
-     (dragstart)="dragstart.emit($event)" 
-     (dblclick)="dblclick.emit($event)"
-     (click)="singleclick.emit(element.id)" 
      [ngStyle]="{
-            'top': element.top + 'px',
-            'left': element.left + 'px',
-            'position': 'absolute',
-            'z-index': 100,
-            'transform': 'rotate(' + element.angle + 'deg)',
-            'visibility': 'hidden'
-          }" />
+        'width': element.width + 'px', 
+        'height': element.height + 'px',
+        'object-fit': element.keep_ratio ? 'contain' : 'fit'
+      }" />
+</div>

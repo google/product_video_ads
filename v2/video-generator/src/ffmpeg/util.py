@@ -124,6 +124,8 @@ def convert_image_overlay(config, field_value, storage, cloud_storage):
   image_path = storage.get_absolute_path(config['type'] + str(config['key']) + str(config['field']) + '.' + extension)
   os.rename(tmp_file_name, image_path)
 
+  logger.debug(config)
+
   return {
       'x': float(config['x']),
       'y': float(config['y']),
@@ -132,6 +134,7 @@ def convert_image_overlay(config, field_value, storage, cloud_storage):
       'angle': int(config.get('angle', '0')),
       'align': config.get('align', 'center'),
       'image': image_path,
+      'keep_ratio': config.get('keep_ratio', False),
       'start_time': float(config['start_time']),
       'end_time': float(config['end_time'])
   }

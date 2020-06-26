@@ -19,9 +19,8 @@ CREDENTIALS_FOLDER=$(pwd)/credentials
 #CREDENTIALS_FOLDER=/Users/rgodoy/credentials
 
 echo 'SPREADSHEET_ID: '
-#SPREADSHEET_ID=1MJ-A7xuUakcf3x3nsoR0Kl9241MI0HSYdbXqEbRIwLw
-#SPREADSHEET_ID=1vxVSnLMQhjF8aDwyNrIUBnXmIVtPHroPqyyq_W_18vA
-read SPREADSHEET_ID
+SPREADSHEET_ID=1Um9HvkTCwfR_cEJBUn-gm0qQz1L5UulVxs8FENtexqY
+#read SPREADSHEET_ID
 
 echo 'Bucket Name:'
 BUCKET_NAME=video-generator-test-123
