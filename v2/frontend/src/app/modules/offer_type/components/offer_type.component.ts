@@ -362,11 +362,15 @@ export class OfferTypeComponent implements OnInit {
     }
 
     public drag_start(event) {
+      console.log(event)
       event.dataTransfer.setData("text/plain", event.target.id)
+      event.dataTransfer.dropEffect = "move"
+      event.dataTransfer.setDragImage(event.target, event.target.offsetWidth/2, event.target.offsetHeight/2)
     }
     
     public drag_over(event) {
       event.preventDefault();
+      event.dataTransfer.dropEffect = "move"
       return false;
     }
 

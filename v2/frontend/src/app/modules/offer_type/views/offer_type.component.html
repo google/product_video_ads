@@ -79,7 +79,7 @@
       <div id="video">
 
       <div *ngIf="is_video" class="video-container">
-        <video #vd1 *ngIf="video_url" class="video" (canplay)="on_video_loaded(vd1)" muted>
+        <video #vd1 *ngIf="video_url" class="video" (loadedmetadata)="on_video_loaded(vd1)" muted>
           <source [src]="video_url" type="video/mp4">
         </video>
       </div>

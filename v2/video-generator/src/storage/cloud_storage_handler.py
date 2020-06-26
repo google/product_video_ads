@@ -38,5 +38,5 @@ class CloudStorageHandler():
       return self.storage_client.get_bucket(bucket_name).blob(object_name).download_as_string()
 
   def download_file_to_path(self, bucket_name, object_name, destination_path):
-      self.logger.info('Downloading from bucket %s file %s and saving to %s' % (bucket_name, object_name, destination_path))
+      self.logger.debug('Downloading from bucket %s file %s and saving to %s' % (bucket_name, object_name, destination_path))
       self.storage_client.get_bucket(bucket_name).blob(object_name).download_to_filename(destination_path)
