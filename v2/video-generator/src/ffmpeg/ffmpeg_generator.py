@@ -258,8 +258,6 @@ class FFMPEGGenerator(object):
     if align == 'right':
       x = '%s-overlay_w' % x
 
-    y = '%s+(%s-overlay_h)/2' % (y, height)
-
     if not width:
       width = '-1'
     if not height:
@@ -269,6 +267,7 @@ class FFMPEGGenerator(object):
     # Keep aspect ratio
     if keep_ratio:
       img = '%s format=rgba,scale=%s %s;' % (image_str, "'if(gt(a,w/h),w,-1)':'if(gt(a,w/h),-1,h)'".replace('w', str(width)).replace('h', str(height)), resize_str)
+      y = '%s+(%s-overlay_h)/2' % (y, height)
     else:
       #scale regular image
       img = '%s format=rgba,scale=%s:%s %s;' % (image_str, width, height, resize_str)
