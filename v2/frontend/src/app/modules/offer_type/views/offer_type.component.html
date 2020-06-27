@@ -87,6 +87,59 @@
       <div *ngIf="!is_video">
         <img #vd1 *ngIf="video_url" (load)="on_image_loaded(vd1)" [src]="video_url"/>
       </div>
+
+      <!-- Box to edit elements on screen -->
+      <div class="edit_box" *ngIf="element_focused" cdkDrag>
+
+        <!-- Box to edit text element -->
+        <div [hidden]="element_focused.view_type != 'text'"> 
+
+          <input [(ngModel)]="element_focused.color"
+          [style.background]="element_focused.color"
+          [(colorPicker)]="element_focused.color"
+          (change)="element_focused.config_color=$event"/>
+          
+          <br/>
+
+          <mat-form-field class="example-full-width">
+            <mat-label>Font size</mat-label>
+            <input [(ngModel)]="element_focused.size" type="number" matInput placeholder="size">
+          </mat-form-field>
+          
+          <br/>
+
+          <mat-form-field class="example-full-width">
+            <mat-label>Width (letters)</mat-label>
+            <input [(ngModel)]="element_focused.width" (change)="on_change_text_width(element_focused)" type="number" matInput placeholder="width">
+          </mat-form-field>
+          
+          <br/>
+
+          <mat-form-field>
+            <mat-label>Align</mat-label>
+            <mat-select [(ngModel)]="element_focused.align" value="center">
+              <mat-option *ngFor="let a of ['center', 'left', 'right']" [value]="a">
+                {{a}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <!-- Box to edit image element -->
+        <div [hidden]="element_focused.view_type != 'image'"> 
+
+          <mat-form-field class="example-full-width">
+            <mat-label>Width</mat-label>
+            <input [(ngModel)]="element_focused.width" type="number" matInput placeholder="width">
+          </mat-form-field>
+          <br/>
+          <mat-form-field class="example-full-width">
+            <mat-label>Height</mat-label>
+            <input [(ngModel)]="element_focused.height" type="number" matInput placeholder="height">
+          </mat-form-field>
+          <br/>
+        </div>
+      </div>
         
       <!-- Items on screen -->
       <div *ngFor="let el of elements" class="items-on-screen-container">
@@ -202,19 +255,14 @@
             <input [(ngModel)]="config.height" type="number" matInput placeholder="height">
           </mat-form-field>
           
-          <mat-form-field>
-            <mat-label>Align</mat-label>
-            <mat-select [(ngModel)]="config.align">
-              <mat-option *ngFor="let a of ['center', 'left']" [value]="a">
-                {{a}}
-              </mat-option>
-            </mat-select>
+          <mat-form-field class="example-full-width">
+            <mat-label>Angle</mat-label>
+            <input [(ngModel)]="config.angle" type="number" matInput placeholder="angle">
           </mat-form-field>
 
           <mat-checkbox class="example-margin" [(ngModel)]="config.keep_ratio">
             Keep Ratio
           </mat-checkbox>
-          
           <br/>
           
           <button mat-stroked-button (click)="create_image()">Insert Image</button>

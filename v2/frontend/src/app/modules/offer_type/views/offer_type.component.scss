@@ -39,3 +39,10 @@ mat-icon {
     margin-bottom: 50px;
 }
 
+.edit_box {
+    position: fixed;
+    top: 25%;
+    right: 10%;
+    border: 1px solid red;
+    background-color: rgba(255, 255, 255, 0.6);
+}

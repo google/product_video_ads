@@ -34,7 +34,7 @@ export class BasessComponents implements OnInit {
   bases : Observable<Base[]>
   base : Base
   seconds : any
-  product : object
+  product : any
   video
   video_duration
   video_url

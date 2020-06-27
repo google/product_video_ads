@@ -77,6 +77,6 @@ export class DraggableElementComponent implements AfterViewInit {
         }
   
         this.html_element.nativeElement.style.visibility = 'visible'
-        this.cd.detectChanges()
+        //this.cd.detectChanges()
     }
 }

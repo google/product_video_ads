@@ -47,7 +47,7 @@ export class OfferTypeComponent implements OnInit {
   loaded_fonts : Set<string>
   locked_name : boolean
   locked_save : boolean
-  base_products_timings = []
+  base_products_timings : Array<any>
   is_video : boolean
   video
   video_url
@@ -63,6 +63,7 @@ export class OfferTypeComponent implements OnInit {
 
   ngOnInit() {
     this.elements = []
+    this.element_focused = undefined
     this.step = 1 
     this.locked_name = false
     this.locked_save = false
@@ -72,6 +73,7 @@ export class OfferTypeComponent implements OnInit {
     this.config.font = 'Ubuntu-Regular.ttf'
     this.offer_type = new OfferType('OfferType', '', [])
     this.video = undefined
+    this.base_products_timings = []
 
     window.scrollTo(0, 0)
 
@@ -79,7 +81,7 @@ export class OfferTypeComponent implements OnInit {
     document.addEventListener('keydown', event => {
       this.control_focused_element(event)
     })
-    
+
     this.facade.update_products()
   }
 
@@ -106,6 +108,11 @@ export class OfferTypeComponent implements OnInit {
 
       case 'ArrowRight':
           x=1
+          break;
+
+      case 'Escape':
+          delete this.element_focused
+          break;
     }
 
     if (x != 0 || y != 0) {
@@ -243,13 +250,7 @@ export class OfferTypeComponent implements OnInit {
   
   private create_element(product) {
     
-    const element = {
-      id: UUID(),
-      x: 0,
-      y: 0,
-      ...product
-    }
-
+    const element = { id: UUID(), x: 0, y: 0, ...product }
     this.elements.push(element)
 
     return element
@@ -287,15 +288,16 @@ export class OfferTypeComponent implements OnInit {
     element.font_family = font_name
 
     // Wrap text to break into lines
+    element['content_original'] = current_product['content']
+
     element.content = this.wrap_text(
       current_product['content'],
       current_product['width'])
-      .join('<br/>')
 
     // Insert the text in black color so it is always visible in the white background
     // the selected color will be applied to the text when the element is dropped in the video.
     element.color = product ? product.color : "#000000";
-    element.config_color = product ? product.color : this.config.color;
+    element.config_color = product ? undefined : this.config.color;
       
     return element
   }
@@ -332,6 +334,10 @@ export class OfferTypeComponent implements OnInit {
       // Else, use url itself (for http*)
       return url
     }
+
+    public on_change_text_width(element_focused) {
+      element_focused.content = this.wrap_text(element_focused.content_original, element_focused.width)
+    }
     
     private wrap_text(text, charaters_per_line) {
       
@@ -358,19 +364,24 @@ export class OfferTypeComponent implements OnInit {
         curr_chars += word.length
       })
       
-      return words
+      return words.join('<br/>')
     }
 
     public drag_start(event) {
-      console.log(event)
-      event.dataTransfer.setData("text/plain", event.target.id)
-      event.dataTransfer.dropEffect = "move"
+
+      const msg = {
+        id: event.target.id,
+        offsetWidth: event.target.offsetWidth,
+        offsetHeight: event.target.offsetHeight
+      }
+
+      // Drag data
+      event.dataTransfer.setData("text/plain", JSON.stringify(msg))
       event.dataTransfer.setDragImage(event.target, event.target.offsetWidth/2, event.target.offsetHeight/2)
     }
     
     public drag_over(event) {
       event.preventDefault();
-      event.dataTransfer.dropEffect = "move"
       return false;
     }
 
@@ -381,24 +392,29 @@ export class OfferTypeComponent implements OnInit {
     
     public drop_event(event) {
       
-      const id = event.dataTransfer.getData("text/plain")
+      const msg = JSON.parse(event.dataTransfer.getData("text/plain"))
       
-      console.log('dropping ' + id)
-
-      if (!id)
+      if (!msg.id)
         return
 
       // Retrieve element
-      const element = this.elements.filter(e => e.id == id)[0]
+      const element = this.elements.filter(e => e.id == msg.id)[0]
+
+      // Update offsets
+      element.offsetWidth = msg.offsetWidth
+      element.offsetHeight = msg.offsetHeight
 
       // Move element
       this.move_element_to(element, event.clientX, event.clientY) 
 
-      // Assign selected color for the text
-      element.color = element.config_color
+      // Assign selected color for the text first time
+      if (element.config_color) {
+        element.color = element.config_color
+        element.config_color = undefined
+      }
 
       // Focus on this element
-      this.focus_element(id)
+      this.focus_element(msg.id)
 
       event.preventDefault()
       return false
@@ -483,7 +499,7 @@ export class OfferTypeComponent implements OnInit {
     
     private add_elements_to_configs() {
       
-      for (let e of this.elements) {
+      for (let e of this.elements.values()) {
         // Add texts
         if (e.view_type == 'text')
           this.offer_type.configs.push(new Config(
