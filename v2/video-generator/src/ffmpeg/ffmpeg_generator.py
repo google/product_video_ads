@@ -276,8 +276,10 @@ class FFMPEGGenerator(object):
 
     if angle and str(angle) != '0':
       img += '%s rotate=%s*PI/180:' % (resize_str, angle)
-      img += 'ow=\'hypot(iw,ih)\':'
-      img += 'oh=ow:'
+      #img += 'ow=\'hypot(iw,ih)\':'
+      #img += 'oh=ow:'
+      img += 'ow=ih:'
+      img += 'oh=iw:'
       img += 'c=none'
       img += ' %s;' % rotate_str
     else:

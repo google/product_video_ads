@@ -46,17 +46,13 @@ export class DraggableElementComponent implements AfterViewInit {
         // Adjust loaded element to screen size
         if (this.element.loaded_element) {
 
-          let align_adjust = 0
-
-          if (this.element.align == 'center')
-             align_adjust = this.html_element.nativeElement.offsetWidth/2
-    
-          if (this.element.align == 'right')
-             align_adjust = this.html_element.nativeElement.offsetWidth
+          // Adjusts differences between backend and frontend (to be fixed)
+          let align_adjust = this.calculate_align_adjust(this.element, this.html_element)
+          let angle_adjust_y = this.calculate_angle_adjust(this.element, this.html_element)
 
           // Scaled X/Y 
           this.element.x = ((parseInt(this.element.x) - align_adjust) / this.video_pos.x_ratio)
-          this.element.y = (parseInt(this.element.y) / this.video_pos.y_ratio)
+          this.element.y = ((parseInt(this.element.y) + angle_adjust_y) / this.video_pos.y_ratio)
           this.element.left = this.element.x
           this.element.top = this.element.y
           
@@ -79,5 +75,25 @@ export class DraggableElementComponent implements AfterViewInit {
         }
   
         this.html_element.nativeElement.style.visibility = 'visible'
+    }
+
+    calculate_align_adjust(element, html_element) {
+      
+      if (element.align == 'center')
+        return html_element.nativeElement.offsetWidth/2
+
+      if (element.align == 'right')
+        return html_element.nativeElement.offsetWidth
+
+      return 0
+    }
+
+    calculate_angle_adjust(element, html_element) {
+
+      if (element.angle != 0) {
+        return html_element.nativeElement.offsetWidth * (element.angle / -90)
+      }
+
+      return 0
     }
 }

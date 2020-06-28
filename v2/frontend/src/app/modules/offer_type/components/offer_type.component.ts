@@ -448,6 +448,13 @@ export class OfferTypeComponent implements OnInit {
       
       for (let e of this.elements.values()) {
 
+        // When flipped or rotated, adjust height
+        if (e.flip || e.angle != 0) {
+          e.angle = -90
+          e.align = 'left'
+          e.y -= document.getElementById(e.id).offsetWidth
+        }
+
         // Add texts
         if (e.view_type == 'text') {
 

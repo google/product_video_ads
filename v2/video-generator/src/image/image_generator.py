@@ -99,7 +99,8 @@ class ImageGenerator(FFMPEGGenerator):
                                else None),
                               ovr.get('fade_in_duration', 0),
                               ovr.get('fade_out_duration', 0),
-                              ovr.get('align', None))
+                              ovr.get('align', None),
+                              ovr.get('keep_ratio', None))
       retval.append(f)
 
       # makes current concat of overlays the one to concat next overlay

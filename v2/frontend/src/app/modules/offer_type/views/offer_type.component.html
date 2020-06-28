@@ -99,20 +99,6 @@
 
       </div>
 
-      <!--div *ngIf="!is_video" class="video-container">
-
-        <img #vd1 *ngIf="video_url" (load)="on_image_loaded(vd1)" [src]="video_url"/>
-
-        <app-draggable-element *ngFor="let el of elements"
-          [element]="el"
-          [video_pos]="video_pos"
-          (dblclick)="delete_element($event)"
-          (dragEnd)="drag_end($event)"
-          (singleclick)="focus_element($event)">
-        </app-draggable-element>
-
-      </div-->
-
       <!-- Box to edit elements on screen -->
       <div class="edit_box" *ngIf="element_focused" cdkDrag>
 
@@ -247,10 +233,14 @@
             </mat-select>
           </mat-form-field>
           
-          <mat-form-field class="example-full-width">
+          <!--mat-form-field class="example-full-width">
             <mat-label>Angle</mat-label>
-            <input [(ngModel)]="config.angle" type="number" matInput placeholder="angle">
-          </mat-form-field>
+            <input [(ngModel)]="config.angle" type="number" min=-90 max=90 matInput placeholder="angle">
+          </mat-form-field-->
+
+          <mat-checkbox class="example-margin" style="margin-left: 2%;" [(ngModel)]="config.flip">
+            Flip
+          </mat-checkbox>
           
           <br/>
           
@@ -270,12 +260,16 @@
             <input [(ngModel)]="config.height" type="number" matInput placeholder="height">
           </mat-form-field>
           
-          <mat-form-field class="example-full-width">
+          <!--mat-form-field class="example-full-width">
             <mat-label>Angle</mat-label>
-            <input [(ngModel)]="config.angle" type="number" matInput placeholder="angle">
-          </mat-form-field>
+            <input [(ngModel)]="config.angle" type="number" min=-90 max=90 matInput placeholder="angle">
+          </mat-form-field-->
 
-          <mat-checkbox class="example-margin" [(ngModel)]="config.keep_ratio">
+          <mat-checkbox class="example-margin" style="margin-left: 2%;" [(ngModel)]="config.flip">
+            Flip
+          </mat-checkbox>
+
+          <mat-checkbox class="example-margin" style="margin-left: 2%;" [(ngModel)]="config.keep_ratio">
             Keep Ratio
           </mat-checkbox>
           <br/>
