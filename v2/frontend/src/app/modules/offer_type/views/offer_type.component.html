@@ -134,6 +134,11 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
+
+          <br/>
+
+          <button mat-stroked-button style="width: 100%" (click)="send_to_back(element_focused)">Send to back</button>
+
         </div>
 
         <!-- Box to edit image element -->
@@ -149,6 +154,9 @@
             <input [(ngModel)]="element_focused.height" type="number" matInput placeholder="height">
           </mat-form-field>
           <br/>
+
+          <button mat-stroked-button style="width: 100%" (click)="send_to_back(element_focused)">Send to back</button>
+
         </div>
       </div>
         
@@ -158,6 +166,16 @@
       <mat-form-field class="example-full-width">
         <mat-label>Title</mat-label>
         <input [(ngModel)]="offer_type.title" matInput [disabled]="locked_name">
+      </mat-form-field>
+
+      <!-- Product to be shown -->
+      <mat-form-field class="example-full-width">
+        <mat-label>Product (view)</mat-label>
+        <mat-select [(ngModel)]="product_shown" (selectionChange)="choose_product_shown()">
+          <mat-option *ngFor="let product of facade.products" [value]="product.id">
+            ({{product.id}}) {{product.values['Title']}}
+          </mat-option>
+        </mat-select>
       </mat-form-field>
 
       <!-- Add New Items -->
@@ -289,7 +307,7 @@
               <p>{{product.start_time}}s - {{product.end_time}}s</p>
           </div>
       </div>
-      
+
       <br/><br/>
       
       <button mat-stroked-button [disabled]="locked_save" (click)="finish()">Save</button>

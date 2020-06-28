@@ -47,6 +47,7 @@ export class OfferTypeComponent implements OnInit {
   locked_name : boolean
   locked_save : boolean
   base_products_timings : Array<any>
+  product_shown : string
   is_video : boolean
   video
   video_url
@@ -72,6 +73,7 @@ export class OfferTypeComponent implements OnInit {
     this.config.font = 'Ubuntu-Regular.ttf'
     this.offer_type = new OfferType('OfferType', '', [])
     this.video = undefined
+    this.product_shown = undefined
     this.base_products_timings = []
 
     window.scrollTo(0, 0)
@@ -404,10 +406,12 @@ export class OfferTypeComponent implements OnInit {
 
       console.log('Loading elements on screen...')
 
+      let zindex = 10
+
       // Add all elements on screen
       for(let c of this.offer_type.configs) {
 
-        let element
+        c['zindex'] = zindex++
 
         // Draw assets
         if (c.type == 'asset') {
@@ -415,9 +419,9 @@ export class OfferTypeComponent implements OnInit {
           const content = this.facade.assets.filter(a => a.id == c.key)[0][c.field]
 
           if (c.field == 'image')
-            element = this.create_image({...c, content, loaded_element: true})
+            this.create_image({...c, content, loaded_element: true})
           else
-            element = this.create_text({...c, content, loaded_element: true})
+            this.create_text({...c, content, loaded_element: true})
         } else {
 
           // Product
@@ -425,13 +429,23 @@ export class OfferTypeComponent implements OnInit {
           const content = current_product.values[c.field]
 
           if (this.is_image(content))
-            element = this.create_image({...c, content, loaded_element: true})
+            this.create_image({...c, content, loaded_element: true})
           else
-            element = this.create_text({...c, content, loaded_element: true})
+            this.create_text({...c, content, loaded_element: true})
         }
       }
 
       this.offer_type.configs = []
+    }
+
+    public choose_product_shown() {
+
+      // Set all products as this
+      for (let element of this.elements)
+        if (element.type == 'product')
+          element.key = this.product_shown
+
+      this.finish()
     }
     
     public delete_element(id) {
@@ -442,6 +456,15 @@ export class OfferTypeComponent implements OnInit {
       this.elements = this.elements.filter(e => e.id != id)
       
       return false;
+    }
+
+    public send_to_back(element) {
+
+      // Remove element
+      this.elements = this.elements.filter(e => e.id != element.id)
+
+      // Insert as first
+      this.elements.unshift(element)
     }
     
     private add_elements_to_configs() {
