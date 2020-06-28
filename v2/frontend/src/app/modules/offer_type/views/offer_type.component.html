@@ -15,7 +15,8 @@
 -->
 
 <h2 class="main_title">Offer Types</h2>
-<div class="inner_content" (drop)="drop_event($event)" (dragover)="drag_over($event)">
+
+<div class="inner_content">
   
   <!-- First screen: choose to edit or create new -->
   <div *ngIf="step == 1">
@@ -78,15 +79,39 @@
   
       <div id="video">
 
-      <div *ngIf="is_video" class="video-container">
-        <video #vd1 *ngIf="video_url" class="video" (loadedmetadata)="on_video_loaded(vd1)" muted>
+      <div class="video-container">
+
+        <!-- If it's video base -->
+        <video #vd1 *ngIf="video_url && is_video" class="video" (loadedmetadata)="on_video_loaded(vd1)" muted>
           <source [src]="video_url" type="video/mp4">
         </video>
+
+        <!-- Or if it's image base -->
+        <img #vd1 *ngIf="video_url && !is_video" (load)="on_image_loaded(vd1)" [src]="video_url"/>
+
+        <app-draggable-element *ngFor="let el of elements"
+          [element]="el"
+          [video_pos]="video_pos"
+          (dblclick)="delete_element($event)"
+          (dragEnd)="drag_end($event)"
+          (singleclick)="focus_element($event)">
+        </app-draggable-element>
+
       </div>
 
-      <div *ngIf="!is_video">
+      <!--div *ngIf="!is_video" class="video-container">
+
         <img #vd1 *ngIf="video_url" (load)="on_image_loaded(vd1)" [src]="video_url"/>
-      </div>
+
+        <app-draggable-element *ngFor="let el of elements"
+          [element]="el"
+          [video_pos]="video_pos"
+          (dblclick)="delete_element($event)"
+          (dragEnd)="drag_end($event)"
+          (singleclick)="focus_element($event)">
+        </app-draggable-element>
+
+      </div-->
 
       <!-- Box to edit elements on screen -->
       <div class="edit_box" *ngIf="element_focused" cdkDrag>
@@ -141,17 +166,6 @@
         </div>
       </div>
         
-      <!-- Items on screen -->
-      <div *ngFor="let el of elements" class="items-on-screen-container">
-        <app-draggable-element 
-          [element]="el"
-          [video_pos]="video_pos"
-          (dragstart)="drag_start($event)"
-          (dblclick)="delete_element($event)"
-          (singleclick)="focus_element($event)">
-        </app-draggable-element>
-      </div>
-      
       <br><br>
       
       <!-- Offer Type -->
@@ -167,7 +181,7 @@
       <mat-form-field>
         <mat-label>Insert new</mat-label>
         <mat-select [(ngModel)]="config.type" (selectionChange)="select_type(config.type)">
-          <mat-option *ngFor="let type of types" [value]="type">
+          <mat-option *ngFor="let type of ['product', 'asset']" [value]="type">
             {{type}}
           </mat-option>
         </mat-select>
@@ -195,9 +209,10 @@
       
       <br/>
       
-      <!-- Text -->
+      <!-- Choosen elements to add -->
       <div *ngIf="config.key">
         
+        <!-- Text -->
         <div *ngIf="!is_image(content.value)">
           
           <mat-form-field>
@@ -269,12 +284,13 @@
         </div>
       </div>
 
+      <!-- Products positions -->
       <div *ngIf="video">
         <h2>Position:</h2>
 
           <p>This position is to visualization only.<br/>You can assign each product to each position when creating the video on next step.</p>
 
-          <div class="added_item" *ngFor="let product of base_products_timings; let i = index" [ngClass]="{'selected_box': product.chosen}" (click)="choose_position(product)" style="min-width: 0">
+          <div class="added_item" *ngFor="let product of base_products_timings; let i = index" (click)="choose_position(product)" style="min-width: 0">
               <p>Position {{i + 1}}</p>
               <p>{{product.start_time}}s - {{product.end_time}}s</p>
           </div>
@@ -285,4 +301,5 @@
       <button mat-stroked-button [disabled]="locked_save" (click)="finish()">Save</button>
       <a style="margin-left: 1%;" mat-stroked-button (click)="ngOnInit()">Cancel</a>
   </div>
+
 </div>

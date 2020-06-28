@@ -1,12 +1,12 @@
 <div 
     #html_element
+    cdkDrag
     *ngIf="element.view_type == 'text'" 
      id="{{element.id}}" 
      innerHTML={{element.content}} 
-     draggable="true"
-     (dragstart)="dragstart.emit($event)" 
-     (dblclick)="dblclick.emit($event)"
-     (click)="singleclick.emit(element.id)"
+     (dblclick)="dblclick.emit(element.id)"
+     (click)="singleclick.emit(element)"
+     (cdkDragEnded)="dragEnd.emit({event: $event, element: element})"
      [ngStyle]="{
             'top': element.top + 'px',
             'left': element.left + 'px',
@@ -18,6 +18,8 @@
             'z-index': 100,
             'line-height': element.size * 1.2 + 'px',
             'transform': 'rotate(' + element.angle + 'deg)',
+            'cursor': 'default',
+            'user-select': 'none', 
             'visibility': 'hidden'
           }">
         </div>
@@ -25,6 +27,11 @@
 <div
   #html_element
   *ngIf="element.view_type == 'image'" 
+    id="{{element.id}}"
+    cdkDrag
+    (dblclick)="dblclick.emit(element.id)"
+    (click)="singleclick.emit(element)"
+    (cdkDragEnded)="dragEnd.emit({event: $event, element: element})"
   [ngStyle]="{
     'top': element.top + 'px',
     'left': element.left + 'px',
@@ -33,19 +40,16 @@
     'position': 'absolute',
     'z-index': 100,
     'transform': 'rotate(' + element.angle + 'deg)',
+    'cursor': 'default',
+    'user-select': 'none', 
     'visibility': 'hidden'
   }" >
   <img 
-    id="{{element.id}}"
-    draggable="true" 
-    (dragstart)="dragstart.emit($event)" 
-    (dblclick)="dblclick.emit($event)"
-    (click)="singleclick.emit(element.id)" 
      src={{element.content}} 
      [ngStyle]="{
         'width': element.width + 'px', 
         'height': element.height + 'px',
-        'border': '1px solid red',
+        'border': '1px dotted #ff000045',
         'object-fit': element.keep_ratio ? 'contain' : 'fit'
       }" />
 </div>

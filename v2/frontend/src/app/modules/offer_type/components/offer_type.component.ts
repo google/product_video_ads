@@ -33,7 +33,6 @@ import * as UUID from 'uuid/v4'
 })
 export class OfferTypeComponent implements OnInit {
   
-  types : Array<string> = ['product', 'asset']
   step : number
   offer_types : Observable<OfferType[]>
   bases : Array<Base>
@@ -117,11 +116,12 @@ export class OfferTypeComponent implements OnInit {
 
     if (x != 0 || y != 0) {
 
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-      const curr_x = this.element_focused.left + this.video_pos.x - this.video_pos.offset_x + this.element_focused.offsetWidth/2 
-      const curr_y = this.element_focused.top + this.video_pos.y - this.video_pos.offset_y + this.element_focused.offsetHeight/2 - scrollTop
+      this.move_element_to(this.element_focused, x, y)
 
-      this.move_element_to(this.element_focused, curr_x + x, curr_y + y)
+      // Change element visually on screen
+      this.element_focused.left += x
+      this.element_focused.top += y
+
       event.preventDefault()
     }
   }
@@ -133,7 +133,7 @@ export class OfferTypeComponent implements OnInit {
   choose_base(base : Base) {
 
     this.video_url = base.url
-    this.base_products_timings = base.products
+    this.base_products_timings = [...base.products]
     
     if (!this.locked_name)
       this.offer_types.pipe(first()).subscribe(ots => {
@@ -179,6 +179,8 @@ export class OfferTypeComponent implements OnInit {
       y: rect.top + scrollTop,
       offset_x: img.offsetLeft,
       offset_y: img.offsetTop,
+      width: this.video.width,
+      height: this.video.height,
       x_ratio: 1,
       y_ratio: 1
     }
@@ -208,6 +210,8 @@ export class OfferTypeComponent implements OnInit {
       y: rect.top + scrollTop,
       offset_x: video.offsetLeft,
       offset_y: video.offsetTop,
+      width: this.video.width,
+      height: this.video.height,
       x_ratio: video.videoWidth/WIDTH,
       y_ratio: video.videoHeight/HEIGHT
     }
@@ -250,7 +254,7 @@ export class OfferTypeComponent implements OnInit {
   
   private create_element(product) {
     
-    const element = { id: UUID(), x: 0, y: 0, ...product }
+    const element = { id: UUID(), ...product }
     this.elements.push(element)
 
     return element
@@ -367,88 +371,33 @@ export class OfferTypeComponent implements OnInit {
       return words.join('<br/>')
     }
 
-    public drag_start(event) {
+    public drag_end({event, element}) {
 
-      const msg = {
-        id: event.target.id,
-        offsetWidth: event.target.offsetWidth,
-        offsetHeight: event.target.offsetHeight
-      }
-
-      // Drag data
-      event.dataTransfer.setData("text/plain", JSON.stringify(msg))
-      event.dataTransfer.setDragImage(event.target, event.target.offsetWidth/2, event.target.offsetHeight/2)
-    }
-    
-    public drag_over(event) {
-      event.preventDefault();
-      return false;
-    }
-
-    public focus_element(id) {
-      event.preventDefault();
-      this.element_focused = this.elements.filter(e => e.id == id)[0]
-    }
-    
-    public drop_event(event) {
-      
-      const msg = JSON.parse(event.dataTransfer.getData("text/plain"))
-      
-      if (!msg.id)
-        return
-
-      // Retrieve element
-      const element = this.elements.filter(e => e.id == msg.id)[0]
-
-      // Update offsets
-      element.offsetWidth = msg.offsetWidth
-      element.offsetHeight = msg.offsetHeight
-
-      // Move element
-      this.move_element_to(element, event.clientX, event.clientY) 
+      this.move_element_to(element, event.distance.x, event.distance.y)
 
       // Assign selected color for the text first time
       if (element.config_color) {
         element.color = element.config_color
         element.config_color = undefined
       }
-
-      // Focus on this element
-      this.focus_element(msg.id)
-
-      event.preventDefault()
-      return false
     }
+    
+    public focus_element(element) {
+      this.element_focused = element
+      console.log('Element focused: ' + element.id)
+    }
+    
+    private move_element_to(element, offset_x, offset_y) {
 
-    private move_element_to(element, raw_x, raw_y) {
+      console.log('Moving element ' + element.id + 'in ' + offset_x + '/' + offset_y)
 
-      console.log('Moving element ' + element.id + 'to ' + raw_x + '/' + raw_y)
-
-      const x = raw_x - this.video_pos.x
-      const y = raw_y - this.video_pos.y
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-      
-      // Adjust on align
-      let align_adjust = 0
-      
-      if (element.align && element.align == 'left')
-        align_adjust = element.offsetWidth/2
-
-      if (element.align && element.align == 'right')
-        align_adjust = -element.offsetWidth/2
-
-      element.left = (this.video_pos.offset_x + x - element.offsetWidth/2)
-      element.top = (this.video_pos.offset_y + y - element.offsetHeight/2 + scrollTop)
-
-      element.x = ((x - align_adjust) * this.video_pos.x_ratio).toFixed(0)
-      element.y = ((y - element.offsetHeight/2 + scrollTop) * this.video_pos.y_ratio).toFixed(0)
+      element.x += offset_x
+      element.y += offset_y
     }
 
     choose_position(product) {
       console.log('Setting video position to ' + product['start_time'])
       this.video.currentTime = product['start_time']
-      this.base_products_timings.forEach(p => p['chosen'] = false)
-      product['chosen'] = true
     }
 
     load_elements_on_screen() {
@@ -466,9 +415,9 @@ export class OfferTypeComponent implements OnInit {
           const content = this.facade.assets.filter(a => a.id == c.key)[0][c.field]
 
           if (c.field == 'image')
-            element = this.create_image({...c, content, needs_screen_adjust: true})
+            element = this.create_image({...c, content, loaded_element: true})
           else
-            element = this.create_text({...c, content, needs_screen_adjust: true})
+            element = this.create_text({...c, content, loaded_element: true})
         } else {
 
           // Product
@@ -476,20 +425,18 @@ export class OfferTypeComponent implements OnInit {
           const content = current_product.values[c.field]
 
           if (this.is_image(content))
-            element = this.create_image({...c, content, needs_screen_adjust: true})
+            element = this.create_image({...c, content, loaded_element: true})
           else
-            element = this.create_text({...c, content, needs_screen_adjust: true})
+            element = this.create_text({...c, content, loaded_element: true})
         }
       }
 
       this.offer_type.configs = []
     }
     
-    public delete_element(event) {
+    public delete_element(id) {
       
       event.preventDefault();
-      
-      const id = event.target.id
       
       // Delete from screen
       this.elements = this.elements.filter(e => e.id != id)
@@ -500,16 +447,24 @@ export class OfferTypeComponent implements OnInit {
     private add_elements_to_configs() {
       
       for (let e of this.elements.values()) {
+
         // Add texts
-        if (e.view_type == 'text')
+        if (e.view_type == 'text') {
+
+          // Adjust X if alignment is center or right for texts
+          if (e.align == 'center' || e.align == 'right') {
+            const htmlElement = document.getElementById(e.id)
+            e.x += e.align == 'center' ? htmlElement.offsetWidth/2 : htmlElement.offsetWidth
+          }
+
           this.offer_type.configs.push(new Config(
             e.key,
             e.type,
             e.field,
-            parseInt(e.x),
-            parseInt(e.y),
-            0,//this.offer_type.start_time,
-            0,//this.offer_type.end_time,
+            parseInt((e.x * this.video_pos.x_ratio).toFixed(0)),
+            parseInt((e.y * this.video_pos.y_ratio).toFixed(0)),
+            0,
+            0,
             e.font,
             e.color,
             Math.floor(e.size * this.video_pos.x_ratio),
@@ -519,25 +474,29 @@ export class OfferTypeComponent implements OnInit {
             e.angle,
             false
           ))
-        else
-      // Add images
-        this.offer_type.configs.push(new Config(
-          e.key,
-          e.type,
-          e.field,
-          parseInt(e.x),
-          parseInt(e.y),
-          0,//this.offer_type.start_time,
-          0,//this.offer_type.end_time,
-          '',
-          '',
-          0,
-          e.width * this.video_pos.x_ratio,
-          e.height * this.video_pos.y_ratio,
-          e.align,
-          e.angle,
-          e.keep_ratio
-        ))
+        }
+
+        else {
+
+          // Add images
+          this.offer_type.configs.push(new Config(
+            e.key,
+            e.type,
+            e.field,
+            parseInt((e.x * this.video_pos.x_ratio).toFixed(0)),
+            parseInt((e.y * this.video_pos.y_ratio).toFixed(0)),
+            0,
+            0,
+            '',
+            '',
+            0,
+            e.width * this.video_pos.x_ratio,
+            e.height * this.video_pos.y_ratio,
+            'left',
+            e.angle,
+            e.keep_ratio
+          ))
+        }
       }
 
       // Delete any other with same title

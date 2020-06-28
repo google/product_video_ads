@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { OfferTypeFacade } from '../offer_type.facade';
 
 @Component({
@@ -28,13 +28,13 @@ export class DraggableElementComponent implements AfterViewInit {
     @Input() element : any
     @Input() video_pos : any
 
-    @Output() dragstart = new EventEmitter<any>()
     @Output() dblclick = new EventEmitter<any>()
     @Output() singleclick = new EventEmitter<any>()
+    @Output() dragEnd = new EventEmitter<any>()
 
     @ViewChild('html_element', {static: false}) html_element : ElementRef;
     
-    constructor(private cd: ChangeDetectorRef) {}
+    constructor() {}
 
     ngAfterViewInit() {
         console.log('Element ' + this.element.id + ' initied')
@@ -43,40 +43,41 @@ export class DraggableElementComponent implements AfterViewInit {
 
     private element_position_to_style() {
 
-        // Set offset according to element size
-        this.element.offsetWidth = this.html_element.nativeElement.offsetWidth
-        this.element.offsetHeight = this.html_element.nativeElement.offsetHeight
+        // Adjust loaded element to screen size
+        if (this.element.loaded_element) {
 
-        if (this.element.needs_screen_adjust) {
-
-          // Adjust on align
           let align_adjust = 0
-            
+
           if (this.element.align == 'center')
-            align_adjust = this.html_element.nativeElement.offsetWidth/2
+             align_adjust = this.html_element.nativeElement.offsetWidth/2
     
           if (this.element.align == 'right')
-            align_adjust = this.html_element.nativeElement.offsetWidth
-    
-          // Position on screen 
-          this.element.left = ((parseInt(this.element.x) - align_adjust) / this.video_pos.x_ratio) + this.video_pos.offset_x
-          this.element.top =  (parseInt(this.element.y) / this.video_pos.y_ratio) + this.video_pos.offset_y
-        
-          // Resize to screen
+             align_adjust = this.html_element.nativeElement.offsetWidth
+
+          // Scaled X/Y 
+          this.element.x = ((parseInt(this.element.x) - align_adjust) / this.video_pos.x_ratio)
+          this.element.y = (parseInt(this.element.y) / this.video_pos.y_ratio)
+          this.element.left = this.element.x
+          this.element.top = this.element.y
+          
+          // Resize image to screen
           if (this.element.view_type == 'image') {
             this.element.width /= this.video_pos.x_ratio
             this.element.height /= this.video_pos.y_ratio
           }
       
+          // Resize font
           this.element.size /= this.video_pos.x_ratio
+          
+        } else {
 
-          this.element.offsetWidth /= this.video_pos.x_ratio
-          this.element.offsetHeight /= this.video_pos.y_ratio
-
-          this.element.needs_screen_adjust = false
+          // Set initial default positions to new element
+          this.element.x = 0
+          this.element.y = parseInt(this.video_pos.height + 30) 
+          this.element.left = 0
+          this.element.top = this.video_pos.height + 30
         }
   
         this.html_element.nativeElement.style.visibility = 'visible'
-        //this.cd.detectChanges()
     }
 }
