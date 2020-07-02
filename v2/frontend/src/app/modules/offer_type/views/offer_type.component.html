@@ -26,7 +26,7 @@
     <mat-spinner *ngIf="bases.length == 0"></mat-spinner>
     
     <div *ngIf="bases.length > 0">
-      <div class="added_item" *ngFor="let offer of offer_types | async">
+      <div class="added_item" *ngFor="let offer of offer_types | async | sortBy: 'asc':'title' | sortBy: 'asc':'base'">
         
         <p><b>{{offer.title}}</b></p>
         <p>({{offer.base}})</p>

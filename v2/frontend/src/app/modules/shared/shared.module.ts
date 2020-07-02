@@ -33,6 +33,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatCardModule} from '@angular/material/card';
 import {MatExpansionModule} from '@angular/material/expansion'
 import {DragDropModule} from '@angular/cdk/drag-drop';
+import { NgpSortModule } from "ngp-sort-pipe";
 
 @NgModule({
   declarations: [],
@@ -68,7 +69,8 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
     MatCheckboxModule,
     MatCardModule,
     MatExpansionModule,
-    DragDropModule
+    DragDropModule,
+    NgpSortModule
   ]
 })
 export class SharedModule { }
