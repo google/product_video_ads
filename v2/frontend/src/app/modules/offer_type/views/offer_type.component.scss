@@ -29,6 +29,7 @@ mat-icon {
 .video-container {
     position: relative;
     margin-bottom: 40px;
+    z-index: 10;
 }
 
 .spinner-element {
@@ -41,6 +42,7 @@ mat-icon {
 }
 
 .edit_box {
+    z-index: 11;
     position: fixed;
     top: 25%;
     right: 10%;

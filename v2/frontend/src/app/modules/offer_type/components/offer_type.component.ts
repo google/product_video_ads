@@ -402,16 +402,12 @@ export class OfferTypeComponent implements OnInit {
       this.video.currentTime = product['start_time']
     }
 
-    load_elements_on_screen() {
+    async load_elements_on_screen() {
 
       console.log('Loading elements on screen...')
 
-      let zindex = 10
-
       // Add all elements on screen
       for(let c of this.offer_type.configs) {
-
-        c['zindex'] = zindex++
 
         // Draw assets
         if (c.type == 'asset') {
@@ -419,9 +415,9 @@ export class OfferTypeComponent implements OnInit {
           const content = this.facade.assets.filter(a => a.id == c.key)[0][c.field]
 
           if (c.field == 'image')
-            this.create_image({...c, content, loaded_element: true})
+            await this.create_image({...c, content, loaded_element: true})
           else
-            this.create_text({...c, content, loaded_element: true})
+            await this.create_text({...c, content, loaded_element: true})
         } else {
 
           // Product
@@ -429,9 +425,9 @@ export class OfferTypeComponent implements OnInit {
           const content = current_product.values[c.field]
 
           if (this.is_image(content))
-            this.create_image({...c, content, loaded_element: true})
+            await this.create_image({...c, content, loaded_element: true})
           else
-            this.create_text({...c, content, loaded_element: true})
+            await this.create_text({...c, content, loaded_element: true})
         }
       }
 
