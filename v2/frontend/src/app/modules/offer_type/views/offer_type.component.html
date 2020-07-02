@@ -260,6 +260,9 @@
             Flip
           </mat-checkbox>
           
+          <mat-checkbox class="example-margin" style="margin-left: 2%;" [(ngModel)]="config.keep_ratio">
+            Keep Ratio
+          </mat-checkbox>
           <br/>
           
           <button mat-stroked-button (click)="create_text()">Insert Text</button>

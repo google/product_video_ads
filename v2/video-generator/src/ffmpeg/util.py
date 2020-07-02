@@ -63,6 +63,12 @@ def convert_text_overlay(config, field_value, storage):
   # Create overlays to all lines broken down
   texts = []
 
+  # Check if need to scale font to fit the space
+  longest_word_length = max([len(s) for s in words])
+
+  if config.get('keep_ratio', False) and longest_word_length < width*0.8:
+      font_size = float(font_size / (longest_word_length/(width*0.8)))
+
   for i, word in enumerate(words):
 
     texts.append({
@@ -75,7 +81,7 @@ def convert_text_overlay(config, field_value, storage):
         'text': word,
         'font': storage.get_absolute_path(config['font']),
         'font_color': config['color'],
-        'font_size': config['size']
+        'font_size': font_size
     })
 
   return texts

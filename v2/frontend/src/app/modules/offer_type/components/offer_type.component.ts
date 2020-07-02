@@ -498,7 +498,7 @@ export class OfferTypeComponent implements OnInit {
             0,
             e.align,
             e.angle,
-            false
+            e.keep_ratio
           ))
         }
 
