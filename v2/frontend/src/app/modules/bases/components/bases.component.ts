@@ -128,9 +128,7 @@ export class BasessComponents implements OnInit {
       duration: 4000,
     }).onAction().subscribe(() => {
       this.facade.delete_base(base.title).then(response => {
-        this._snackBar.open("Base deleted (" + response.status + ')', 'OK', {
-          duration: 2000
-        })
+        this._snackBar.open("Base deleted (" + response.status + ')', 'OK', {duration: 2000})
       })
     })
   }
@@ -139,25 +137,22 @@ export class BasessComponents implements OnInit {
 
     this.new_base = false
 
-    this._snackBar.open("Creating new base...", 'OK', {
-      duration: 10000,
-    })
+    this._snackBar.open("Uploading new base, please wait...")
 
+    // Upload to drive
     this.facade.upload_base_file(file).then(response => {
 
-      this.facade.add_base(title, file.name, response.id).then(response => {
+      // Add to configuration
+      this.facade.add_base(title, file.name, response.id)
 
-        this._snackBar.open("Uploaded successfuly (" + response['status'] + ')', 'OK', {
-          duration: 2000
-        })
+      // Handle default time to images (fix this)
+      if (!this.is_video_base(file.name)) {
+        this.base = this.facade.bases.filter(b => b.title == title)[0]
+        this.base.products.push({start_time: 0, end_time: 0})
+        this.finish()
+      } else 
+        this.save()
 
-        // Handle default time to images
-        if (!this.is_video_base(file.name)) {
-          this.base = this.facade.bases.filter(b => b.title == title)[0]
-          this.base.products.push({start_time: 0, end_time: 0})
-          this.finish()
-        }
-      })
     }).catch(err => {
       this._snackBar.open("Fail: " + err, 'OK', {
         duration: 4000

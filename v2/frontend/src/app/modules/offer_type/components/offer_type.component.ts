@@ -542,18 +542,17 @@ export class OfferTypeComponent implements OnInit {
 
     save() {
 
-      this._snackBar.open("Saving...", 'OK', {
-        duration: 2000,
-      })
+      this._snackBar.open("Saving...")
 
       this.facade.save().then(response => {
 
         const status = response['status']
 
-        if (status == 200)
+        if (status == 200) {
+          this._snackBar.open("Saved", '', { duration: 2000 })
           this.ngOnInit()
-        else
-          this._snackBar.open("Error (" + status + ')', 'OK', { duration: 10000 })
+        } else
+            this._snackBar.open("Error (" + status + ')', 'OK', { duration: 10000 })
       })
     }
   }

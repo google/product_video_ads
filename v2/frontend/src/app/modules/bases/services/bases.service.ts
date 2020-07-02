@@ -50,7 +50,6 @@ export class BasesService {
 
     add_base(title, file, id) {
         this._bases.next([...this.bases, new Base(title, file, [], environment.drive_file_prefix + id)])
-        return this.save()
     }
 
     delete_base(title : string) : Promise<any> {
