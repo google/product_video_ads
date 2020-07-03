@@ -34,7 +34,6 @@ export class BasessComponents implements OnInit {
   bases : Observable<Base[]>
   base : Base
   seconds : any
-  product : any
   video
   video_duration
   video_url
@@ -47,7 +46,6 @@ export class BasessComponents implements OnInit {
     this.new_base = false
     this.new_font = false
     this.is_edit_base_file = false
-    this.product = {'start_time': 0.0, 'end_time': 0.0}
     this.video = undefined
     this.base = undefined
     this.video_url = ''
@@ -114,8 +112,11 @@ export class BasessComponents implements OnInit {
     })
   }
 
-  add_product() {
-    this.base.products.push({...this.product})
+  add_product(start_time, end_time) {
+    this.base.products.push({
+      start_time: Math.max(start_time, 0.1), 
+      end_time: end_time
+    })
   }
 
   delete_product(index) {
