@@ -495,7 +495,7 @@ export class OfferTypeComponent implements OnInit {
             e.color,
             Math.floor(e.size * this.video_pos.x_ratio),
             e.width,
-            0,
+            e.height,
             e.align,
             e.angle,
             e.keep_ratio
