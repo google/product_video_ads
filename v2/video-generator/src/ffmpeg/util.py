@@ -53,6 +53,7 @@ def convert_configs_to_format(configs, products_data, storage, cloud_storage):
 
 
 def convert_text_overlay(config, field_value, storage):
+
     width = int(config.get('width', 0))
     font_size = float(config['size'])
 
@@ -67,8 +68,9 @@ def convert_text_overlay(config, field_value, storage):
         actual_lines = len(words)
         desired_lines = int(config.get('height', 1))
 
-        if actual_lines != desired_lines:
-            # Calculate font size and width to fit desired lines
+        if actual_lines > desired_lines:
+
+            # Shrink to less lines
             font_size, width = _fit_font_size_to_width_height(font_size, width, desired_lines, len(field_value))
 
             # Wrap content again according to new width
@@ -100,8 +102,8 @@ def _fit_font_size_to_width_height(font_size, width, desired_lines, text_length)
     desired_size = float(width * desired_lines)
 
     factor = actual_size / desired_size
-
-    return (font_size/factor)*0.70, math.ceil(width*factor)*1.2
+    
+    return (font_size/factor)*0.9, math.ceil(width*factor)
 
 
 def _wrap_text(text, charaters_per_line):
