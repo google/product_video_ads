@@ -29,6 +29,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
           [drive_folder]='drive_folder | async'
           [sheet_text]='sheet_text'
           (onlogin)='login($event)'
+          (onshare)='share_access($event)'
           (onlogout)='logout()'
           (ongeneratenew)='generate_new()'>
       </login-view>
@@ -62,6 +63,15 @@ export class LoginComponent implements OnInit {
 
   logout() {
     this.loginFacade.logout()
+  }
+
+  share_access(email) {
+
+    this._snackBar.open('Processing...')
+
+    this.loginFacade.share_access(email)
+      .then(() => this._snackBar.open('Access granted!', '', { duration: 5000 }))
+      .catch((e) => this._snackBar.open(e.result.error.errors[0].message, 'OK', { duration: 10000 }))
   }
 
   generate_new() {

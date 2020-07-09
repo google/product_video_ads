@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1Um9HvkTCwfR_cEJBUn-gm0qQz1L5UulVxs8FENtexqY/edit'
+var SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/3h3g5f237rt7dgvtrh/edit'
 var SHEET_NAME = 'Campaigns'
 var SLEEP_TIME_SECONDS = 60
 var ACCOUNTS_LIMIT = 50
