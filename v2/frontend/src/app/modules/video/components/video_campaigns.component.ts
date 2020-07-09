@@ -32,6 +32,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 })
 export class VideoCampaignsComponent implements OnInit {
 
+  drive_url = 'https://drive.google.com/uc?export=download&id='
   yt_url = 'https://www.youtube.com/embed/'
 
   ad_group_types = [
@@ -79,6 +80,11 @@ export class VideoCampaignsComponent implements OnInit {
       this.mode = ''
     }
 
+    is_video(video : Video) {
+      const video_base = this.facade.bases.filter(b => b.title == video.base_video)[0]
+      return video_base && video_base.file.endsWith('mp4')
+    }
+
     select_single_video_mode() {
       this.mode = 'single'
     }
@@ -94,7 +100,7 @@ export class VideoCampaignsComponent implements OnInit {
 
     add_single_video(product_keys, configs, campaign_configs) {
       this.add_video(product_keys, configs, campaign_configs)
-      this._snackBar.open('Single video scheduled (check videos section above)', 'OK', { duration: 4000 })
+      this._snackBar.open('Single ad scheduled (check Ads section above)', 'OK', { duration: 4000 })
     }
     
     private add_video(product_keys, configs, campaign_configs) {
@@ -130,7 +136,7 @@ export class VideoCampaignsComponent implements OnInit {
         }
       }
 
-      this._snackBar.open('Scheduled for creation (check videos section above)', 'OK', { duration: 4000 })
+      this._snackBar.open('Scheduled for creation (check Ads section above)', 'OK', { duration: 4000 })
     }
 
     update_video() {
@@ -145,11 +151,11 @@ export class VideoCampaignsComponent implements OnInit {
 
       const video_name = video.generated_video || 'being generated'
 
-      this._snackBar.open('Confirm deletion of video ' + video_name + '?', 'Confirm', {
+      this._snackBar.open('Confirm deletion of asset ' + video_name + '?', 'Confirm', {
         duration: 4000,
       }).onAction().subscribe(() => {
         this.facade.delete_video(video.generated_video).then(response => {
-          this._snackBar.open("Video deleted (" + response.status + ')', 'OK', {
+          this._snackBar.open("Asset deleted (" + response.status + ')', 'OK', {
             duration: 2000
           })
         })

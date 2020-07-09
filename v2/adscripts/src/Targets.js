@@ -1,6 +1,6 @@
 function add_campaign_targets(campaign_name, location_targets_string) {
   
-  var campaign = Util.findCampaign(campaign_name)
+  var campaign = Util.findVideoCampaign(campaign_name) || Util.findCampaign(campaign_name) 
   
   if (campaign === undefined) {
     Logger.log('Campaign not found: ' + campaign_name) 

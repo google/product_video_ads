@@ -14,7 +14,7 @@
    limitations under the License.
 -->
 
-<h2 class="main_title">Preview Videos</h2>
+<h2 class="main_title">Preview</h2>
 <div class="inner_content">
 
   <!-- Shows generated videos and logs, if there's any -->
@@ -24,7 +24,7 @@
     <mat-expansion-panel expanded="false">
       <mat-expansion-panel-header>
         <mat-panel-title>
-          <b>Videos</b>
+          <b>Assets</b>
         </mat-panel-title>
       </mat-expansion-panel-header>
   
@@ -54,7 +54,7 @@
 
         <div class="added_item video_box" *ngIf="video.status == 'Preview'">
           <mat-icon aria-hidden="false" aria-label="access_time icon">access_time</mat-icon>
-          <p>Generating video...</p>
+          <p>Generating asset...</p>
           <span style="cursor: pointer" (click)="delete_video(video)">
             <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
           </span>
@@ -69,7 +69,7 @@
     <mat-expansion-panel expanded="false">
       <mat-expansion-panel-header>
         <mat-panel-title>
-          <b>Video Generator Logs</b>
+          <b>Generator Logs</b>
         </mat-panel-title>
       </mat-expansion-panel-header>
   
@@ -102,12 +102,12 @@
 
     <div class="added_item" [ngClass]="{'selected_box': mode == 'single'}" (click)="select_single_video_mode()">
       <mat-icon aria-hidden="false" aria-label="video_label icon" title="video_label">video_label</mat-icon>
-      <p>Create <b>one</b><br/>single video</p>
+      <p>Create <b>one</b><br/>single asset</p>
     </div>
 
     <div class="added_item" [ngClass]="{'selected_box': mode == 'bulk'}" (click)="select_bulk_video_mode()">
       <mat-icon aria-hidden="false" aria-label="video_library icon" title="video_library">video_library</mat-icon>
-      <p>Create <b>multiple</b><br/>videos in bulk</p>
+      <p>Create <b>multiple</b><br/>assets in bulk</p>
     </div>
   </div>
 
@@ -144,13 +144,13 @@
 
     <br/><br/>
 
-    <button mat-stroked-button [disabled]="!is_all_filled()" (click)="add_single_video()">Create Video</button>
+    <button mat-stroked-button [disabled]="!is_all_filled()" (click)="add_single_video()">Create Asset</button>
   </div>
 
     <!-- Configure bulk video creation -->
     <div *ngIf="mode=='bulk'">
 
-        <h3>Select product groups to create videos:</h3>
+        <h3>Select product groups to create assets:</h3>
 
         <mat-checkbox class="example-margin" (change)="check_all($event)">
           <b>Check All</b>

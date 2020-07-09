@@ -49,9 +49,9 @@ export class OfferTypeComponent implements OnInit {
   base_products_timings : Array<any>
   product_shown : string
   is_video : boolean
-  video
-  video_url
-  video_pos
+  base_asset
+  base_url
+  base_specs
 
   constructor(public facade : OfferTypeFacade, private router: Router, private _snackBar: MatSnackBar, private cd: ChangeDetectorRef) {
     this.offer_types = this.facade.offer_types$
@@ -67,12 +67,12 @@ export class OfferTypeComponent implements OnInit {
     this.step = 1 
     this.locked_name = false
     this.locked_save = false
-    this.video_url = ''
+    this.base_url = ''
     this.loaded_fonts = new Set()
     this.config = new Config()
     this.config.font = 'Ubuntu-Regular.ttf'
     this.offer_type = new OfferType('OfferType', '', [])
-    this.video = undefined
+    this.base_asset = undefined
     this.product_shown = undefined
     this.base_products_timings = []
 
@@ -134,7 +134,7 @@ export class OfferTypeComponent implements OnInit {
 
   choose_base(base : Base) {
 
-    this.video_url = base.url
+    this.base_url = base.url
     this.base_products_timings = [...base.products]
     
     if (!this.locked_name)
@@ -170,19 +170,12 @@ export class OfferTypeComponent implements OnInit {
   
   public on_image_loaded(img) {
 
-    this.video = img
-
-    var rect = img.getBoundingClientRect();
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+    this.base_asset = img
 
     // To calculate elements positions relative
-    this.video_pos = {
-      x: rect.left, 
-      y: rect.top + scrollTop,
-      offset_x: img.offsetLeft,
-      offset_y: img.offsetTop,
-      width: this.video.width,
-      height: this.video.height,
+    this.base_specs = {
+      width: this.base_asset.width,
+      height: this.base_asset.height,
       x_ratio: 1,
       y_ratio: 1
     }
@@ -192,28 +185,19 @@ export class OfferTypeComponent implements OnInit {
 
   public on_video_loaded(video) {
     
-    const adjust = video.videoWidth / 800
+    this.base_asset = video
 
+    const adjust = video.videoWidth / 800
     const WIDTH = video.videoWidth / adjust 
     const HEIGHT = video.videoHeight / adjust 
-
-    this.video = video
 
     video.width = WIDTH
     video.height = HEIGHT
 
-    var rect = video.getBoundingClientRect();
-
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-
     // To calculate elements positions relative
-    this.video_pos = {
-      x: rect.left, 
-      y: rect.top + scrollTop,
-      offset_x: video.offsetLeft,
-      offset_y: video.offsetTop,
-      width: this.video.width,
-      height: this.video.height,
+    this.base_specs = {
+      width: this.base_asset.width,
+      height: this.base_asset.height,
       x_ratio: video.videoWidth/WIDTH,
       y_ratio: video.videoHeight/HEIGHT
     }
@@ -399,7 +383,7 @@ export class OfferTypeComponent implements OnInit {
 
     choose_position(product) {
       console.log('Setting video position to ' + product['start_time'])
-      this.video.currentTime = product['start_time']
+      this.base_asset.currentTime = product['start_time']
     }
 
     async load_elements_on_screen() {
@@ -487,13 +471,13 @@ export class OfferTypeComponent implements OnInit {
             e.key,
             e.type,
             e.field,
-            parseInt((e.x * this.video_pos.x_ratio).toFixed(0)),
-            parseInt((e.y * this.video_pos.y_ratio).toFixed(0)),
+            parseInt((e.x * this.base_specs.x_ratio).toFixed(0)),
+            parseInt((e.y * this.base_specs.y_ratio).toFixed(0)),
             0,
             0,
             e.font,
             e.color,
-            Math.floor(e.size * this.video_pos.x_ratio),
+            Math.floor(e.size * this.base_specs.x_ratio),
             e.width,
             e.height,
             e.align,
@@ -509,15 +493,15 @@ export class OfferTypeComponent implements OnInit {
             e.key,
             e.type,
             e.field,
-            parseInt((e.x * this.video_pos.x_ratio).toFixed(0)),
-            parseInt((e.y * this.video_pos.y_ratio).toFixed(0)),
+            parseInt((e.x * this.base_specs.x_ratio).toFixed(0)),
+            parseInt((e.y * this.base_specs.y_ratio).toFixed(0)),
             0,
             0,
             '',
             '',
             0,
-            e.width * this.video_pos.x_ratio,
-            e.height * this.video_pos.y_ratio,
+            e.width * this.base_specs.x_ratio,
+            e.height * this.base_specs.y_ratio,
             'left',
             e.angle,
             e.keep_ratio

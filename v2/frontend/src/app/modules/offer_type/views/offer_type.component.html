@@ -61,37 +61,35 @@
     </div>
   </div>
   
-  <!-- Configure chosen base video -->
-  <div [hidden]="!video_url">
+  <!-- Configure chosen base -->
+  <div [hidden]="!base_url">
     
       <h2>How to configure offer type?</h2>
 
-      <p>This is where you place elements like images and texts on your video.</p>
-      <p>Drag and Drop elements to position them on video. Use double-click to delete elements.</p>
-      <p>"Product" elements are dynamic and replaced when generating video during next step.</p>
+      <p>This is where you place elements like images and texts on your base.</p>
+      <p>Drag and Drop elements to position them on screen. Use double-click to delete elements.</p>
+      <p>"Product" elements are dynamic and replaced when generating preview/ads during next step.</p>
       <p>Values you choose under "Products" elements are just examples texts/images.</p>
       <p>"Assets" elements are static and fixed, so will stay as you see here.</p>
-      <p>The selected color for the inserted texts will be applied when the element is dragged and dropped in the video area.</p>
+      <p>The selected color for the inserted texts will be applied when the element is dragged and dropped in the base area.</p>
       <br/>
 
       <!-- Spinner -->
-      <mat-spinner class="spinner-element" style="position: absolute" *ngIf="video_url && !video"></mat-spinner>
+      <mat-spinner class="spinner-element" style="position: absolute" *ngIf="base_url && !base_asset"></mat-spinner>
   
-      <div id="video">
-
-      <div class="video-container">
+      <div class="asset-container">
 
         <!-- If it's video base -->
-        <video #vd1 *ngIf="video_url && is_video" class="video" (loadedmetadata)="on_video_loaded(vd1)" muted>
-          <source [src]="video_url" type="video/mp4">
+        <video #vd1 *ngIf="base_url && is_video" class="video" (loadedmetadata)="on_video_loaded(vd1)" muted>
+          <source [src]="base_url" type="video/mp4">
         </video>
 
         <!-- Or if it's image base -->
-        <img #vd1 *ngIf="video_url && !is_video" (load)="on_image_loaded(vd1)" [src]="video_url"/>
+        <img #img1 *ngIf="base_url && !is_video" (load)="on_image_loaded(img1)" [src]="base_url"/>
 
         <app-draggable-element *ngFor="let el of elements"
           [element]="el"
-          [video_pos]="video_pos"
+          [video_pos]="base_specs"
           (dblclick)="delete_element($event)"
           (dragEnd)="drag_end($event)"
           (singleclick)="focus_element($event)">
@@ -197,7 +195,7 @@
       </mat-form-field>
 
       <!-- Add New Items -->
-      <h2>Add new element to video:</h2>
+      <h2>Add new element to base:</h2>
       
       <!-- Choose type -->
       <mat-form-field>
@@ -219,7 +217,7 @@
         </mat-select>
       </mat-form-field>
       
-      <!-- Content to place on top of video -->
+      <!-- Content to place on top of base -->
       <mat-form-field *ngIf="config.field">
         <mat-label>Value</mat-label>
         <mat-select [(ngModel)]="content" (selectionChange)="select_example(content)">
@@ -320,7 +318,8 @@
       </div>
 
       <!-- Products positions -->
-      <div *ngIf="video">
+      <div *ngIf="base_asset && is_video">
+
         <h2>Position:</h2>
 
           <p>This position is to visualization only.<br/>You can assign each product to each position when creating the video on next step.</p>
@@ -335,6 +334,4 @@
       
       <button mat-stroked-button [disabled]="locked_save" (click)="finish()">Save</button>
       <a style="margin-left: 1%;" mat-stroked-button (click)="ngOnInit()">Cancel</a>
-  </div>
-
 </div>

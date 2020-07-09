@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1yqn2zyCCIluXUEmlMcvCgWxQdTPTaAuherozaFjJzFQ/edit'
+var SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1Um9HvkTCwfR_cEJBUn-gm0qQz1L5UulVxs8FENtexqY/edit'
 var SHEET_NAME = 'Campaigns'
 var SLEEP_TIME_SECONDS = 60
 var ACCOUNTS_LIMIT = 50
@@ -195,6 +195,32 @@ var STATUS_HANDLERS = {
           row.set('Status', 'Running')
    		}
     },
+
+    'Image Ready': function(row) {
+      
+      var adGroupName = row.get('BaseVideo') + '-' + String(row.get('GeneratedVideo')).replace(/,/g, '-')
+      
+      // Add targets related to Campaign
+      add_campaign_targets(row.get('CampaignName'), row.get('TargetLocation'))        
+    
+      // Create or simply get adGroup
+      var adGroup = Util.createOrRetrieveAdGroup(row.get('CampaignName'), adGroupName)
+      row.set('AdGroupName', adGroupName)
+        
+      // Create video ad
+      var adName = 'Ad ' + (adGroup.ads().get().totalNumEntities() + 1)
+      var ad = Util.createOrReactivateAd(adName, adGroup, row.get('GeneratedVideo'), row.get('Url'))
+      
+      // This may be null if video is not available
+      if (ad != null) {
+        
+        Logger.log('Ad %s created', ad.getName())
+        row.set('AdName', ad.getName())
+
+        // It's running
+        row.set('Status', 'Running')
+     }
+  },
     
 	'Price Changed': function(row) {
 	  Util.pauseAllVideoAds(row.get('AdGroupName'), row.get('CampaignName'))
@@ -204,7 +230,7 @@ var STATUS_HANDLERS = {
 }
 function add_campaign_targets(campaign_name, location_targets_string) {
   
-  var campaign = Util.findCampaign(campaign_name)
+  var campaign = Util.findVideoCampaign(campaign_name) || Util.findCampaign(campaign_name) 
   
   if (campaign === undefined) {
     Logger.log('Campaign not found: ' + campaign_name) 
@@ -248,9 +274,18 @@ var Util = {
     	})[0].getRange().getValues()
     },
   
-    findCampaign: function(campaign_name) {
+    findVideoCampaign: function(campaign_name) {
     
       var campaign = AdsApp.videoCampaigns()
+                   .withCondition('CampaignName = "' + campaign_name + '"')
+                   .get()
+      
+      return campaign.hasNext() ? campaign.next() : undefined
+    },
+
+    findCampaign: function(campaign_name) {
+    
+      var campaign = AdsApp.campaigns()
                    .withCondition('CampaignName = "' + campaign_name + '"')
                    .get()
       
@@ -266,6 +301,16 @@ var Util = {
     
       return videoAdGroup.hasNext() ? videoAdGroup.next() : undefined
     },
+
+    findAdGroup: function(adGroupName, campaignName) {
+    
+      var displayAdGroup = AdsApp.adGroups()
+            .withCondition('CampaignName = "' + campaignName + '"')
+            .withCondition('Name = "' + adGroupName + '"')
+            .get()
+    
+      return displayAdGroup.hasNext() ? displayAdGroup.next() : undefined
+    },
   
   	findVideoAd: function(adName, adGroup) {
     
@@ -277,6 +322,21 @@ var Util = {
         
         if (existingVideoAd.getName() == adName)
           return existingVideoAd
+      }
+      
+      return undefined
+    },
+
+    findAd: function(adName, adGroup) {
+    
+      var adsIterator = adGroup.ads().get()
+          
+      while (adsIterator.hasNext()) {
+        
+      	var existingAd = adsIterator.next()
+        
+        if (existingAd.getName() == adName)
+          return existingAd
       }
       
       return undefined
@@ -338,6 +398,37 @@ var Util = {
         
         return adGroup
     },
+
+    createOrRetrieveAdGroup: function(campaignName, adGroupName) {
+      
+      var adGroup = this.findAdGroup(adGroupName, campaignName)
+    
+      // Already existing adGroup
+      if (adGroup) {
+        
+        adGroup.enable()
+        adGroup.isEnabled()
+        
+        Logger.log('AdGroup %s already exists', adGroup.getName())
+        
+      } else {
+        
+          // New adGroup
+        var campaign = AdsApp.campaigns()
+            .withCondition('Name = "' + campaignName + '"')
+            .get()
+            .next()
+      
+          adGroup =  campaign.newAdGroupBuilder()
+                .withName(adGroupName)
+                .build()
+                .getResult()
+        
+          Logger.log('AdGroup %s created', adGroup.getName())
+      }
+      
+      return adGroup
+  },
   
   	createOrReactivateVideoAd: function(adName, adGroup, videoId, url, callToAction) {
 
@@ -409,5 +500,46 @@ var Util = {
       Logger.log('videoAd %s created with type %s', videoAd.getName(), videoAd.getType())
       
       return videoAd
+    },
+
+    createOrReactivateAd: function(adName, adGroup, imageId, url) {
+
+      // First, check if it already exists
+      var ad = this.findAd(adName, adGroup)
+      
+      if (ad) {
+        
+        ad.enable()
+        ad.isEnabled()
+          
+        Logger.log('Existing ad %s changed to ENABLED', ad.getName())
+        
+        return ad
+      }
+      
+      // Else, let's create new ad
+      var imageBlob = DriveApp.getFileById(imageId).getBlob()
+
+      var imageMedia = AdsApp.adMedia()
+        .newImageBuilder()
+        .withName(imageId)
+        .withData(imageBlob)
+        .build()
+        .getResult()
+      
+      if (imageMedia == null) {
+      	Logger.log('Problem linking image %s - please verify!', imageId)
+        return null
+      }
+
+      ad = adGroup.newAd().imageAdBuilder()
+        .withName(adName)
+        .withImage(imageMedia)
+        .withDisplayUrl(url)
+        .withFinalUrl(url)
+        .build()
+        .getResult()
+      
+      return ad
     }
 }
