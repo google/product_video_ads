@@ -42,6 +42,10 @@ export class LoginFacade {
         this.loginService.logout()
     }
 
+    share_access(email) : Promise<void> {
+        return this.loginService.share_access(email)
+    }
+
     generate_new() {
         return this.loginService.generate_new()
     }

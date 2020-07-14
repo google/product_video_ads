@@ -66,6 +66,13 @@
       <a target="_blank" href="https://drive.google.com/corp/drive/u/0/folders/{{drive_folder}}">here</a>
     </p>
 
+    <mat-form-field class="example-full-width">
+      <mat-label>Share access with</mat-label>
+      <input #email placeholder="E-mail" matInput>
+    </mat-form-field>
+    
+    <button style="margin-left: 1%;" [disabled]="!email.value" mat-stroked-button color="primary" (click)="share_access(email.value)">Share access</button>
+
     <h2>Documentation</h2>
 
     <mat-accordion class="example-headers-align">

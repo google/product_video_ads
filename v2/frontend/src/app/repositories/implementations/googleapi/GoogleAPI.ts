@@ -234,7 +234,7 @@ export class GoogleAPI {
   }
 
   /* Check if logged user has access to the PVA Template spreadsheet before creating a copy */
-  async has_spreadsheet_access(sheet_id : string) {
+  async  has_spreadsheet_access(sheet_id : string) {
     try {
       // try to read something from the trix, if the user does not have access, the catch will get the error
       const response = await this.gapi.client.sheets.spreadsheets.values.get({
@@ -246,6 +246,21 @@ export class GoogleAPI {
       console.log("The user does NOT have access to PVA Template spreadsheet.");
       return false
     }
+  }
+
+  async grant_editor_to(file_id : string, email : string) {
+
+    console.log('Granting access on ' + file_id + ' to ' + email)
+
+    return await this.gapi.client.drive.permissions.create({
+      resource: {
+        'type': 'user',
+        'role': 'writer',
+        'emailAddress': email
+      },
+      fileId: file_id,
+      fields: 'id',
+    })
   }
 
   is_valid_response(response : any, spec_field : string) {

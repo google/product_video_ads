@@ -33,6 +33,7 @@ export class LoginPresentation implements OnInit {
   @Output() onlogin = new EventEmitter<string>()
   @Output() onlogout = new EventEmitter()
   @Output() ongeneratenew = new EventEmitter()
+  @Output() onshare = new EventEmitter()
 
   sheet : string
   step = 0;
@@ -47,6 +48,10 @@ export class LoginPresentation implements OnInit {
 
   logout() {
     this.onlogout.emit()
+  }
+
+  share_access(email) {
+    this.onshare.emit(email)
   }
 
   generate_one() {

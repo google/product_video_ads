@@ -42,7 +42,7 @@ export class BasesFacade {
     }
 
     add_base(title, file, id) {
-        return this.service.add_base(title, file, id)
+        this.service.add_base(title, file, id)
     }
 
     upload_base_file(file : File) : Promise<any> {

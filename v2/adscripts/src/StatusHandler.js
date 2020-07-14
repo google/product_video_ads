@@ -40,6 +40,32 @@ var STATUS_HANDLERS = {
           row.set('Status', 'Running')
    		}
     },
+
+    'Image Ready': function(row) {
+      
+      var adGroupName = row.get('BaseVideo') + '-' + String(row.get('GeneratedVideo')).replace(/,/g, '-')
+      
+      // Add targets related to Campaign
+      add_campaign_targets(row.get('CampaignName'), row.get('TargetLocation'))        
+    
+      // Create or simply get adGroup
+      var adGroup = Util.createOrRetrieveAdGroup(row.get('CampaignName'), adGroupName)
+      row.set('AdGroupName', adGroupName)
+        
+      // Create video ad
+      var adName = 'Ad ' + (adGroup.ads().get().totalNumEntities() + 1)
+      var ad = Util.createOrReactivateAd(adName, adGroup, row.get('GeneratedVideo'), row.get('Url'))
+      
+      // This may be null if video is not available
+      if (ad != null) {
+        
+        Logger.log('Ad %s created', ad.getName())
+        row.set('AdName', ad.getName())
+
+        // It's running
+        row.set('Status', 'Running')
+     }
+  },
     
 	'Price Changed': function(row) {
 	  Util.pauseAllVideoAds(row.get('AdGroupName'), row.get('CampaignName'))

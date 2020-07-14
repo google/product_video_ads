@@ -104,6 +104,11 @@ export class LoginService {
         this.emit_status_event(-1)
     }
 
+    async share_access(email) : Promise<void> {
+        await this.googleApi.grant_editor_to(this.sheet_id, email)
+        await this.googleApi.grant_editor_to(this.drive_folder, email)
+    }
+
     async generate_new() {
         const user_has_access = await this.googleApi.has_spreadsheet_access(environment.template_sheet_id);
         if(user_has_access) {

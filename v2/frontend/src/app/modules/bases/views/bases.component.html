@@ -151,15 +151,15 @@
 
             <mat-form-field class="example-full-width">
                 <mat-label>Start Time</mat-label>
-                <input [(ngModel)]="product.start_time" type="number" matInput >
+                <input #start_time type="number" min=0.1 step=0.1 value="0.1" matInput >
             </mat-form-field>
 
             <mat-form-field class="example-full-width">
                 <mat-label>End Time</mat-label>
-                <input [(ngModel)]="product.end_time" type="number" matInput >
+                <input #end_time min=0.1 step=0.1 type="number" value="1" matInput >
             </mat-form-field>
 
-            <button mat-stroked-button (click)="add_product()">Add Position</button>
+            <button mat-stroked-button (click)="add_product(start_time.value, end_time.value)">Add Position</button>
 
             <br/>
 

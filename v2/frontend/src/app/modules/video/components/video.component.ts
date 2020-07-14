@@ -90,7 +90,7 @@ export class VideoComponent implements OnInit {
 
     add_single_video() {
       this.add_video()
-      this._snackBar.open('Single video scheduled (check videos section above)', 'OK', { duration: 4000 })
+      this._snackBar.open('Single asset scheduled (check assets section above)', 'OK', { duration: 4000 })
     }
     
     private add_video() {
@@ -136,7 +136,7 @@ export class VideoComponent implements OnInit {
         }
       }
 
-      this._snackBar.open('Scheduled for creation (check videos section above)', 'OK', { duration: 4000 })
+      this._snackBar.open('Scheduled for creation (check assets section above)', 'OK', { duration: 4000 })
     }
 
     update_video() {
@@ -151,11 +151,11 @@ export class VideoComponent implements OnInit {
 
       const video_name = video.generated_video || 'being generated'
 
-      this._snackBar.open('Confirm deletion of video ' + video_name + '?', 'Confirm', {
+      this._snackBar.open('Confirm deletion of asset ' + video_name + '?', 'Confirm', {
         duration: 4000,
       }).onAction().subscribe(() => {
         this.facade.delete_video(video.generated_video).then(response => {
-          this._snackBar.open("Video deleted (" + response.status + ')', 'OK', {
+          this._snackBar.open("Asset deleted (" + response.status + ')', 'OK', {
             duration: 2000
           })
         })
