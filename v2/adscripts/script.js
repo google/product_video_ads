@@ -156,7 +156,7 @@ function Row(row, sheet) {
   	rowRange.setValues(rowData)
   }
 }
-var FIELDS = ['AccountID', 'CampaignName', 'AdGroupName', 'AdName', 'TargetLocation', 'TargetAge', 'TargetUserInterest', 'Url', 'CallToAction', 'AdGroupType', 'Configs', 'BaseVideo', 'Status', 'GeneratedVideo']
+var FIELDS = ['AccountID', 'CampaignName', 'AdGroupName', 'AdName', 'TargetLocation', 'TargetAge', 'TargetUserInterest', 'Url', 'CallToAction', 'AdGroupType', 'Configs', 'BaseVideo', 'Status', 'GeneratedVideo', 'CurrentPrices', 'AudienceName']
 
 var STATUS_HANDLERS = {
   
@@ -180,6 +180,9 @@ var STATUS_HANDLERS = {
         // Create or simply get adGroup
         var adGroup = Util.createOrRetrieveVideoAdGroup(row.get('CampaignName'), row.get('AdGroupType'), adGroupName)
         row.set('AdGroupName', adGroupName)
+
+        // Associate audience with the adGroup
+        Util.associateAudienceWithAdGroup(adGroup, row.get('AudienceName'))
           
       	// Create video ad
       	var adName = 'Ad ' + (adGroup.videoAds().get().totalNumEntities() + 1)
@@ -409,5 +412,41 @@ var Util = {
       Logger.log('videoAd %s created with type %s', videoAd.getName(), videoAd.getType())
       
       return videoAd
+    },
+  
+    associateAudienceWithAdGroup: function(adGroup, audienceName) {
+      if (audienceName === null || audienceName ===  '') {
+        Logger.log('Row without audience')
+        return
+      }
+      
+      userListIterator = AdsApp.userlists().withCondition("Name = '" + audienceName + "'").get()
+      
+      if (!userListIterator.hasNext()) {
+        Logger.log('Could not find audience ' + audienceName)
+        return
+      }
+      
+      if (userListIterator.totalNumEntities() > 1) {
+        Logger.log('More than one audience found for name ' + audienceName)
+        while (userListIterator.hasNext()) {
+          Logger.log('Audience found: ' + userListIterator.next().getName())
+        }
+        return
+      }
+      
+      var audienceBuilder = adGroup.videoTargeting().newAudienceBuilder();
+
+      var audienceOperation = audienceBuilder
+        .withAudienceType("USER_LIST")
+        .withAudienceId(userListIterator.next().getId())
+        .build()
+
+      var audienceResultSuccessful = audienceOperation.isSuccessful();
+      if (audienceResultSuccessful) {
+        Logger.log('AdGroup ' + adGroup.getName() + ' linked to audience ' + audienceName)
+      } else {
+        Logger.log('Could not link adGroup ' + adGroup.getName() + ' to audience ' + audienceName)
+      }
     }
 }

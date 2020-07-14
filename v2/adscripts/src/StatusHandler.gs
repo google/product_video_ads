@@ -1,4 +1,4 @@
-var FIELDS = ['AccountID', 'CampaignName', 'AdGroupName', 'AdName', 'TargetLocation', 'TargetAge', 'TargetUserInterest', 'Url', 'CallToAction', 'AdGroupType', 'Configs', 'BaseVideo', 'Status', 'GeneratedVideo']
+var FIELDS = ['AccountID', 'CampaignName', 'AdGroupName', 'AdName', 'TargetLocation', 'TargetAge', 'TargetUserInterest', 'Url', 'CallToAction', 'AdGroupType', 'Configs', 'BaseVideo', 'Status', 'GeneratedVideo', 'CurrentPrices', 'AudienceName']
 
 var STATUS_HANDLERS = {
   
@@ -22,6 +22,9 @@ var STATUS_HANDLERS = {
         // Create or simply get adGroup
         var adGroup = Util.createOrRetrieveVideoAdGroup(row.get('CampaignName'), row.get('AdGroupType'), adGroupName)
         row.set('AdGroupName', adGroupName)
+
+        // Associate audience with the adGroup
+        Util.associateAudienceWithAdGroup(adGroup, row.get('AudienceName'))
           
       	// Create video ad
       	var adName = 'Ad ' + (adGroup.videoAds().get().totalNumEntities() + 1)
