@@ -37,6 +37,8 @@ class FFMPEGGenerator(object):
 
   def __init__(self):
 
+    self.thread_queue_size = 8000
+
     # FFMPEG installed
     self.ffmpeg_executable = 'ffmpeg_latest/bin/ffmpeg'
 
@@ -268,6 +270,7 @@ class FFMPEGGenerator(object):
     if keep_ratio:
       img = '%s format=rgba,scale=%s %s;' % (image_str, "'if(gt(a,w/h),w,-1)':'if(gt(a,w/h),-1,h)'".replace('w', str(width)).replace('h', str(height)), resize_str)
       y = '%s+(%s-overlay_h)/2' % (y, height)
+      x = '%s+(%s-overlay_w)/2' % (x, width)
     else:
       #scale regular image
       img = '%s format=rgba,scale=%s:%s %s;' % (image_str, width, height, resize_str)
@@ -555,6 +558,7 @@ class FFMPEGGenerator(object):
           include_args += ['-c:v', 'gif']
 
         #include_args += ['-analyzeduration', '2147483647', '-probesize', '2147483647']
+        #include_args += ['-thread_queue_size', str(self.thread_queue_size), '-re']
         include_args += ['-i']
 
         # Convert all images to PNG to avoid problems
