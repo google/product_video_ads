@@ -117,11 +117,15 @@ export class VideoCampaignsComponent implements OnInit {
     }
 
     create_bulk() {
-
       for(let [group, campaign_configs] of this.selected_groups.entries()) {
-
         const group_products = this.product_groups.get(group)
-
+        // Validate correct groups configuration
+        const valid_groups = this.facade.validate_groups(group, group_products);
+        // Show message if any errors are found
+        if(!valid_groups["valid"]) {
+            this._snackBar.open(valid_groups["error"], 'OK', { duration: 8000 });
+            return
+        }
         // Check how many videos should be created for that group
         for (let video = 0; video < group_products.length; video+=this.base.products.length) {
 
@@ -135,7 +139,6 @@ export class VideoCampaignsComponent implements OnInit {
           )
         }
       }
-
       this._snackBar.open('Scheduled for creation (check Ads section above)', 'OK', { duration: 4000 })
     }
 

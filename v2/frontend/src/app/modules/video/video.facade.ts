@@ -158,4 +158,41 @@ export class VideoFacade {
         delete_video(generated_video : string) {
             return this.videoService.delete_video(generated_video)
         }
+
+        get_products_by_offer_group(group : string) {
+            const products_by_offer_group = this.productsService.products.filter(prod => prod.group === group);
+            return products_by_offer_group;
+        }
+
+        validate_groups(group : string, group_products : Product[]) {
+            const products_by_offer_group = this.get_products_by_offer_group(group);
+            let action_status : Map<string, string> = new Map<string, string>();
+            action_status["error"] = "";
+            action_status["valid"] = true;
+            // 1. Validate if the configured Offer Types exist and have the same Base.
+            // If products length within an Offer Group is different from the products length found in the available products for a Base,
+            // that means that either the Offer Type does not exist or it uses a different Base.
+            if(products_by_offer_group.length != group_products.length) {
+                action_status["error"] = `ERROR: The Offer Group "${group}" contains invalid Offer Types. Please check that the configured Offer Types exist or the Offer Types have the same Base.`;
+                action_status["valid"] = false;
+                return action_status
+            }
+            this.validate_group_products(group_products, action_status)
+            return action_status
+        }
+            
+        validate_group_products(group_products : Product[], action_status : Map<string, string>) {
+            let posSet = new Set();
+            for(let p = 0; p < group_products.length; p++) {
+                let pos = group_products[p].position;
+                // 2. Validate uniqueness among positions in the Offer Group
+                if(posSet.has(pos)) {
+                    action_status["error"] = `ERROR: The positions configured in the Offer Group "${group_products[p].group}" must be unique. Please fix the positions to proceed.`
+                    action_status["valid"] = false;
+                    return action_status;
+                }
+                posSet.add(pos);
+            }
+            return action_status
+        }
     }
