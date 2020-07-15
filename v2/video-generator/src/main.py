@@ -38,58 +38,58 @@ logger = log.getLogger()
 
 
 def main():
+    # Read environment parameters
+    spreadsheet_id = os.environ.get('SPREADSHEET_ID')
+    bucket_name = os.environ.get('BUCKET_NAME')
 
-  # Read environment parameters
-  spreadsheet_id = os.environ.get('SPREADSHEET_ID')
-  bucket_name = os.environ.get('BUCKET_NAME')
+    if spreadsheet_id is None or bucket_name is None:
+        print('Please set environment variable SPREADSHEET_ID and BUCKET_NAME')
+        exit(1)
 
-  if spreadsheet_id is None or bucket_name is None:
-    print 'Please set environment variable SPREADSHEET_ID and BUCKET_NAME'
-    exit(1)
+    authenticator = TokenAuth(bucket_name, CloudStorageHandler())
+    credentials = None
 
-  authenticator = TokenAuth(bucket_name, CloudStorageHandler())
-  credentials = None
+    # Tries to retireve token from storage each 5 minutes
+    while True:
+        credentials = authenticator.authenticate()
 
-  # Tries to retireve token from storage each 5 minutes
-  while True:
-    credentials = authenticator.authenticate()
+        if credentials is not None:
+            break
 
-    if credentials is not None:
-      break
+        logger.info('Sleeping for 5 minutes before trying again...')
+        time.sleep(5 * 60)
 
-    logger.info('Sleeping for 5 minutes before trying again...')
-    time.sleep(5*60)
+    # Starts processing only after token authenticated!
+    logger.info('Started processing...')
 
-  # Starts processing only after token authenticated!
-  logger.info('Started processing...')
+    # Dependencies
+    configuration = Configuration(spreadsheet_id, credentials)
+    storage = StorageHandler(configuration.get_drive_folder(), credentials)
+    cloud_storage = CloudStorageHandler(credentials)
+    video_processor = VideoProcessor(storage, VideoGenerator(), Uploader(credentials), cloud_storage)
+    image_processor = ImageProcessor(storage, ImageGenerator(), cloud_storage)
 
-  # Dependencies
-  configuration = Configuration(spreadsheet_id, credentials)
-  storage = StorageHandler(configuration.get_drive_folder(), credentials)
-  cloud_storage = CloudStorageHandler(credentials)
-  video_processor = VideoProcessor(storage, VideoGenerator(), Uploader(credentials), cloud_storage)
-  image_processor = ImageProcessor(storage, ImageGenerator(), cloud_storage)
+    # Handler acts as facade
+    handler = EventHandler(configuration, video_processor, image_processor)
 
-  # Handler acts as facade
-  handler = EventHandler(configuration, video_processor, image_processor)
+    while True:
 
-  while True:
+        try:
 
-    try:
+            # Sync drive files to local tmp
+            storage.update_local_files()
 
-      # Sync drive files to local tmp
-      storage.update_local_files()
+            # Process configuration joining threads
+            handler.handle_configuration()
 
-      # Process configuration joining threads
-      handler.handle_configuration()
+        except Exception as e:
+            logger.error(e)
 
-    except Exception as e:
-      logger.error(e)
+        # Sleep!
+        interval = configuration.get_interval_in_minutes()
+        logger.info('Sleeping for %s minutes', interval)
+        time.sleep(int(interval) * 60)
 
-    # Sleep!
-    interval = configuration.get_interval_in_minutes()
-    logger.info('Sleeping for %s minutes', interval)
-    time.sleep(int(interval) * 60)
 
 if __name__ == '__main__':
-  main()
+    main()

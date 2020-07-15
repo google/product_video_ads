@@ -15,16 +15,13 @@
 # limitations under the License.
 
 CREDENTIALS_FOLDER=$(pwd)/credentials
-#CREDENTIALS_FOLDER=/usr/local/google/home/rgodoy/credentials
-#CREDENTIALS_FOLDER=/Users/rgodoy/credentials
 
 echo 'SPREADSHEET_ID: '
-SPREADSHEET_ID=1Um9HvkTCwfR_cEJBUn-gm0qQz1L5UulVxs8FENtexqY
-#read SPREADSHEET_ID
+read SPREADSHEET_ID
 
 echo 'Bucket Name:'
-BUCKET_NAME=video-generator-test-123
 #read BUCKET_NAME
+BUCKET_NAME=video-generator-test-123
 
 if [[ "$(docker images -q video-generator:latest 2> /dev/null)" == "" ]]; then
   echo 'Image video-generator:latest not found - You must build it first!'
@@ -35,6 +32,7 @@ docker run --rm \
   -e SPREADSHEET_ID=$SPREADSHEET_ID \
   -e GOOGLE_APPLICATION_CREDENTIALS='/credentials/credentials.json' \
   -e BUCKET_NAME=$BUCKET_NAME \
+  -e DEBUG=1 \
   -v $CREDENTIALS_FOLDER:/credentials \
   --name video-generator \
   video-generator

@@ -11,7 +11,7 @@ ADD src/ /usr/src/app
 
 # Zip with ffmpeg binary
 ADD ffmpeg_latest.zip /
-RUN unzip /ffmpeg_latest.zip -d /usr/src/app
+RUN unzip -o /ffmpeg_latest.zip -d /usr/src/app
 
 # Install app
 WORKDIR /usr/src/app
