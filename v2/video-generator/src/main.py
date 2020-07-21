@@ -16,23 +16,21 @@
 
 import os
 import time
+
 import log
 from authentication.token_auth import TokenAuth
-from configuration.spreadsheet_configuration import SpreadsheetConfiguration as Configuration
-from storage.cloud_storage_handler import CloudStorageHandler as CloudStorageHandler
-from storage.drive_storage_handler import DriveStorageHandler as StorageHandler
-
 # Handle "events" from configuration
 from configuration.event_handler import EventHandler as EventHandler
-
+from configuration.spreadsheet_configuration import SpreadsheetConfiguration as Configuration
+from image.image_generator import ImageGenerator as ImageGenerator
 # Handles image processing
 from image.image_processor import ImageProcessor as ImageProcessor
-from image.image_generator import ImageGenerator as ImageGenerator
-
+from storage.cloud_storage_handler import CloudStorageHandler as CloudStorageHandler
+from storage.drive_storage_handler import DriveStorageHandler as StorageHandler
+from uploader.youtube_upload import YoutubeUploader as Uploader
+from video.video_generator import VideoGenerator as VideoGenerator
 # Handles video processing
 from video.video_processor import VideoProcessor as VideoProcessor
-from video.video_generator import VideoGenerator as VideoGenerator
-from uploader.youtube_upload import YoutubeUploader as Uploader
 
 logger = log.getLogger()
 

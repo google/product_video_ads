@@ -27,6 +27,7 @@ import os
 import re
 import subprocess
 import tempfile
+
 import log
 
 
@@ -91,13 +92,12 @@ class FFMPEGGenerator(object):
       FFMpegExecutionError: if the ffmpeg process returns an error
     """
         # Group all args and runs ffmpeg
-        ffmpeg_output = self._info_from_ffmpeg(video_file_path,
-                                               self.ffmpeg_executable)
+        ffmpeg_output = self._info_from_ffmpeg(video_file_path, self.ffmpeg_executable).decode('utf-8')
+
         self.logger.debug('ffmpeg ran with output:')
         self.logger.debug(ffmpeg_output)
 
-        duration_search = re.search('(?<=Duration: )([^,]*)', ffmpeg_output,
-                                    re.IGNORECASE)
+        duration_search = re.search('(?<=Duration: )([^,]*)', ffmpeg_output, re.IGNORECASE)
 
         if duration_search:
             duration_string = duration_search.group(1)
@@ -377,9 +377,9 @@ class FFMPEGGenerator(object):
     def _write_to_temp_file(self, text):
         """Writes a string to a new temporary file and returns its name."""
 
-        (fd, text_file_name) = tempfile.mkstemp(
-            prefix='vogon_', suffix='.txt', text=True)
-        with os.fdopen(fd, 'w') as f:
+        (fd, text_file_name) = tempfile.mkstemp(prefix='vogon_', suffix='.txt', text=True)
+
+        with os.fdopen(fd, 'wb') as f:
             f.write(text.encode('utf8'))
 
         return text_file_name

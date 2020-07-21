@@ -1,5 +1,5 @@
 credentials/
-env
+env3
 .idea
 *.pyc
 ffmpeg_latest/

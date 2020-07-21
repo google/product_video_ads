@@ -17,12 +17,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import imghdr
 import math
+import os
+import shutil
 
 import requests
-import shutil
-import imghdr
-import os
+
 import log
 
 logger = log.getLogger()
@@ -54,7 +55,7 @@ def convert_configs_to_format(configs, products_data, storage, cloud_storage):
 
 def convert_text_overlay(config, field_value, storage):
 
-    width = int(config.get('width', 0))
+    width = int(config.get('width') or 0)
     font_size = float(config['size'])
 
     # Wrap long texts to many smaller texts

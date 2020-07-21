@@ -12,28 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import log
 import pickle
-import google.auth
-from google.cloud.exceptions import NotFound
+
+import log
+
 
 class TokenAuth():
+    FILE = 'token'
 
-  FILE = 'token'
+    logger = log.getLogger()
 
-  logger = log.getLogger()
+    def __init__(self, bucket_name, storage_client):
+        self.bucket_name = bucket_name
+        self.storage_client = storage_client
 
-  def __init__(self, bucket_name, storage_client):
-    self.bucket_name = bucket_name
-    self.storage_client = storage_client
+    def authenticate(self):
 
-  def authenticate(self):
+        self.logger.info('Retrieving token from %s/%s', self.bucket_name, self.FILE)
 
-    self.logger.info('Retrieving token from %s/%s', self.bucket_name, self.FILE)
-
-    try:
-      token = self.storage_client.download_string(self.bucket_name, self.FILE)
-      return pickle.loads(token)
-    except Exception as e:
-      self.logger.error('Error retrieving token: %s', e)
-      return None
+        try:
+            token = self.storage_client.download_string(self.bucket_name, self.FILE)
+            return pickle.loads(token, encoding='latin1')
+        except Exception as e:
+            self.logger.error('Error retrieving token: %s', e)
+            return None

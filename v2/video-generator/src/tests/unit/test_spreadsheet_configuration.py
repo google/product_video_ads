@@ -1,5 +1,5 @@
 from mock import Mock, patch
-from pytest import fixture, raises
+from pytest import fixture
 
 from configuration.spreadsheet_configuration import SpreadsheetConfiguration
 

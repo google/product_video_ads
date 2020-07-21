@@ -10,11 +10,10 @@ pytest = "*"
 google-api-python-client = "*"
 google-auth = "*"
 google-auth-oauthlib = "*"
-flask = "*"
 google-cloud-storage = "*"
 pytest = "*"
 pytest-mock = "*"
 requests = "*"
 
 [requires]
-python_version = "2.7"
+python_version = "3"

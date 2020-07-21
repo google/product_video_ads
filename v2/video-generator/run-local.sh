@@ -18,7 +18,7 @@ export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
 CREDENTIALS_FOLDER=$(pwd)/credentials
-SPREADSHEET_ID=11RnI52cb1RO4qihmg7fcf-yjnqsWgdsAMwdm6r2X91M
+SPREADSHEET_ID=1Um9HvkTCwfR_cEJBUn-gm0qQz1L5UulVxs8FENtexqY
 BUCKET_NAME=video-generator-test-123
 
 export GOOGLE_APPLICATION_CREDENTIALS=$CREDENTIALS_FOLDER/credentials.json

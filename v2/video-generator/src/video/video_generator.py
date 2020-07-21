@@ -12,12 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
-import math
-import os
-import re
-import subprocess
-import tempfile
 import log
 from ffmpeg.ffmpeg_generator import FFMPEGGenerator
 

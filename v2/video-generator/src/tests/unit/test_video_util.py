@@ -1,5 +1,4 @@
 from mock import Mock, patch
-from pytest import fixture
 
 from ffmpeg import util
 
