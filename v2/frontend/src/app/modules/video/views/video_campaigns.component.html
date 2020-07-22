@@ -271,6 +271,12 @@
             <input [(ngModel)]="selected_groups.get(group.key).target_user_interest" matInput>
           </mat-form-field> -->
 
+          <!-- Audience Lists -->
+          <mat-form-field class="example-full-width">
+            <mat-label>Audience</mat-label>
+            <input [(ngModel)]="selected_groups.get(group.key).audience_list" placeholder="audience1,audience2" matInput>
+          </mat-form-field>
+
         </div>
       </section>
 

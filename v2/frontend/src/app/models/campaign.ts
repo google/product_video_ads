@@ -25,6 +25,7 @@ export class Campaign {
         public url : string = '',
         public call_to_action : string = '',
         public adgroup_type : string = '',
+        public audience_lists : string = '',
         public adgroup_name : string = '',
         public ad_name : string = ''
         ) {}

@@ -109,7 +109,8 @@ export class VideoFacade {
                 campaign_configs.target_user_interest,
                 campaign_configs.url,
                 campaign_configs.call_to_action,
-                campaign_configs.adgroup_type
+                campaign_configs.adgroup_type,
+                campaign_configs.audience_list
             )
 
             return this.videoService.add_production_video(final_configs, base.title, campaign)

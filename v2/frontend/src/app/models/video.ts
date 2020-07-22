@@ -41,6 +41,7 @@ export class Video {
                 video_array[7],
                 video_array[8],
                 video_array[9],
+                video_array[14],
                 video_array[2],
                 video_array[3]
             ),
@@ -63,7 +64,8 @@ export class Video {
             JSON.stringify(video.configs),
             video.base_video,
             video.status,
-            video.generated_video
+            video.generated_video,
+            video.campaign.audience_lists
         ]
     }
 }
