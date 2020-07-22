@@ -182,7 +182,7 @@ var STATUS_HANDLERS = {
         row.set('AdGroupName', adGroupName)
 
         // Associate audience with the adGroup
-        Util.associateAudienceWithVideoAdGroup(adGroup, row.get('AudienceName'))
+        Util.associateAudienceWithAdGroup(adGroup, row.get('AudienceName'), Util.videoAdAudienceAssociator)
           
       	// Create video ad
       	var adName = 'Ad ' + (adGroup.videoAds().get().totalNumEntities() + 1)
@@ -209,6 +209,9 @@ var STATUS_HANDLERS = {
       // Create or simply get adGroup
       var adGroup = Util.createOrRetrieveAdGroup(row.get('CampaignName'), adGroupName)
       row.set('AdGroupName', adGroupName)
+
+      // Associate audience with the adGroup
+      Util.associateAudienceWithAdGroup(adGroup, row.get('AudienceName'), Util.adAudienceAssociator)
         
       // Create video ad
       var adName = 'Ad ' + (adGroup.ads().get().totalNumEntities() + 1)
@@ -504,46 +507,6 @@ var Util = {
       
       return videoAd
     },
-  
-    associateAudienceWithVideoAdGroup: function(adGroup, audienceNames) {
-      if (audienceNames === null || audienceNames ===  '') {
-        Logger.log('Row without audience')
-        return
-      }
-      
-      audienceNames.split(',').forEach(function(originalAudienceName) {
-        audienceName = originalAudienceName.trim()
-
-        userListIterator = AdsApp.userlists().withCondition("Name = '" + audienceName + "'").get()
-      
-        if (!userListIterator.hasNext()) {
-          Logger.log('Could not find audience ' + audienceName)
-          return
-        }
-        
-        if (userListIterator.totalNumEntities() > 1) {
-          Logger.log('More than one audience found for name ' + audienceName)
-          while (userListIterator.hasNext()) {
-            Logger.log('Audience found: ' + userListIterator.next().getName())
-          }
-          return
-        }
-        
-        var audienceBuilder = adGroup.videoTargeting().newAudienceBuilder();
-  
-        var audienceOperation = audienceBuilder
-          .withAudienceType("USER_LIST")
-          .withAudienceId(userListIterator.next().getId())
-          .build()
-  
-        var audienceResultSuccessful = audienceOperation.isSuccessful();
-        if (audienceResultSuccessful) {
-          Logger.log('AdGroup ' + adGroup.getName() + ' linked to audience ' + audienceName)
-        } else {
-          Logger.log('Could not link adGroup ' + adGroup.getName() + ' to audience ' + audienceName)
-        }
-      })
-    },
 
     createOrReactivateAd: function(adName, adGroup, imageId, url) {
 
@@ -584,5 +547,57 @@ var Util = {
         .getResult()
       
       return ad
+    },
+  
+    associateAudienceWithAdGroup: function(adGroup, audienceNames, audienceAssociator) {
+      if (audienceNames === null || audienceNames ===  '') {
+        Logger.log('Row without audience')
+        return
+      }
+      
+      audienceNames.split(',').forEach(function(originalAudienceName) {
+        audienceName = originalAudienceName.trim()
+
+        userListIterator = AdsApp.userlists().withCondition("Name = '" + audienceName + "'").get()
+      
+        if (!userListIterator.hasNext()) {
+          Logger.log('Could not find audience ' + audienceName)
+          return
+        }
+        
+        if (userListIterator.totalNumEntities() > 1) {
+          Logger.log('More than one audience found for name ' + audienceName)
+          while (userListIterator.hasNext()) {
+            Logger.log('Audience found: ' + userListIterator.next().getName())
+          }
+          return
+        }
+        
+        audienceOperation = audienceAssociator(adGroup, userListIterator.next().getId())
+
+        var audienceResultSuccessful = audienceOperation.isSuccessful();
+        if (audienceResultSuccessful) {
+          Logger.log('AdGroup ' + adGroup.getName() + ' linked to audience ' + audienceName)
+        } else {
+          Logger.log('Could not link adGroup ' + adGroup.getName() + ' to audience ' + audienceName)
+        }
+      })
+    },
+    
+    videoAdAudienceAssociator: function(adGroup, audienceId) {
+        return adGroup
+          .videoTargeting()
+          .newAudienceBuilder()
+          .withAudienceType("USER_LIST")
+          .withAudienceId(audienceId)
+          .build();
+    },
+    
+    adAudienceAssociator: function(adGroup, audienceId) {
+        return adGroup.targeting()
+          .newUserListBuilder()
+          .withAudienceId(audienceId)
+          .build();
     }
 }
+

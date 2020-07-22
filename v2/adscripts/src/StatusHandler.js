@@ -24,7 +24,7 @@ var STATUS_HANDLERS = {
         row.set('AdGroupName', adGroupName)
 
         // Associate audience with the adGroup
-        Util.associateAudienceWithVideoAdGroup(adGroup, row.get('AudienceName'))
+        Util.associateAudienceWithAdGroup(adGroup, row.get('AudienceName'), Util.videoAdAudienceAssociator)
           
       	// Create video ad
       	var adName = 'Ad ' + (adGroup.videoAds().get().totalNumEntities() + 1)
@@ -51,6 +51,9 @@ var STATUS_HANDLERS = {
       // Create or simply get adGroup
       var adGroup = Util.createOrRetrieveAdGroup(row.get('CampaignName'), adGroupName)
       row.set('AdGroupName', adGroupName)
+
+      // Associate audience with the adGroup
+      Util.associateAudienceWithAdGroup(adGroup, row.get('AudienceName'), Util.adAudienceAssociator)
         
       // Create video ad
       var adName = 'Ad ' + (adGroup.ads().get().totalNumEntities() + 1)
