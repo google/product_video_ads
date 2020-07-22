@@ -1,4 +1,4 @@
-var FIELDS = ['AccountID', 'CampaignName', 'AdGroupName', 'AdName', 'TargetLocation', 'TargetAge', 'TargetUserInterest', 'Url', 'CallToAction', 'AdGroupType', 'Configs', 'BaseVideo', 'Status', 'GeneratedVideo', 'CurrentPrices', 'AudienceName']
+var FIELDS = ['AccountID', 'CampaignName', 'AdGroupName', 'AdName', 'TargetLocation', 'TargetAge', 'TargetUserInterest', 'Url', 'CallToAction', 'AdGroupType', 'Configs', 'BaseVideo', 'Status', 'GeneratedVideo', 'AudienceName']
 
 var STATUS_HANDLERS = {
   
@@ -24,7 +24,7 @@ var STATUS_HANDLERS = {
         row.set('AdGroupName', adGroupName)
 
         // Associate audience with the adGroup
-        Util.associateAudienceWithAdGroup(adGroup, row.get('AudienceName'))
+        Util.associateAudienceWithVideoAdGroup(adGroup, row.get('AudienceName'))
           
       	// Create video ad
       	var adName = 'Ad ' + (adGroup.videoAds().get().totalNumEntities() + 1)
@@ -64,12 +64,12 @@ var STATUS_HANDLERS = {
 
         // It's running
         row.set('Status', 'Running')
-     }
-  },
+      }
+    },
     
-	'Price Changed': function(row) {
-	  Util.pauseAllVideoAds(row.get('AdGroupName'), row.get('CampaignName'))
-    row.set('AdName', '')
-  	row.set('Status', 'Paused')
-	}
+    'Price Changed': function(row) {
+      Util.pauseAllVideoAds(row.get('AdGroupName'), row.get('CampaignName'))
+      row.set('AdName', '')
+      row.set('Status', 'Paused')
+    }
 }
