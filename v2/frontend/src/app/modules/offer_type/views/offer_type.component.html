@@ -26,7 +26,16 @@
     <mat-spinner *ngIf="bases.length == 0"></mat-spinner>
     
     <div *ngIf="bases.length > 0">
-      <div class="added_item" *ngFor="let offer of offer_types | async | sortBy: 'asc':'title' | sortBy: 'asc':'base'">
+
+      <!-- Search term -->
+      <mat-form-field class="example-full-width">
+        <mat-label>Search offer types</mat-label>
+        <input name="search_term" #search_term matInput>
+      </mat-form-field>
+
+      <br/>
+
+      <div class="added_item" *ngFor="let offer of offer_types | async | filter : search_term.value | sortBy: 'asc':'title' | sortBy: 'asc':'base'">
         
         <p><b>{{offer.title}}</b></p>
         <p>({{offer.base}})</p>
@@ -137,7 +146,7 @@
 
           <br/>
 
-          <mat-checkbox class="example-margin" style="margin-left: 2%;" [(ngModel)]="element_focused.keep_ratio">
+          <!--mat-checkbox class="example-margin" style="margin-left: 2%;" [(ngModel)]="element_focused.keep_ratio">
             Fit text
           </mat-checkbox>
 
@@ -146,9 +155,7 @@
           <mat-form-field *ngIf="element_focused.keep_ratio" class="example-full-width">
             <mat-label>Lines to fill</mat-label>
             <input [(ngModel)]="element_focused.height" type="number" matInput placeholder="lines">
-          </mat-form-field>
-
-          <br/>
+          </mat-form-field-->
 
           <button mat-stroked-button style="width: 100%" (click)="send_to_back(element_focused)">Send to back</button>
 
@@ -271,14 +278,14 @@
             Flip
           </mat-checkbox>
           
-          <mat-checkbox class="example-margin" style="margin-left: 2%;" [(ngModel)]="config.keep_ratio">
+          <!--mat-checkbox class="example-margin" style="margin-left: 2%;" [(ngModel)]="config.keep_ratio">
             Fit text
           </mat-checkbox>
 
           <mat-form-field *ngIf="config.keep_ratio" class="example-full-width">
             <mat-label>Lines to fill</mat-label>
             <input [(ngModel)]="config.height" type="number" matInput placeholder="lines">
-          </mat-form-field>
+          </mat-form-field-->
 
           <br/>
           
@@ -324,7 +331,7 @@
 
           <p>This position is to visualization only.<br/>You can assign each product to each position when creating the video on next step.</p>
 
-          <div class="added_item" *ngFor="let product of base_products_timings; let i = index" (click)="choose_position(product)" style="min-width: 0">
+          <div class="added_item" *ngFor="let product of base_products_timings; let i = index" (click)="choose_position(product)" style="min-width: 0; width: 6vw">
               <p>Position {{i + 1}}</p>
               <p>{{product.start_time}}s - {{product.end_time}}s</p>
           </div>
