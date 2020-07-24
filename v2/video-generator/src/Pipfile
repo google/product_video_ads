@@ -12,6 +12,7 @@ google-auth = "*"
 google-auth-oauthlib = "*"
 google-cloud-storage = "*"
 pytest = "*"
+more_itertools = "*"
 pytest-mock = "*"
 requests = "*"
 

@@ -476,6 +476,7 @@ class FFMPEGGenerator(object):
     def _image_and_video_inputs(self, images_and_videos, text_tmp_images):
         """Generates a list of input arguments for ffmpeg with the given images."""
         include_cmd = []
+        resized_images = set()
 
         # adds images as video starting on overlay time and finishing on overlay end
         img_formats = ['gif', 'jpg', 'jpeg', 'png']
@@ -515,11 +516,14 @@ class FFMPEGGenerator(object):
                 # include_args += ['-thread_queue_size', str(self.thread_queue_size), '-re']
                 include_args += ['-i']
 
-                # Convert all images to PNG to avoid problems
-                # filename_png = filename + '.png'
-                # self.convert_to_png(filename, filename_png, self.ffmpeg_executable)
+                # Resize all images to avoid FFMPEG to run with unecessary large images
+                if filename not in resized_images:
+                    self.resize_images(filename, filename, ovl['width'], ovl['height'], ovl['keep_ratio'],
+                                   self.convert_executable[0])
 
-                include_cmd += include_args + ['%s' % (filename)]
+                    resized_images.add(filename)
+
+                include_cmd += include_args + ['%s' % filename]
 
             # treats video overlays
             else:
@@ -569,12 +573,19 @@ class FFMPEGGenerator(object):
         except subprocess.CalledProcessError as e:
             raise VideoGenerationError(' '.join(args), e.output)
 
-    def convert_to_png(self, input_file, output_file, executable='ffmpeg'):
+    def resize_images(self, input_file, output_file, width, height, keep_ratio, executable='convert'):
 
-        args = [executable, '-i', input_file, output_file]
+        args = [executable,
+                input_file,
+                '-resize',
+                '%dx%d>%s' % (width, height, '' if keep_ratio else '!'),
+                '-quality', '95',
+                '-depth', '8',
+                output_file
+                ]
 
-        self.logger.info('Running ffmpeg to convert image with args:')
-        self.logger.info(' '.join(args))
+        self.logger.debug('Running imagemagick to resize image with args:')
+        self.logger.debug(' '.join(args))
 
         # Returns results or raises an exception
         try:
