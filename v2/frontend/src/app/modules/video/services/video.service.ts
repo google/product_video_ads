@@ -50,16 +50,16 @@ export class VideoService {
         })
     }
 
-    add_preview_video(configs : Array<Config>, base : string) {
-        return this.add_video(configs, base, 'Preview')
+    add_preview_video(configs : Array<Config>, base : string, name : string) {
+        return this.add_video(configs, base, 'Preview', name)
     }
 
-    add_production_video(configs : Array<Config>, base : string, campaign : Campaign) {
-        return this.add_video(configs, base, 'On', campaign)
+    add_production_video(configs : Array<Config>, base : string, campaign : Campaign, name : string) {
+        return this.add_video(configs, base, 'On', name, campaign)
     }
 
-    private add_video(configs : Array<Config>, base : string, status : string, campaign? : Campaign) {
-        this._videos.next([...this.videos, new Video(configs, base, status, campaign)])
+    private add_video(configs : Array<Config>, base : string, status : string, name : string, campaign? : Campaign) {
+        this._videos.next([...this.videos, new Video(new Date().toLocaleString('pt-BR'), name, configs, base, status, campaign)])
         return this.repository.save_videos(this.videos)
     }
 

@@ -50,6 +50,7 @@ export class VideoCampaignsComponent implements OnInit {
   logs : Observable<string[]>
 
   product_groups : Map<string, Product[]>
+  product_groups_validations : Map<string, string[]>
   selected_groups : Map<string, any> = new Map<string, any>()
   mode : string
   
@@ -91,6 +92,8 @@ export class VideoCampaignsComponent implements OnInit {
 
     select_bulk_video_mode() {
       this.product_groups = this.facade.get_available_groups_for_base(this.base.title)
+      this.product_groups_validations = this.facade.validate_groups(this.product_groups)
+
       this.mode = 'bulk'
     }
 
@@ -99,14 +102,25 @@ export class VideoCampaignsComponent implements OnInit {
     }
 
     add_single_video(product_keys, configs, campaign_configs) {
-      this.add_video(product_keys, configs, campaign_configs)
+      this.add_video(product_keys, configs, campaign_configs, 'Single')
       this._snackBar.open('Single ad scheduled (check Ads section above)', 'OK', { duration: 4000 })
     }
     
-    private add_video(product_keys, configs, campaign_configs) {
-      this.facade.add_production_video(configs, this.base, product_keys, campaign_configs).then(response => {
+    private add_video(product_keys, configs, campaign_configs, name) {
+      this.facade.add_production_video(configs, this.base, product_keys, campaign_configs, name).then(response => {
         this.mode = ''
       })
+    }
+
+    check_all(element) {
+
+      this.selected_groups.clear()
+
+      const valid_groups = Array.from(this.product_groups.keys()).filter(k => this.product_groups_validations.get(k).length == 0)
+
+      if (element.checked)
+        for (let group of valid_groups)
+          this.selected_groups.set(group, {})
     }
 
     check_group(element, group) {
@@ -117,15 +131,11 @@ export class VideoCampaignsComponent implements OnInit {
     }
 
     create_bulk() {
+
       for(let [group, campaign_configs] of this.selected_groups.entries()) {
+
         const group_products = this.product_groups.get(group)
-        // Validate correct groups configuration
-        const valid_groups = this.facade.validate_groups(group, group_products);
-        // Show message if any errors are found
-        if(!valid_groups["valid"]) {
-            this._snackBar.open(valid_groups["error"], 'OK', { duration: 8000 });
-            return
-        }
+
         // Check how many videos should be created for that group
         for (let video = 0; video < group_products.length; video+=this.base.products.length) {
 
@@ -135,10 +145,12 @@ export class VideoCampaignsComponent implements OnInit {
           this.add_video(
             sorted_products.map(p => p.id),
             sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type, this.base.title)),
-            campaign_configs
+            campaign_configs,
+            group
           )
         }
       }
+
       this._snackBar.open('Scheduled for creation (check Ads section above)', 'OK', { duration: 4000 })
     }
 

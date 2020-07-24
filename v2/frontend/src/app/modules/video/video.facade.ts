@@ -90,14 +90,14 @@ export class VideoFacade {
             return final_configs
         }
         
-        add_preview_video(configs : Array<Config>, base : Base, product_keys : any) {
+        add_preview_video(configs : Array<Config>, base : Base, product_keys : any, name : string) {
 
             const final_configs = this.add_video(configs, base, product_keys)
 
-            return this.videoService.add_preview_video(final_configs, base.title)
+            return this.videoService.add_preview_video(final_configs, base.title, name)
         }
 
-        add_production_video(configs : Array<Config>, base : Base, product_keys : any, campaign_configs : any) {
+        add_production_video(configs : Array<Config>, base : Base, product_keys : any, campaign_configs : any, name : string) {
 
             const final_configs = this.add_video(configs, base, product_keys)
 
@@ -112,7 +112,7 @@ export class VideoFacade {
                 campaign_configs.adgroup_type
             )
 
-            return this.videoService.add_production_video(final_configs, base.title, campaign)
+            return this.videoService.add_production_video(final_configs, base.title, campaign, name)
         }
         
         get_available_groups_for_base(base_title : string) : Map<string, Product[]> {
@@ -160,39 +160,52 @@ export class VideoFacade {
         }
 
         get_products_by_offer_group(group : string) {
-            const products_by_offer_group = this.productsService.products.filter(prod => prod.group === group);
-            return products_by_offer_group;
+            return this.productsService.products.filter(prod => prod.group === group)
         }
 
-        validate_groups(group : string, group_products : Product[]) {
-            const products_by_offer_group = this.get_products_by_offer_group(group);
-            let action_status : Map<string, string> = new Map<string, string>();
-            action_status["error"] = "";
-            action_status["valid"] = true;
+        public validate_groups(product_groups : Map<string, Product[]>) : Map<string, string[]> {
+
+            const validations = new Map<string, string[]>()
+
+            for (const [group, products] of product_groups.entries()) {
+
+                let errors = []
+
+                if (!this.validate_group_offertypes(group, products))
+                    errors.push(`ERROR: The offer group contains invalid offer types. Please check that the configured offer types exist or the offer types have the same base.`)
+
+                if (!this.validate_group_products(products))
+                    errors.push(`ERROR: The positions configured in the offer group must be unique. Please fix the positions to proceed.`)
+
+                validations.set(group, errors)
+            }
+
+            return validations
+        }
+
+        private validate_group_offertypes(group : string, group_products : Product[]) : boolean {
+            
             // 1. Validate if the configured Offer Types exist and have the same Base.
             // If products length within an Offer Group is different from the products length found in the available products for a Base,
             // that means that either the Offer Type does not exist or it uses a different Base.
-            if(products_by_offer_group.length != group_products.length) {
-                action_status["error"] = `ERROR: The Offer Group "${group}" contains invalid Offer Types. Please check that the configured Offer Types exist or the Offer Types have the same Base.`;
-                action_status["valid"] = false;
-                return action_status
-            }
-            this.validate_group_products(group_products, action_status)
-            return action_status
+            return this.get_products_by_offer_group(group).length == group_products.length
         }
             
-        validate_group_products(group_products : Product[], action_status : Map<string, string>) {
+        private validate_group_products(group_products : Product[]) {
+
             let posSet = new Set();
+
             for(let p = 0; p < group_products.length; p++) {
+                
                 let pos = group_products[p].position;
+
                 // 2. Validate uniqueness among positions in the Offer Group
-                if(posSet.has(pos)) {
-                    action_status["error"] = `ERROR: The positions configured in the Offer Group "${group_products[p].group}" must be unique. Please fix the positions to proceed.`
-                    action_status["valid"] = false;
-                    return action_status;
-                }
+                if(posSet.has(pos))
+                    return false
+
                 posSet.add(pos);
             }
-            return action_status
+
+            return true
         }
     }

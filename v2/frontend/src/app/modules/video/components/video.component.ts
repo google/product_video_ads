@@ -41,6 +41,7 @@ export class VideoComponent implements OnInit {
   logs : Observable<string[]>
 
   product_groups : Map<string, Product[]>
+  product_groups_validations : Map<string, string[]>
   selected_groups : Set<string> = new Set<string>()
   mode : string
   
@@ -81,6 +82,8 @@ export class VideoComponent implements OnInit {
 
     select_bulk_video_mode() {
       this.product_groups = this.facade.get_available_groups_for_base(this.base.title)
+      this.product_groups_validations = this.facade.validate_groups(this.product_groups)
+
       this.mode = 'bulk'
     }
 
@@ -89,13 +92,13 @@ export class VideoComponent implements OnInit {
     }
 
     add_single_video() {
-      this.add_video()
+      this.add_video(this.configs, this.base, this.product_keys, 'Preview')
       this._snackBar.open('Single asset scheduled (check assets section above)', 'OK', { duration: 4000 })
     }
     
-    private add_video() {
-      this.facade.add_preview_video(this.configs, this.base, this.product_keys)
-      .then(response => { this.mode = '' })
+    private add_video(configs, base, product_keys, name) {
+      this.facade.add_preview_video(configs, base, product_keys, name)
+      .then( _ => { this.mode = '' })
     }
 
     check_group(element, group) {
@@ -109,21 +112,19 @@ export class VideoComponent implements OnInit {
 
       this.selected_groups.clear()
 
+      const valid_groups = Array.from(this.product_groups.keys()).filter(k => this.product_groups_validations.get(k).length == 0)
+
       if (element.checked)
-        for (let group of this.product_groups.keys())
+        for (let group of valid_groups)
           this.selected_groups.add(group)
     }
 
     create_bulk() {
+
       for(let group of this.selected_groups) {
+        
         const group_products = this.product_groups.get(group)
-        // Validate correct groups configuration
-        const valid_groups = this.facade.validate_groups(group, group_products);
-        // Show message if any errors are found
-        if(!valid_groups["valid"]) {
-            this._snackBar.open(valid_groups["error"], 'OK', { duration: 8000 });
-            return
-        }
+
         // Check how many videos should be created for that group
         for (let video = 0; video < group_products.length; video+=this.base.products.length) {
 
@@ -131,14 +132,15 @@ export class VideoComponent implements OnInit {
                                               .sort((a, b) => a.position - b.position)
 
           // Keys
-          this.product_keys = sorted_products.map(p => p.id)
+          let product_keys = sorted_products.map(p => p.id)
 
           // Offer Type Configs
-          this.configs = sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type, this.base.title))
+          let configs = sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type, this.base.title))
 
-          this.add_video()
+          this.add_video(configs, this.base, product_keys, group)
         }
       }
+
       this._snackBar.open('Scheduled for creation (check assets section above)', 'OK', { duration: 4000 })
     }
 
