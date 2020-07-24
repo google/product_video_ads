@@ -64,7 +64,7 @@ export class OfferTypeComponent implements OnInit {
   ngOnInit() {
     this.elements = []
     this.element_focused = undefined
-    this.step = 1 
+    this.step = 1
     this.locked_name = false
     this.locked_save = false
     this.base_url = ''

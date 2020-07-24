@@ -37,6 +37,10 @@
 
         <div *ngIf="video.generated_video && video.status == 'Not Started'" class="added_item video_box" >
           
+          <div>{{video.date}}</div>
+          <div><b>{{video.name}}</b></div>
+          <div>({{video.base_video}})</div>
+
           <video *ngIf="is_video(video)" width="200" height="150" controls>
               <source [src]="drive_url + video.generated_video" type="video/mp4">
           </video>
@@ -53,8 +57,16 @@
         </div>
 
         <div class="added_item video_box" *ngIf="video.status == 'Preview'">
-          <mat-icon aria-hidden="false" aria-label="access_time icon">access_time</mat-icon>
-          <p>Generating asset...</p>
+
+          <div>{{video.date}}</div>
+          <div><b>{{video.name}}</b></div>
+          <div>({{video.base_video}})</div>
+
+          <div style="border:1px solid #000; margin: 10% 0; padding: 5%">
+            <mat-icon aria-hidden="false" aria-label="access_time icon">access_time</mat-icon>
+            <p>Generating asset...</p>
+          </div>
+
           <span style="cursor: pointer" (click)="delete_video(video)">
             <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
           </span>
@@ -156,14 +168,25 @@
           <b>Check All</b>
         </mat-checkbox>
 
-        <br/>
+        <br/><br/>
 
           <!-- Product Group -->
           <section *ngFor="let group of product_groups | keyvalue">
-              <mat-checkbox class="example-margin" [checked]="selected_groups.has(group.key)" (change)="check_group($event, group.key)">
+
+              <mat-checkbox class="example-margin" [checked]="selected_groups.has(group.key)" [disabled]="product_groups_validations.get(group.key).length > 0" (change)="check_group($event, group.key)">
                 {{group.key}}
               </mat-checkbox>
+
+              <!-- Validations errors to group, if any -->
+              <div style="color: red" *ngFor="let error of product_groups_validations.get(group.key)">
+                {{error}}
+              </div>
+
           </section>
+
+          <br/>
+
+          <div>{{selected_groups.size}} selected</div>
 
         <br/><br/>
 

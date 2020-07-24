@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import log
 import google.auth
 from google.cloud import storage
+
+import log
 
 API_SCOPES = [
     'https://www.googleapis.com/auth/devstorage.read_write'
@@ -22,21 +23,20 @@ API_SCOPES = [
 
 
 class CloudStorageHandler():
+    logger = log.getLogger()
 
-  logger = log.getLogger()
+    def __init__(self, credentials=None):
+        if credentials is None:
+            # Obtains Service Account from environment just to access storage
+            # It comes from GCP or GOOGLE_APPLICATION_CREDENTIALS env variable file
+            credentials, _ = google.auth.default(scopes=API_SCOPES)
 
-  def __init__(self, credentials=None):
+        self.storage_client = storage.Client(credentials=credentials)
 
-    if credentials is None:
-      # Obtains Service Account from environment just to access storage
-      # It comes from GCP or GOOGLE_APPLICATION_CREDENTIALS env variable file
-      credentials, _ = google.auth.default(scopes=API_SCOPES)
+    def download_string(self, bucket_name, object_name):
+        return self.storage_client.get_bucket(bucket_name).blob(object_name).download_as_string()
 
-    self.storage_client = storage.Client(credentials=credentials)
-
-  def download_string(self, bucket_name, object_name):
-      return self.storage_client.get_bucket(bucket_name).blob(object_name).download_as_string()
-
-  def download_file_to_path(self, bucket_name, object_name, destination_path):
-      self.logger.debug('Downloading from bucket %s file %s and saving to %s' % (bucket_name, object_name, destination_path))
-      self.storage_client.get_bucket(bucket_name).blob(object_name).download_to_filename(destination_path)
+    def download_file_to_path(self, bucket_name, object_name, destination_path):
+        self.logger.debug(
+            'Downloading from bucket %s file %s and saving to %s' % (bucket_name, object_name, destination_path))
+        self.storage_client.get_bucket(bucket_name).blob(object_name).download_to_filename(destination_path)

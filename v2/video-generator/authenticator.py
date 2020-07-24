@@ -16,25 +16,25 @@ import pickle
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 # Read client's ID and secret
-client_id = raw_input('Client ID: ')
-client_secret = raw_input('Client secret: ')
+client_id = input('Client ID: ')
+client_secret = input('Client secret: ')
 
 # Get credentials from console flow
 credentials = InstalledAppFlow.from_client_config({
-        "installed": {
-            "client_id": client_id,
-            "client_secret": client_secret,
-            "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob"],
-            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-            "token_uri": "https://oauth2.googleapis.com/token"
-        }
-    }, scopes=[
-        'https://www.googleapis.com/auth/spreadsheets',
-        'https://www.googleapis.com/auth/youtube.upload',
-        'https://www.googleapis.com/auth/drive',
-        'https://www.googleapis.com/auth/devstorage.read_write'
-    ]).run_console()
+    "installed": {
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob"],
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token"
+    }
+}, scopes=[
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/youtube.upload',
+    'https://www.googleapis.com/auth/drive',
+    'https://www.googleapis.com/auth/devstorage.read_write'
+]).run_console()
 
 # Writes credentials token to current folder
-with open('token', 'w') as token_file:
+with open('token', 'wb') as token_file:
     token_file.write(pickle.dumps(credentials))

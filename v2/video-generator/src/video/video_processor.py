@@ -15,8 +15,9 @@
 """Manages video processing tasks sequentially."""
 
 import traceback
-import log
 from datetime import datetime
+
+import log
 from ffmpeg import util
 
 logger = log.getLogger()

@@ -27,6 +27,7 @@ import os
 import re
 import subprocess
 import tempfile
+
 import log
 
 
@@ -91,13 +92,12 @@ class FFMPEGGenerator(object):
       FFMpegExecutionError: if the ffmpeg process returns an error
     """
         # Group all args and runs ffmpeg
-        ffmpeg_output = self._info_from_ffmpeg(video_file_path,
-                                               self.ffmpeg_executable)
+        ffmpeg_output = self._info_from_ffmpeg(video_file_path, self.ffmpeg_executable).decode('utf-8')
+
         self.logger.debug('ffmpeg ran with output:')
         self.logger.debug(ffmpeg_output)
 
-        duration_search = re.search('(?<=Duration: )([^,]*)', ffmpeg_output,
-                                    re.IGNORECASE)
+        duration_search = re.search('(?<=Duration: )([^,]*)', ffmpeg_output, re.IGNORECASE)
 
         if duration_search:
             duration_string = duration_search.group(1)
@@ -377,9 +377,9 @@ class FFMPEGGenerator(object):
     def _write_to_temp_file(self, text):
         """Writes a string to a new temporary file and returns its name."""
 
-        (fd, text_file_name) = tempfile.mkstemp(
-            prefix='vogon_', suffix='.txt', text=True)
-        with os.fdopen(fd, 'w') as f:
+        (fd, text_file_name) = tempfile.mkstemp(prefix='vogon_', suffix='.txt', text=True)
+
+        with os.fdopen(fd, 'wb') as f:
             f.write(text.encode('utf8'))
 
         return text_file_name
@@ -476,6 +476,7 @@ class FFMPEGGenerator(object):
     def _image_and_video_inputs(self, images_and_videos, text_tmp_images):
         """Generates a list of input arguments for ffmpeg with the given images."""
         include_cmd = []
+        resized_images = set()
 
         # adds images as video starting on overlay time and finishing on overlay end
         img_formats = ['gif', 'jpg', 'jpeg', 'png']
@@ -515,11 +516,14 @@ class FFMPEGGenerator(object):
                 # include_args += ['-thread_queue_size', str(self.thread_queue_size), '-re']
                 include_args += ['-i']
 
-                # Convert all images to PNG to avoid problems
-                # filename_png = filename + '.png'
-                # self.convert_to_png(filename, filename_png, self.ffmpeg_executable)
+                # Resize all images to avoid FFMPEG to run with unecessary large images
+                if filename not in resized_images:
+                    self.resize_images(filename, filename, ovl['width'], ovl['height'], ovl['keep_ratio'],
+                                   self.convert_executable[0])
 
-                include_cmd += include_args + ['%s' % (filename)]
+                    resized_images.add(filename)
+
+                include_cmd += include_args + ['%s' % filename]
 
             # treats video overlays
             else:
@@ -569,12 +573,19 @@ class FFMPEGGenerator(object):
         except subprocess.CalledProcessError as e:
             raise VideoGenerationError(' '.join(args), e.output)
 
-    def convert_to_png(self, input_file, output_file, executable='ffmpeg'):
+    def resize_images(self, input_file, output_file, width, height, keep_ratio, executable='convert'):
 
-        args = [executable, '-i', input_file, output_file]
+        args = [executable,
+                input_file,
+                '-resize',
+                '%dx%d>%s' % (width, height, '' if keep_ratio else '!'),
+                '-quality', '95',
+                '-depth', '8',
+                output_file
+                ]
 
-        self.logger.info('Running ffmpeg to convert image with args:')
-        self.logger.info(' '.join(args))
+        self.logger.debug('Running imagemagick to resize image with args:')
+        self.logger.debug(' '.join(args))
 
         # Returns results or raises an exception
         try:

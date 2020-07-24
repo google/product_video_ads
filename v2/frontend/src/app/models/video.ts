@@ -20,6 +20,8 @@ import { Campaign } from './campaign'
 export class Video {
 
     constructor(
+        public date : string = '',
+        public name : string = '',
         public configs : Array<Config>,
         public base_video : string,
         public status : string,
@@ -29,28 +31,32 @@ export class Video {
         
     public static from_video_array(video_array : Array<any>) : Video {
         return new Video(
-            JSON.parse(video_array[10] || '[]'),
-            video_array[11],
-            video_array[12],
+            video_array[0],
+            video_array[1],
+            JSON.parse(video_array[12] || '[]'),
+            video_array[13],
+            video_array[14],
             new Campaign(
-                video_array[0],
-                video_array[1],
-                video_array[4],
-                video_array[5],
+                video_array[2],
+                video_array[3],
                 video_array[6],
                 video_array[7],
                 video_array[8],
                 video_array[9],
-                video_array[14],
-                video_array[2],
-                video_array[3]
+                video_array[10],
+                video_array[11],
+                video_array[16],
+                video_array[4],
+                video_array[5]
             ),
-            video_array[13]
+            video_array[15]
         )
     }
             
     public static to_video_array(video : Video) : Array<any> {
         return [
+            video.date,
+            video.name,
             video.campaign.account_id,
             video.campaign.campaign_name,
             video.campaign.adgroup_name,

@@ -14,12 +14,14 @@
 
 """The Drive Storage Handler encapsulates all interaction with drive."""
 
-from datetime import datetime
 import io
 import os
+from datetime import datetime
+
+from apiclient.http import MediaFileUpload
 from apiclient.http import MediaIoBaseDownload
 from googleapiclient.discovery import build
-from apiclient.http import MediaFileUpload
+
 import log
 
 
