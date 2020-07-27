@@ -71,7 +71,7 @@ read
 
 # Generate auth token
 gsutil cp gs://product-video-ads/video-generator/authenticator.py authenticator.py
-pip install google-auth-oauthlib==0.4.0
+pip3 install google-auth-oauthlib==0.4.0
 python3 authenticator.py
 
 # Crete bucket for token
