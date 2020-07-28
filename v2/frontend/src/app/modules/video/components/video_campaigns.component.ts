@@ -35,12 +35,11 @@ export class VideoCampaignsComponent implements OnInit {
   drive_url = 'https://drive.google.com/uc?export=download&id='
   yt_url = 'https://www.youtube.com/embed/'
 
-  ad_group_types = [
-    'TRUE_VIEW_IN_STREAM', 
-    'TRUE_VIEW_IN_DISPLAY', 
-    'NON_SKIPPABLE_IN_STREAM',
-    'BUMPER'
-  ]
+  ad_group_types = [['TRUE_VIEW_IN_STREAM', 'TRUE_VIEW_IN_STREAM'],
+  ['TRUE_VIEW_IN_STREAM', 'TRUE_VIEW_FOR_ACTION'],
+  ['TRUE_VIEW_IN_DISPLAY', 'TRUE_VIEW_IN_DISPLAY'],
+  ['NON_SKIPPABLE_IN_STREAM', 'NON_SKIPPABLE_IN_STREAM'],
+  ['BUMPER', 'BUMPER']]
   
   // Data to view
   bases : Observable<Base[]>

@@ -196,8 +196,8 @@
       <mat-form-field class="example-full-width">
         <mat-label>Type of Ad</mat-label>
         <mat-select [(ngModel)]="campaign.adgroup_type">
-          <mat-option *ngFor="let type of ad_group_types" [value]="type">
-            {{type}}
+          <mat-option *ngFor="let type of ad_group_types" [value]="type[0]">
+            {{type[1]}}
           </mat-option>
         </mat-select>
       </mat-form-field>
@@ -280,8 +280,8 @@
           <mat-form-field class="example-full-width">
             <mat-label>Type of Ad</mat-label>
             <mat-select [(ngModel)]="selected_groups.get(group.key).adgroup_type">
-              <mat-option *ngFor="let type of ad_group_types" [value]="type">
-                {{type}}
+              <mat-option *ngFor="let type of ad_group_types" [value]="type[0]">
+                {{type[1]}}
               </mat-option>
             </mat-select>
           </mat-form-field>
