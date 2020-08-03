@@ -269,8 +269,9 @@ class FFMPEGGenerator(object):
         # Keep aspect ratio
         if keep_ratio:
             img = '%s format=rgba,scale=%s %s;' % (
-            image_str, "'if(gt(a,w/h),w,-1)':'if(gt(a,w/h),-1,h)'".replace('w', str(width)).replace('h', str(height)),
-            resize_str)
+                image_str,
+                "'if(gt(a,w/h),w,-1)':'if(gt(a,w/h),-1,h)'".replace('w', str(width)).replace('h', str(height)),
+                resize_str)
             y = '%s+(%s-overlay_h)/2' % (y, height)
             x = '%s+(%s-overlay_w)/2' % (x, width)
         else:
@@ -517,9 +518,9 @@ class FFMPEGGenerator(object):
                 include_args += ['-i']
 
                 # Resize all images to avoid FFMPEG to run with unecessary large images
-                if filename not in resized_images:
+                if (filename not in resized_images) and filename.endswith('png'):
                     self.resize_images(filename, filename, ovl['width'], ovl['height'], ovl['keep_ratio'],
-                                   self.convert_executable[0])
+                                       self.convert_executable[0])
 
                     resized_images.add(filename)
 
