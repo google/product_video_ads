@@ -194,7 +194,7 @@
       <!-- Product to be shown -->
       <mat-form-field class="example-full-width">
         <mat-label>Product (view)</mat-label>
-        <mat-select [(ngModel)]="product_shown" (selectionChange)="choose_product_shown()">
+        <mat-select [(ngModel)]="product_shown" (selectionChange)="choose_product_shown()" [disabled]="!base_asset">
           <mat-option *ngFor="let product of facade.products" [value]="product.id">
             ({{product.id}}) {{product.values['Title']}}
           </mat-option>

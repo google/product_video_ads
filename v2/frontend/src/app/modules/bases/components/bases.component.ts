@@ -102,9 +102,7 @@ export class BasessComponents implements OnInit {
 
   edit_base_file(file : File) {
 
-    this._snackBar.open("Editing base file...", 'OK', {
-      duration: 10000,
-    })
+    this._snackBar.open("Editing base file, please wait...")
 
     this.facade.upload_base_file(file).then(response => {
       this.facade.update_file(this.base.title, file.name, response.id)

@@ -116,16 +116,11 @@ export class VideoFacade {
             return this.videoService.add_production_video(final_configs, base.title, campaign, name)
         }
         
-        get_available_groups_for_base(base_title : string) : Map<string, Product[]> {
+        get_available_groups_for_base() : Map<string, Product[]> {
             
             const groups : Map<string, Product[]> = new Map<string, Product[]>()
-            const offer_types = this.offerTypeService.offer_types.filter(o => o.base == base_title).map(o => o.title)
 
             for(let product of this.productsService.products) {
-                
-                if (!product.group || offer_types.indexOf(product.offer_type) < 0)
-                    continue
-                
                 const group_products = groups.get(product.group) || []
                 group_products.push(product)
                 groups.set(product.group, group_products)
@@ -134,9 +129,9 @@ export class VideoFacade {
             return groups
         }
         
-        get_configs_from_offer_type(offer_type_title : string, base_title : string) : Config[] {
+        get_configs_from_offer_type(offer_type_title : string) : Config[] {
             
-            const offer_types = this.offerTypeService.offer_types.filter(o => o.title == offer_type_title && o.base == base_title)
+            const offer_types = this.offerTypeService.offer_types.filter(o => o.title == offer_type_title)
             
             if (offer_types.length == 0)
                 return []
@@ -164,7 +159,7 @@ export class VideoFacade {
             return this.productsService.products.filter(prod => prod.group === group)
         }
 
-        public validate_groups(product_groups : Map<string, Product[]>) : Map<string, string[]> {
+        public validate_groups(product_groups : Map<string, Product[]>, base_product_count : number) : Map<string, string[]> {
 
             const validations = new Map<string, string[]>()
 
@@ -172,11 +167,15 @@ export class VideoFacade {
 
                 let errors = []
 
-                if (!this.validate_group_offertypes(group, products))
-                    errors.push(`ERROR: The offer group contains invalid offer types. Please check that the configured offer types exist or the offer types have the same base.`)
+                // Validate if using inexistent offer types
+                let missing_offer_types = this.validate_group_offertypes(products)
 
-                if (!this.validate_group_products(products))
-                    errors.push(`ERROR: The positions configured in the offer group must be unique. Please fix the positions to proceed.`)
+                if (missing_offer_types.length > 0)
+                    errors.push(`ERROR: The offer group contains invalid offer types ${missing_offer_types}`)
+
+                // Validate if not correct product count or invalid positions
+                if (!this.validate_group_products(products, base_product_count))
+                    errors.push(`ERROR: The ${base_product_count} positions configured in the offer group must be unique`)
 
                 validations.set(group, errors)
             }
@@ -184,16 +183,25 @@ export class VideoFacade {
             return validations
         }
 
-        private validate_group_offertypes(group : string, group_products : Product[]) : boolean {
+        private validate_group_offertypes(group_products : Product[]) : string[] {
             
-            // 1. Validate if the configured Offer Types exist and have the same Base.
-            // If products length within an Offer Group is different from the products length found in the available products for a Base,
-            // that means that either the Offer Type does not exist or it uses a different Base.
-            return this.get_products_by_offer_group(group).length == group_products.length
+            const offer_types = new Set(this.offerTypeService.offer_types.map(o => o.title))
+            const missing_offer_types = []
+            
+            for (let p of group_products)
+                if(!offer_types.has(p.offer_type))
+                    missing_offer_types.push(p.offer_type)
+
+            return missing_offer_types
         }
             
-        private validate_group_products(group_products : Product[]) {
+        private validate_group_products(group_products : Product[], base_product_count : number) {
 
+            // Count matches?
+            if (group_products.length != base_product_count)
+                return false
+
+            // Correct positions?
             let posSet = new Set();
 
             for(let p = 0; p < group_products.length; p++) {

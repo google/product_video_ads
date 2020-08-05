@@ -168,25 +168,23 @@ export class OfferTypeComponent implements OnInit {
     })
   }
   
-  public on_image_loaded(img) {
-
-    this.base_asset = img
+  public async on_image_loaded(img) {
 
     // To calculate elements positions relative
     this.base_specs = {
-      width: this.base_asset.width,
-      height: this.base_asset.height,
+      width: img.width,
+      height: img.height,
       x_ratio: 1,
       y_ratio: 1
     }
 
-    this.load_elements_on_screen()
+    await this.load_elements_on_screen()
+
+    this.base_asset = img
   }
 
-  public on_video_loaded(video) {
+  public async on_video_loaded(video) {
     
-    this.base_asset = video
-
     const adjust = video.videoWidth / 800
     const WIDTH = video.videoWidth / adjust 
     const HEIGHT = video.videoHeight / adjust 
@@ -196,13 +194,15 @@ export class OfferTypeComponent implements OnInit {
 
     // To calculate elements positions relative
     this.base_specs = {
-      width: this.base_asset.width,
-      height: this.base_asset.height,
+      width: video.width,
+      height: video.height,
       x_ratio: video.videoWidth/WIDTH,
       y_ratio: video.videoHeight/HEIGHT
     }
 
-    this.load_elements_on_screen()
+    await this.load_elements_on_screen()
+
+    this.base_asset = video
   }
 
   select_type(type) {

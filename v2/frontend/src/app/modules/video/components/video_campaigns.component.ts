@@ -90,8 +90,8 @@ export class VideoCampaignsComponent implements OnInit {
     }
 
     select_bulk_video_mode() {
-      this.product_groups = this.facade.get_available_groups_for_base(this.base.title)
-      this.product_groups_validations = this.facade.validate_groups(this.product_groups)
+      this.product_groups = this.facade.get_available_groups_for_base()
+      this.product_groups_validations = this.facade.validate_groups(this.product_groups, this.base.products.length)
 
       this.mode = 'bulk'
     }
@@ -143,7 +143,7 @@ export class VideoCampaignsComponent implements OnInit {
 
           this.add_video(
             sorted_products.map(p => p.id),
-            sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type, this.base.title)),
+            sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type)),
             campaign_configs,
             group
           )
