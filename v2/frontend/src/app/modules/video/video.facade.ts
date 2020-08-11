@@ -217,4 +217,8 @@ export class VideoFacade {
 
             return true
         }
+        
+        public is_generating() : boolean {
+            return this.videoService.is_generating()
+        }
     }

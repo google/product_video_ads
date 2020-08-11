@@ -71,6 +71,10 @@ export class VideoService {
         this._logs.next(await this.repository.load_logs())
     }
 
+    is_generating() : boolean {
+        return this.videos.some(video => ['Preview', 'On'].indexOf(video.status) >= 0)
+    }
+
     delete_video(generated_video : string) {
         this._videos.next(this.videos.filter(v => v.generated_video != generated_video))
         return this.repository.save_videos(this.videos)

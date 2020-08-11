@@ -92,6 +92,13 @@ export class VideoComponent implements OnInit {
     }
 
     add_single_video() {
+
+      // Block deletions when videos are being generated
+      if(this.facade.is_generating()) {
+        this._snackBar.open('Cannot add more videos while some are being generated', 'OK')
+        return
+      }
+
       this.add_video(this.configs, this.base, this.product_keys, 'Preview')
       this._snackBar.open('Single asset scheduled (check assets section above)', 'OK', { duration: 4000 })
     }
@@ -120,6 +127,12 @@ export class VideoComponent implements OnInit {
     }
 
     create_bulk() {
+
+      // Block deletions when videos are being generated
+      if(this.facade.is_generating()) {
+        this._snackBar.open('Cannot add more videos while some are being generated', 'OK')
+        return
+      }
 
       for(let group of this.selected_groups) {
         
@@ -153,6 +166,12 @@ export class VideoComponent implements OnInit {
     }
 
     delete_video(video : Video) {
+
+      // Block deletions when videos are being generated
+      if(this.facade.is_generating()) {
+        this._snackBar.open('Cannot make deletions while videos are being generated', 'OK')
+        return
+      }
 
       const video_name = video.generated_video || 'being generated'
 
