@@ -1,0 +1,14 @@
+mat-form-field, input {
+    margin: 10px;
+    font-size: 18px;
+}
+
+.edit_box {
+    z-index: 11;
+    position: fixed;
+    top: 25%;
+    right: 10%;
+    border: 1px solid red;
+    background-color: rgba(255, 255, 255, 0.6);
+    padding: 1%;
+}

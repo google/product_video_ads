@@ -18,13 +18,11 @@ import { NgModule } from '@angular/core';
 import { OfferTypeRoutingModule } from './offer_type-routing.module';
 import { OfferTypeComponent } from './components/offer_type.component';
 import { SharedModule } from '../shared/shared.module';
-import { DraggableElementComponent } from './components/draggable_element.component';
 import { FilterPipe } from './pipes/FilterPipe';
 
 @NgModule({
   declarations: [
     OfferTypeComponent,
-    DraggableElementComponent,
     FilterPipe
   ],
   imports: [

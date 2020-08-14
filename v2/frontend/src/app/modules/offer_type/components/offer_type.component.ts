@@ -14,48 +14,47 @@
    limitations under the License.
 */
 
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { OfferTypeFacade } from '../offer_type.facade';
+import { InterfaceHelper } from '../../shared/InterfaceHelper'
 import { Observable } from 'rxjs';
 import { OfferType } from 'app/models/offertype';
 import { Config } from 'app/models/config';
-import { Router } from '@angular/router';
 import { Base } from 'app/models/base';
 import { first } from 'rxjs/operators'
-import * as UUID from 'uuid/v4'
 
 @Component({
   selector: 'app-base',
   templateUrl: '../views/offer_type.component.html',
   styleUrls: ['../views/offer_type.component.scss'],
-  providers: [OfferTypeFacade]
+  providers: [OfferTypeFacade, InterfaceHelper]
 })
 export class OfferTypeComponent implements OnInit {
-  
-  step : number
-  offer_types : Observable<OfferType[]>
-  bases : Array<Base>
-  offer_type : OfferType
-  config : any = {}
-  fields : Array<string>
-  contents : Array<any>
-  content : any
-  elements : Array<any>
-  element_focused : any
-  loaded_fonts : Set<string>
-  locked_name : boolean
-  locked_save : boolean
-  base_products_timings : Array<any>
-  product_shown : string
-  is_video : boolean
+
+  step: number
+  offer_types: Observable<OfferType[]>
+  bases: Array<Base>
+  offer_type: OfferType
+  config: any = {}
+  fields: Array<string>
+  contents: Array<any>
+  content: any
+  elements: Array<any>
+  element_focused: any
+  loaded_fonts: Set<string>
+  locked_name: boolean
+  locked_save: boolean
+  base_products_timings: Array<any>
+  product_shown: string
+  is_video: boolean
   base_asset
   base_url
   base_specs
 
-  constructor(public facade : OfferTypeFacade, private router: Router, private _snackBar: MatSnackBar, private cd: ChangeDetectorRef) {
+  constructor(public facade: OfferTypeFacade, private helper: InterfaceHelper, private _snackBar: MatSnackBar) {
     this.offer_types = this.facade.offer_types$
-    
+
     this.facade.bases.subscribe(bases => {
       this.bases = bases
     })
@@ -78,87 +77,40 @@ export class OfferTypeComponent implements OnInit {
 
     window.scrollTo(0, 0)
 
-    // Bind arrow keys
-    document.addEventListener('keydown', event => {
-      this.control_focused_element(event)
-    })
-
     this.facade.update_products()
-  }
-
-  private control_focused_element(event) {
-
-    if (this.element_focused == undefined)
-      return
-
-    let x = 0, y = 0
-
-    switch (event.key) {
-
-      case 'ArrowUp': 
-        y=-1 
-        break;
-
-      case 'ArrowDown':
-        y=1
-          break;
-
-      case 'ArrowLeft':
-          x=-1
-          break;
-
-      case 'ArrowRight':
-          x=1
-          break;
-
-      case 'Escape':
-          delete this.element_focused
-          break;
-    }
-
-    if (x != 0 || y != 0) {
-
-      this.move_element_to(this.element_focused, x, y)
-
-      // Change element visually on screen
-      this.element_focused.left += x
-      this.element_focused.top += y
-
-      event.preventDefault()
-    }
   }
 
   move_step(step) {
     this.step = step
   }
 
-  choose_base(base : Base) {
+  choose_base(base: Base) {
 
     this.base_url = base.url
     this.base_products_timings = [...base.products]
-    
+
     if (!this.locked_name)
       this.offer_types.pipe(first()).subscribe(ots => {
         this.offer_type.title += ' ' + (ots.length + 1)
       })
-    
+
     this.offer_type.base = base.title
     this.is_video = base.file.endsWith('.mp4')
     this.move_step(3)
   }
 
-  edit_type(offer_type : OfferType) {
-    this.offer_type = {...offer_type}
+  edit_type(offer_type: OfferType) {
+    this.offer_type = { ...offer_type }
     this.locked_name = true
     this.choose_base(this.bases.filter(b => b.title == offer_type.base)[0])
   }
 
-  copy_type(offer_type : OfferType) {
-    this.offer_type = {...offer_type}
+  copy_type(offer_type: OfferType) {
+    this.offer_type = { ...offer_type }
     this.move_step(2)
   }
 
-  delete_type(offer_type : OfferType) {
+  delete_type(offer_type: OfferType) {
 
     this._snackBar.open('Confirm ' + offer_type.title + ' deletion?', 'Confirm', {
       duration: 4000
@@ -167,7 +119,7 @@ export class OfferTypeComponent implements OnInit {
       this.save()
     })
   }
-  
+
   public async on_image_loaded(img) {
 
     // To calculate elements positions relative
@@ -178,16 +130,18 @@ export class OfferTypeComponent implements OnInit {
       y_ratio: 1
     }
 
-    await this.load_elements_on_screen()
+    // Load elements on screen
+    this.elements = await this.helper.parse_configs_to_elements(this.offer_type.configs)
 
+    // Set base to this screen
     this.base_asset = img
   }
 
   public async on_video_loaded(video) {
-    
+
     const adjust = video.videoWidth / 800
-    const WIDTH = video.videoWidth / adjust 
-    const HEIGHT = video.videoHeight / adjust 
+    const WIDTH = video.videoWidth / adjust
+    const HEIGHT = video.videoHeight / adjust
 
     video.width = WIDTH
     video.height = HEIGHT
@@ -196,12 +150,14 @@ export class OfferTypeComponent implements OnInit {
     this.base_specs = {
       width: video.width,
       height: video.height,
-      x_ratio: video.videoWidth/WIDTH,
-      y_ratio: video.videoHeight/HEIGHT
+      x_ratio: video.videoWidth / WIDTH,
+      y_ratio: video.videoHeight / HEIGHT
     }
 
-    await this.load_elements_on_screen()
+    // Load elements on screen
+    this.elements = await this.helper.parse_configs_to_elements(this.offer_type.configs)
 
+    // Set base to this screen
     this.base_asset = video
   }
 
@@ -219,11 +175,11 @@ export class OfferTypeComponent implements OnInit {
 
     if (this.config.type == 'product') {
 
-      this.contents = this.facade.products.map(p => { 
-        return {'id': p.id, 'value': p.values[field] } 
+      this.contents = this.facade.products.map(p => {
+        return { 'id': p.id, 'value': p.values[field] }
       })
     } else {
-      this.contents = this.facade.assets.map(a => { return {'id': a.id, 'value': a[field] || ''} })
+      this.contents = this.facade.assets.map(a => { return { 'id': a.id, 'value': a[field] || '' } })
     }
 
     this.contents = this.contents.filter(a => a.value != undefined).filter(a => a.value != '')
@@ -234,309 +190,96 @@ export class OfferTypeComponent implements OnInit {
     this.config.content = content.value
   }
 
-  is_image(content) {
-    return content && (content.startsWith('http') || content.startsWith('gs://'))
-  }
-  
-  private create_element(product) {
-    
-    const element = { id: UUID(), ...product }
-    this.elements.push(element)
-
-    return element
+  // Bind from view
+  public is_image(content) {
+    return this.helper.is_image(content)
   }
 
   // Bind from view
-  async create_text(product?) {
-    
-    const current_product = product ? product : this.config
-    const element = this.create_element(current_product)
-
-    element.view_type = 'text'
-
-    // Load font for this text, if not loaded yet
-    const font_name = current_product.font.split('.')[0]
-
-    if (!this.loaded_fonts.has(font_name)) {
-
-      const font_content = this.facade.fonts[current_product.font]
-
-      const styles = `
-      @font-face {
-        font-family: ${font_name};
-        src: url(data:font/truetype;charset=utf-8;base64,${btoa(font_content)}) format('truetype');
-      }`
-
-      const node = document.createElement('style');
-      node.innerHTML = styles;
-      document.head.appendChild(node); 
-
-      this.loaded_fonts.add(font_name)
-    }
-
-    // Add this font to the element
-    element.font_family = font_name
-
-    // Wrap text to break into lines
-    element['content_original'] = current_product['content']
-
-    element.content = this.wrap_text(
-      current_product['content'],
-      current_product['width'])
-
-    // Insert the text in black color so it is always visible in the white background
-    // the selected color will be applied to the text when the element is dropped in the video.
-    element.color = product ? product.color : "#000000";
-    element.config_color = product ? undefined : this.config.color;
-      
-    return element
+  public async create_text(product?) {
+    const element = await this.helper.create_text(product ? product : this.config, this.loaded_fonts)
+    this.elements.push(element)
   }
-    
-    // Bind from view
-    public async create_image(product?) {
-      
-      const current_product = product ? product : this.config
 
-      // Download image bytes if needed (if has security)
-      current_product.content = await this.download_image(current_product.content)
-
-      const element = this.create_element(current_product)
-      
-      element.view_type = 'image'
-
-      return element
-    }
-
-    private async download_image(url : string) {
-
-      const data_uri = 'data:image/{EXTENSION};base64,{DATA}'
-
-      // Only rule for now is download from GCS bucket
-      if (url.startsWith('gs://')) {
-        
-        const splits = url.split('.')
-
-        return data_uri.
-            replace('{EXTENSION}', splits[splits.length-1]).
-            replace('{DATA}', btoa(await this.facade.download_image_from_gcs(url)))
-      }
-
-      // Else, use url itself (for http*)
-      return url
-    }
-
-    public on_change_text_width(element_focused) {
-      element_focused.content = this.wrap_text(element_focused.content_original, element_focused.width)
-    }
-    
-    private wrap_text(text, charaters_per_line) {
-      
-      const words = []
-      
-      if (charaters_per_line == 0 || text == undefined)
-        return [text]
-      
-      const all_words = text.split(' ')
-      let curr_chars = 0
-      let last_index = 0
-      
-      all_words.forEach((word, i) => {
-        
-        if (curr_chars + word.length >= charaters_per_line) {
-          words.push(all_words.slice(last_index, i).join(' '))
-          last_index = i
-          curr_chars = 0
-        }
-        
-        if (i == all_words.length - 1)
-        words.push(all_words.slice(last_index, i+1).join(' '))
-        
-        curr_chars += word.length
-      })
-      
-      return words.join('<br/>')
-    }
-
-    public drag_end({event, element}) {
-
-      this.move_element_to(element, event.distance.x, event.distance.y)
-
-      // Assign selected color for the text first time
-      if (element.config_color) {
-        element.color = element.config_color
-        element.config_color = undefined
-      }
-    }
-    
-    public focus_element(element) {
-      this.element_focused = element
-      console.log('Element focused: ' + element.id)
-    }
-    
-    private move_element_to(element, offset_x, offset_y) {
-
-      console.log('Moving element ' + element.id + 'in ' + offset_x + '/' + offset_y)
-
-      element.x += offset_x
-      element.y += offset_y
-    }
-
-    choose_position(product) {
-      console.log('Setting video position to ' + product['start_time'])
-      this.base_asset.currentTime = product['start_time']
-    }
-
-    async load_elements_on_screen() {
-
-      console.log('Loading elements on screen...')
-
-      // Add all elements on screen
-      for(let c of this.offer_type.configs) {
-
-        // Draw assets
-        if (c.type == 'asset') {
-          
-          const content = this.facade.assets.filter(a => a.id == c.key)[0][c.field]
-
-          if (c.field == 'image')
-            await this.create_image({...c, content, loaded_element: true})
-          else
-            await this.create_text({...c, content, loaded_element: true})
-        } else {
-
-          // Product
-          const current_product = this.facade.products.filter(p => p.id == c.key)[0] || this.facade.products[0]
-          const content = current_product.values[c.field]
-
-          if (this.is_image(content))
-            await this.create_image({...c, content, loaded_element: true})
-          else
-            await this.create_text({...c, content, loaded_element: true})
-        }
-      }
-
-      this.offer_type.configs = []
-    }
-
-    public choose_product_shown() {
-
-      // Set all products as this
-      for (let element of this.elements)
-        if (element.type == 'product')
-          element.key = this.product_shown
-
-      this.finish()
-    }
-    
-    public delete_element(id) {
-      
-      event.preventDefault();
-      
-      // Delete from screen
-      this.elements = this.elements.filter(e => e.id != id)
-      
-      return false;
-    }
-
-    public send_to_back(element) {
-
-      // Remove element
-      this.elements = this.elements.filter(e => e.id != element.id)
-
-      // Insert as first
-      this.elements.unshift(element)
-    }
-    
-    private add_elements_to_configs() {
-      
-      for (let e of this.elements.values()) {
-
-        // When flipped or rotated, adjust height
-        if (e.flip || e.angle != 0) {
-          e.angle = -90
-          e.align = 'left'
-          e.y -= document.getElementById(e.id).offsetWidth
-        }
-
-        // Add texts
-        if (e.view_type == 'text') {
-
-          // Adjust X if alignment is center or right for texts
-          if (e.align == 'center' || e.align == 'right') {
-            const htmlElement = document.getElementById(e.id)
-            e.x += e.align == 'center' ? htmlElement.offsetWidth/2 : htmlElement.offsetWidth
-          }
-
-          this.offer_type.configs.push(new Config(
-            e.key,
-            e.type,
-            e.field,
-            parseInt((e.x * this.base_specs.x_ratio).toFixed(0)),
-            parseInt((e.y * this.base_specs.y_ratio).toFixed(0)),
-            0,
-            0,
-            e.font,
-            e.color,
-            Math.floor(e.size * this.base_specs.x_ratio),
-            e.width,
-            e.height,
-            e.align,
-            e.angle,
-            e.keep_ratio
-          ))
-        }
-
-        else {
-
-          // Add images
-          this.offer_type.configs.push(new Config(
-            e.key,
-            e.type,
-            e.field,
-            parseInt((e.x * this.base_specs.x_ratio).toFixed(0)),
-            parseInt((e.y * this.base_specs.y_ratio).toFixed(0)),
-            0,
-            0,
-            '',
-            '',
-            0,
-            e.width * this.base_specs.x_ratio,
-            e.height * this.base_specs.y_ratio,
-            'left',
-            e.angle,
-            e.keep_ratio
-          ))
-        }
-      }
-
-      // Delete any other with same title
-      this.facade.delete_offer_type(this.offer_type.title, this.offer_type.base)
-
-      // Add it
-      this.facade.add_offer_type(this.offer_type)
-    }
-
-    finish() {
-
-      this.locked_save = true
-
-      this.add_elements_to_configs()
-      this.save()
-    }
-
-    save() {
-
-      this._snackBar.open("Saving...")
-
-      this.facade.save().then(response => {
-
-        const status = response['status']
-
-        if (status == 200) {
-          this._snackBar.open("Saved", '', { duration: 2000 })
-          this.ngOnInit()
-        } else
-            this._snackBar.open("Error (" + status + ')', 'OK', { duration: 10000 })
-      })
-    }
+  // Bind from view
+  public async create_image(product?) {
+    const element = await this.helper.create_image(product ? product : this.config)
+    this.elements.push(element)
   }
+
+  public on_change_text_width(element_focused) {
+    element_focused.content = this.helper.wrap_text(element_focused.content_original, element_focused.width)
+  }
+
+  public focus_element(element) {
+    this.element_focused = element
+    console.log('Element focused: ' + element.id)
+  }
+
+  choose_position(product) {
+    console.log('Setting video position to ' + product['start_time'])
+    this.base_asset.currentTime = product['start_time']
+  }
+
+  public choose_product_shown() {
+
+    // Set all products as this
+    for (let element of this.elements)
+      if (element.type == 'product')
+        element.key = this.product_shown
+
+    this.finish()
+  }
+
+  public delete_element(id) {
+
+    event.preventDefault();
+
+    // Delete from screen
+    this.elements = this.elements.filter(e => e.id != id)
+
+    return false;
+  }
+
+  public send_to_back(element) {
+
+    // Remove element
+    this.elements = this.elements.filter(e => e.id != element.id)
+
+    // Insert as first
+    this.elements.unshift(element)
+  }
+
+  finish() {
+
+    this.locked_save = true
+
+    // Parse screen elements to offer type configuration
+    this.offer_type.configs = this.helper.parse_elements_to_configs(this.elements, this.base_specs)
+
+    // Delete any other with same title
+    this.facade.delete_offer_type(this.offer_type.title, this.offer_type.base)
+
+    // Add it
+    this.facade.add_offer_type(this.offer_type)
+
+    // Save it!
+    this.save()
+  }
+
+  save() {
+
+    this._snackBar.open("Saving...")
+
+    this.facade.save().then(response => {
+
+      const status = response['status']
+
+      if (status == 200) {
+        this._snackBar.open("Saved", '', { duration: 2000 })
+        this.ngOnInit()
+      } else
+        this._snackBar.open("Error (" + status + ')', 'OK', { duration: 10000 })
+    })
+  }
+}

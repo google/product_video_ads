@@ -100,91 +100,21 @@
           [element]="el"
           [video_pos]="base_specs"
           (dblclick)="delete_element($event)"
-          (dragEnd)="drag_end($event)"
           (singleclick)="focus_element($event)">
         </app-draggable-element>
 
       </div>
 
       <!-- Box to edit elements on screen -->
-      <div class="edit_box" *ngIf="element_focused" cdkDrag>
-
-        <div style="text-align: center; margin-top: 5%; font-weight: bold;">{{element_focused.field}} ({{element_focused.type}})</div>
-
-        <!-- Box to edit text element -->
-        <div [hidden]="element_focused.view_type != 'text'"> 
-
-          <input [(ngModel)]="element_focused.color"
-          [style.background]="element_focused.color"
-          [(colorPicker)]="element_focused.color" />
-          
-          <br/>
-
-          <mat-form-field class="example-full-width">
-            <mat-label>Font size</mat-label>
-            <input [(ngModel)]="element_focused.size" type="number" matInput placeholder="size">
-          </mat-form-field>
-          
-          <br/>
-
-          <mat-form-field class="example-full-width">
-            <mat-label>Width (letters)</mat-label>
-            <input [(ngModel)]="element_focused.width" (change)="on_change_text_width(element_focused)" type="number" matInput placeholder="width">
-          </mat-form-field>
-          
-          <br/>
-
-          <mat-form-field>
-            <mat-label>Align</mat-label>
-            <mat-select [(ngModel)]="element_focused.align" value="center">
-              <mat-option *ngFor="let a of ['center', 'left', 'right']" [value]="a">
-                {{a}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <br/>
-
-          <!--mat-checkbox class="example-margin" style="margin-left: 2%;" [(ngModel)]="element_focused.keep_ratio">
-            Fit text
-          </mat-checkbox>
-
-          <br/>
-
-          <mat-form-field *ngIf="element_focused.keep_ratio" class="example-full-width">
-            <mat-label>Lines to fill</mat-label>
-            <input [(ngModel)]="element_focused.height" type="number" matInput placeholder="lines">
-          </mat-form-field-->
-
-          <button mat-stroked-button style="width: 100%" (click)="send_to_back(element_focused)">Send to back</button>
-
-        </div>
-
-        <!-- Box to edit image element -->
-        <div [hidden]="element_focused.view_type != 'image'"> 
-
-          <mat-form-field class="example-full-width">
-            <mat-label>Width</mat-label>
-            <input [(ngModel)]="element_focused.width" type="number" matInput placeholder="width">
-          </mat-form-field>
-
-          <br/>
-
-          <mat-form-field class="example-full-width">
-            <mat-label>Height</mat-label>
-            <input [(ngModel)]="element_focused.height" type="number" matInput placeholder="height">
-          </mat-form-field>
-
-          <br/>
-
-          <button mat-stroked-button style="width: 100%" (click)="send_to_back(element_focused)">Send to back</button>
-
-        </div>
-      </div>
+      <app-edit-element-box
+        [element_focused]="element_focused"
+        (on_change_text_width)="on_change_text_width($event)"
+        (on_send_to_back)="send_to_back($event)">
+      </app-edit-element-box>
         
       <br><br>
       
-      <!-- Offer Type -->
+      <!-- Title -->
       <mat-form-field class="example-full-width">
         <mat-label>Title</mat-label>
         <input [(ngModel)]="offer_type.title" matInput [disabled]="locked_name">
@@ -277,15 +207,6 @@
             Flip
           </mat-checkbox>
           
-          <!--mat-checkbox class="example-margin" style="margin-left: 2%;" [(ngModel)]="config.keep_ratio">
-            Fit text
-          </mat-checkbox>
-
-          <mat-form-field *ngIf="config.keep_ratio" class="example-full-width">
-            <mat-label>Lines to fill</mat-label>
-            <input [(ngModel)]="config.height" type="number" matInput placeholder="lines">
-          </mat-form-field-->
-
           <br/>
           
           <button mat-stroked-button (click)="create_text()">Insert Text</button>
@@ -304,11 +225,6 @@
             <input [(ngModel)]="config.height" type="number" matInput placeholder="height">
           </mat-form-field>
           
-          <!--mat-form-field class="example-full-width">
-            <mat-label>Angle</mat-label>
-            <input [(ngModel)]="config.angle" type="number" min=-90 max=90 matInput placeholder="angle">
-          </mat-form-field-->
-
           <mat-checkbox class="example-margin" style="margin-left: 2%;" [(ngModel)]="config.flip">
             Flip
           </mat-checkbox>

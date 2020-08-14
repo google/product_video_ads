@@ -63,6 +63,10 @@ export class VideoService {
         return this.repository.save_videos(this.videos)
     }
 
+    public download_base_video(url : string) : Promise<string> {
+        return this.repository.download_base_video_from_drive(url)
+    }
+
     async update_videos() {
         this._videos.next(await this.repository.load_videos())
     }

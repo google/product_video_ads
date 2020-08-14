@@ -15,7 +15,6 @@
 */
 
 import { NgModule } from '@angular/core';
-
 import { CommonModule } from '@angular/common'
 
 import { MatTableModule } from '@angular/material/table'
@@ -35,8 +34,14 @@ import {MatExpansionModule} from '@angular/material/expansion'
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import { NgpSortModule } from "ngp-sort-pipe";
 
+import { DraggableElementComponent } from './draggable_element/draggable_element.component';
+import { EditElementBoxComponent } from './edit_element_box/edit_element_box.component'
+
 @NgModule({
-  declarations: [],
+  declarations: [
+    DraggableElementComponent,
+    EditElementBoxComponent
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -47,6 +52,7 @@ import { NgpSortModule } from "ngp-sort-pipe";
     MatSelectModule,
     MatProgressSpinnerModule,
     ColorPickerModule,
+    DragDropModule,
     MatSliderModule,
     MatSnackBarModule,
     MatDialogModule,
@@ -70,7 +76,9 @@ import { NgpSortModule } from "ngp-sort-pipe";
     MatCardModule,
     MatExpansionModule,
     DragDropModule,
-    NgpSortModule
+    NgpSortModule,
+    DraggableElementComponent,
+    EditElementBoxComponent
   ]
 })
 export class SharedModule { }

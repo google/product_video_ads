@@ -62,7 +62,7 @@ export class VideoFacade {
             return this.videoService.logs$
         }
 
-        private add_video(configs : Array<Config>, base : Base, product_keys : any) {
+        public generate_final_configs(configs : Config[][], base : Base, product_keys : any) : Config[][] {
             
             let final_configs = []
             
@@ -74,7 +74,7 @@ export class VideoFacade {
                 // Treat each config item
                 for(let config of ci) {
                     
-                    let new_config = {...config}
+                    let new_config : Config = {...config}
                     
                     if (new_config.type == 'product')
                         new_config.key = product_keys[i]
@@ -90,16 +90,11 @@ export class VideoFacade {
             return final_configs
         }
         
-        add_preview_video(configs : Array<Config>, base : Base, product_keys : any, name : string) {
-
-            const final_configs = this.add_video(configs, base, product_keys)
-
-            return this.videoService.add_preview_video(final_configs, base.title, name)
+        add_preview_video(configs : Array<Config>, base : Base, name : string) {
+            return this.videoService.add_preview_video(configs, base.title, name)
         }
 
         add_production_video(configs : Array<Config>, base : Base, product_keys : any, campaign_configs : any, name : string) {
-
-            const final_configs = this.add_video(configs, base, product_keys)
 
             const campaign = new Campaign(
                 campaign_configs.account,
@@ -113,7 +108,7 @@ export class VideoFacade {
                 campaign_configs.audience_list
             )
 
-            return this.videoService.add_production_video(final_configs, base.title, campaign, name)
+            return this.videoService.add_production_video(configs, base.title, campaign, name)
         }
         
         get_available_groups_for_base() : Map<string, Product[]> {
@@ -220,5 +215,9 @@ export class VideoFacade {
         
         public is_generating() : boolean {
             return this.videoService.is_generating()
+        }
+
+        public download_base_video(url : string) : Promise<string> {
+            return this.videoService.download_base_video(url)
         }
     }

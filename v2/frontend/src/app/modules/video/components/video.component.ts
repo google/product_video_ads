@@ -42,18 +42,21 @@ export class VideoComponent implements OnInit {
 
   product_groups : Map<string, Product[]>
   product_groups_validations : Map<string, string[]>
-  selected_groups : Set<string> = new Set<string>()
+  selected_groups : Set<string>
   mode : string
   
   // Chosen
   base : Base
   configs : Array<any>
   product_keys: Array<any>
+  final_configs : Array<any>
   
   constructor(private facade : VideoFacade, private _snackBar: MatSnackBar) {
       this.offer_types = this.facade.offer_types$
       this.videos = this.facade.videos
       this.logs = this.facade.logs
+      this.final_configs = []
+      this.selected_groups = new Set<string>()
     }
     
     ngOnInit() {
@@ -70,6 +73,8 @@ export class VideoComponent implements OnInit {
     
     choose_base(base : Base) {
       this.configs = new Array(base.products.length)
+      this.final_configs = []
+      this.selected_groups.clear()
       this.product_keys = new Array(base.products.length)
 
       this.base = base
@@ -78,6 +83,7 @@ export class VideoComponent implements OnInit {
 
     select_single_video_mode() {
       this.mode = 'single'
+      this.final_configs = []
     }
 
     select_bulk_video_mode() {
@@ -99,12 +105,17 @@ export class VideoComponent implements OnInit {
         return
       }
 
-      this.add_video(this.configs, this.base, this.product_keys, 'Preview')
+      this.add_video(
+        this.facade.generate_final_configs(this.configs, this.base, this.product_keys), 
+        this.base, 
+        'Preview'
+      )
+
       this._snackBar.open('Single asset scheduled (check assets section above)', 'OK', { duration: 4000 })
     }
     
-    private add_video(configs, base, product_keys, name) {
-      this.facade.add_preview_video(configs, base, product_keys, name)
+    private add_video(configs, base, name) {
+      this.facade.add_preview_video(configs, base, name)
       .then( _ => { this.mode = '' })
     }
 
@@ -126,13 +137,15 @@ export class VideoComponent implements OnInit {
           this.selected_groups.add(group)
     }
 
-    create_bulk() {
+    review_create_bulk() {
 
       // Block deletions when videos are being generated
       if(this.facade.is_generating()) {
         this._snackBar.open('Cannot add more videos while some are being generated', 'OK')
         return
       }
+
+      this.final_configs = []
 
       for(let group of this.selected_groups) {
         
@@ -150,10 +163,26 @@ export class VideoComponent implements OnInit {
           // Offer Type Configs
           let configs = sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type))
 
-          this.add_video(configs, this.base, product_keys, group)
+          this.final_configs.push({
+            configs: this.facade.generate_final_configs(configs, this.base, product_keys),
+            group: group
+          })
         }
       }
+    }
 
+    create_bulk() {
+
+      // Block deletions when videos are being generated
+      if(this.facade.is_generating()) {
+        this._snackBar.open('Cannot add more videos while some are being generated', 'OK')
+        return
+      }
+
+      for(let { group, configs } of this.final_configs)
+          this.add_video(configs, this.base, group)
+
+      this.final_configs = []
       this._snackBar.open('Scheduled for creation (check assets section above)', 'OK', { duration: 4000 })
     }
 
@@ -185,7 +214,7 @@ export class VideoComponent implements OnInit {
         })
       })
     }
-    
+
     indexTracker(index: number, value: any) {
       return index;
     }

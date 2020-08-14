@@ -153,6 +153,7 @@
     <br/><br/>
 
     <button mat-stroked-button [disabled]="!is_all_filled()" (click)="add_single_video()">Create Asset</button>
+
   </div>
 
     <!-- Configure bulk video creation -->
@@ -186,6 +187,18 @@
 
         <br/><br/>
 
-        <button mat-stroked-button (click)="create_bulk()">Create Bulk</button>
+        <button mat-stroked-button (click)="review_create_bulk()">Review Bulk</button>
+
+        <br/><br/>
+
+        <!-- After review -->
+        <div *ngIf="final_configs.length > 0">
+
+          <app-video-preview  [base]="base" [configs]="final_configs"></app-video-preview>
+
+          <br/><br/>
+          
+          <button mat-stroked-button (click)="create_bulk()">Create Bulk</button>
+        </div>
     </div>
 </div>

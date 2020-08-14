@@ -41,6 +41,10 @@ export class ConfigurationRepository implements ConfigurationInterface {
         return this.googleApi.download_gcs_file(url)
     }
 
+    download_base_video_from_drive(url : string) : Promise<string> {
+        return this.googleApi.download_file(url)
+    }
+
     async load_logs() : Promise<string[]> {
         return (await this.googleApi.get_values(environment.configuration.logs_range)).reverse()
     }

@@ -15,13 +15,11 @@
 */
 
 import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-import { OfferTypeFacade } from '../offer_type.facade';
 
 @Component({
   selector: 'app-draggable-element',
-  templateUrl: '../views/draggable_element.component.html',
-  styleUrls: ['../views/offer_type.component.scss'],
-  providers: [OfferTypeFacade]
+  templateUrl: './draggable_element.component.html',
+  providers: []
 })
 export class DraggableElementComponent implements AfterViewInit {
 
@@ -39,6 +37,14 @@ export class DraggableElementComponent implements AfterViewInit {
     ngAfterViewInit() {
         console.log('Element ' + this.element.id + ' initied')
         setTimeout(this.element_position_to_style.bind(this), 1000)
+    }
+
+    on_drag_element({ event, element }) {
+
+      element.x += event.distance.x
+      element.y += event.distance.y
+
+      this.dragEnd.emit({event, element})
     }
 
     private element_position_to_style() {

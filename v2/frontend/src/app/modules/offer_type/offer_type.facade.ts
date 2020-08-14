@@ -67,10 +67,6 @@ export class OfferTypeFacade {
         return this.assetsService.assets
     }
 
-    download_image_from_gcs(url : string) : Promise<string>{
-        return this.offerTypeService.download_image_from_gcs(url)
-    }
-
     delete_offer_type(title : string, base : string) : void {
         this.offerTypeService.delete_offer_type(title, base)
     }

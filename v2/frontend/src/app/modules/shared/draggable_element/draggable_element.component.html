@@ -6,7 +6,7 @@
      innerHTML={{element.content}} 
      (dblclick)="dblclick.emit(element.id)"
      (click)="singleclick.emit(element)"
-     (cdkDragEnded)="dragEnd.emit({event: $event, element: element})"
+     (cdkDragEnded)="on_drag_element({event: $event, element: element})"
      [ngStyle]="{
             'top': element.top + 'px',
             'left': element.left + 'px',
@@ -32,7 +32,7 @@
     cdkDrag
     (dblclick)="dblclick.emit(element.id)"
     (click)="singleclick.emit(element)"
-    (cdkDragEnded)="dragEnd.emit({event: $event, element: element})"
+    (cdkDragEnded)="on_drag_element({event: $event, element: element})"
   [ngStyle]="{
     'top': element.top + 'px',
     'left': element.left + 'px',
