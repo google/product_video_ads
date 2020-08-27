@@ -10,7 +10,8 @@
             </mat-expansion-panel-header>
 
         <div *ngFor="let i of s.images" style="position: relative; margin: 2%">
-            <img [src]="i.image" width=800 height=450 />
+
+            <img [src]="i.image" [width]="base_specs.width" [height]="base_specs.height" />
 
             <app-draggable-element *ngFor="let el of i.elements"
                 [element]="el"

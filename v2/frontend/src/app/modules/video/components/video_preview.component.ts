@@ -72,6 +72,8 @@ export class VideoPreviewComponent implements OnInit {
 
                 // To calculate elements positions relative
                 this.base_specs = {
+                    width: WIDTH,
+                    height: HEIGHT,
                     x_ratio: video.videoWidth / WIDTH,
                     y_ratio: video.videoHeight / HEIGHT
                 }
