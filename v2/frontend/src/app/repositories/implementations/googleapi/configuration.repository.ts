@@ -37,11 +37,11 @@ export class ConfigurationRepository implements ConfigurationInterface {
         return this.googleApi.upload_file(file, folders['fonts'])
     }
 
-    download_image_from_gcs(url : string) : Promise<string> {
+    download_image_from_gcs(url : string) : Promise<any> {
         return this.googleApi.download_gcs_file(url)
     }
 
-    download_base_video_from_drive(url : string) : Promise<string> {
+    download_base_video_from_drive(url : string) : Promise<any> {
         return this.googleApi.download_file(url)
     }
 

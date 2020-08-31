@@ -16,39 +16,34 @@
 
 import { Injectable } from '@angular/core';
 import { ConfigurationRepository } from './configuration.repository';
-import { environment } from 'environments/environment';
 
 @Injectable({providedIn: 'root'})
 export class CachedConfigurationRepository extends ConfigurationRepository {
 
+    // In-Memory ephemeral cache to avoid calling network so often
+    cache : Map<string, any> = new Map<string, any>();
+
     public clear_cache() {
-        Object.values(environment.local_storage_keys)
-            .forEach(key => localStorage.removeItem(key))
+        this.cache.clear()
     }
 
-    async load_fonts(evict : boolean = false): Promise<Map<string, any>> {
-
-        if (evict)
-            localStorage.removeItem(environment.local_storage_keys.fonts)
-
-        return (await this.load_data<Map<string, any>>(environment.local_storage_keys.fonts, super.load_fonts.bind(this)))
+    async download_image_from_gcs(url : string) : Promise<any> {
+        return (await this.load_data(url, super.download_image_from_gcs.bind(this, url)))
     }
 
-    private load_from_cache(key : string) {
-        return localStorage.getItem(key)
+    async download_base_video_from_drive(url : string) : Promise<any> {
+        return (await this.load_data(url, super.download_base_video_from_drive.bind(this, url)))
     }
 
-    private save_to_cache(key : string, value : Object) {
-        localStorage.setItem(key, JSON.stringify(value))
+    private save_to_cache(key : string, value : any) {
+        this.cache.set(key, value)
     }
 
-    private async load_data<T>(key : string, fallback : Function) : Promise<T> {
+    private async load_data(key : string, fallback : Function) {
 
         // Check local cache
-        const data = this.load_from_cache(key)
-
-        if (data != null)
-            return JSON.parse(data) as T
+        if (this.cache.has(key))
+            return this.cache.get(key)
 
         // Fetch new data
         const fallback_data = await fallback()

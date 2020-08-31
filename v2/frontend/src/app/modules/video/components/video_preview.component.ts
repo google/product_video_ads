@@ -79,7 +79,10 @@ export class VideoPreviewComponent implements OnInit {
                 }
 
                 // Take screenshots based on configs
-                this.configs.forEach(this.take_screenshots_from_configs.bind(this))
+                for( let c of this.configs) {
+                    console.log('Loading ' + c.group)
+                    await this.take_screenshots_from_configs(c)
+                }
             }
 
             video.src = `data:video/mp4;base64,${btoa(data)}`

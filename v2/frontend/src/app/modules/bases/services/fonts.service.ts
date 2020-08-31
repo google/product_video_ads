@@ -18,7 +18,6 @@ import { Injectable } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
 import { CachedConfigurationRepository } from 'app/repositories/implementations/googleapi/cached-configuration.repository'
 import { LoginService } from 'app/modules/login/services/login.service'
-import { environment } from 'environments/environment'
 
 @Injectable({
     providedIn: 'root'
@@ -46,6 +45,6 @@ export class FontsService {
     }
 
     async reload_fonts() : Promise<any> {
-        return this._fonts.next(await this.repository.load_fonts(true))
+        return this._fonts.next(await this.repository.load_fonts())
     }
 }
