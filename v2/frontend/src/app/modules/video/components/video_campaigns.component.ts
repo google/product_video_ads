@@ -101,12 +101,12 @@ export class VideoCampaignsComponent implements OnInit {
     }
 
     add_single_video(product_keys, configs, campaign_configs) {
-      this.add_video(product_keys, configs, campaign_configs, 'Single')
+      this.add_video(this.facade.generate_final_configs(configs, this.base, product_keys), campaign_configs, 'Single')
       this._snackBar.open('Single ad scheduled (check Ads section above)', 'OK', { duration: 4000 })
     }
     
-    private add_video(product_keys, configs, campaign_configs, name) {
-      this.facade.add_production_video(configs, this.base, product_keys, campaign_configs, name).then(response => {
+    private add_video(configs, campaign_configs, name) {
+      this.facade.add_production_video(configs, this.base, campaign_configs, name).then(response => {
         this.mode = ''
       })
     }
@@ -141,9 +141,14 @@ export class VideoCampaignsComponent implements OnInit {
           let sorted_products = group_products.slice(video, video + this.base.products.length)
                                               .sort((a, b) => a.position - b.position)
 
+          // Keys
+          let product_keys = sorted_products.map(p => p.id)
+
+          // Offer Type Configs
+          let configs = sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type))
+
           this.add_video(
-            sorted_products.map(p => p.id),
-            sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type)),
+            this.facade.generate_final_configs(configs, this.base, product_keys),
             campaign_configs,
             group
           )

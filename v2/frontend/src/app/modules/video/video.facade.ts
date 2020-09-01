@@ -94,7 +94,7 @@ export class VideoFacade {
             return this.videoService.add_preview_video(configs, base.title, name)
         }
 
-        add_production_video(configs : Array<Config>, base : Base, product_keys : any, campaign_configs : any, name : string) {
+        add_production_video(configs : Array<Config>, base : Base, campaign_configs : any, name : string) {
 
             const campaign = new Campaign(
                 campaign_configs.account,
