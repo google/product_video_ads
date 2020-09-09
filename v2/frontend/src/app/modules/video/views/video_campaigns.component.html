@@ -14,7 +14,7 @@
    limitations under the License.
 -->
 
-<h2 class="main_title">Configure Ad Campaign</h2>
+<h2 class="main_title">Configure Asset</h2>
 <div class="inner_content">
 
     <!-- Shows generated videos and logs, if there's any -->
@@ -43,8 +43,7 @@
 
               <div style="margin: 1% 0; color: blue"><b>{{video.status}}</b></div>
 
-              <div><b>{{video.campaign.account_id}}</b></div>
-              <div>({{video.campaign.campaign_name}})</div>
+              <div><b>{{video.visibility}}</b></div>
 
               <br/>
 
@@ -71,8 +70,7 @@
               <div><b>{{video.name}}</b></div>
               <div>({{video.base_video}})</div>
 
-              <div><b>{{video.campaign.account_id}}</b></div>
-              <div>({{video.campaign.campaign_name}})</div>
+              <div><b>{{video.visibility}}</b></div>
 
               <br/>
 
@@ -168,65 +166,31 @@
 
       <br/>
 
-      <!-- Account -->
+      <!-- Name -->
       <mat-form-field class="example-full-width">
-        <mat-label>Account</mat-label>
-        <input [(ngModel)]="campaign.account" placeholder="123-456-7890" matInput>
+        <mat-label>Name</mat-label>
+        <input [(ngModel)]="video_metadata.name" placeholder="Name" matInput>
       </mat-form-field>
 
-      <!-- Campaign -->
+      <!-- Description -->
       <mat-form-field class="example-full-width">
-        <mat-label>Campaign</mat-label>
-        <input [(ngModel)]="campaign.campaign" placeholder="Created Campaign Name" matInput>
+        <mat-label>Description</mat-label>
+        <input [(ngModel)]="video_metadata.description" placeholder="Description" matInput>
       </mat-form-field>
 
-      <!-- URL -->
+      <!-- Visibility -->
       <mat-form-field class="example-full-width">
-        <mat-label>URL (after click)</mat-label>
-        <input [(ngModel)]="campaign.url" placeholder="https://google.com" matInput>
-      </mat-form-field>
-
-      <!-- Call to Action -->
-      <mat-form-field class="example-full-width">
-        <mat-label>Call To Action (button text)</mat-label>
-        <input [(ngModel)]="campaign.call_to_action" placeholder="Check it" matInput>
-      </mat-form-field>
-
-      <!-- AdGroup Type -->
-      <mat-form-field class="example-full-width">
-        <mat-label>Type of Ad</mat-label>
-        <mat-select [(ngModel)]="campaign.adgroup_type">
-          <mat-option *ngFor="let type of ad_group_types" [value]="type[0]">
-            {{type[1]}}
+        <mat-label>Visibility</mat-label>
+        <mat-select [(ngModel)]="video_metadata.visibility">
+          <mat-option *ngFor="let visibility of visibilities" [value]="visibility">
+            {{visibility}}
           </mat-option>
         </mat-select>
       </mat-form-field>
 
-      <br/>
-
-      <h3>Targets <a href="https://developers.google.com/adwords/api/docs/appendix/geotargeting" target="_blank">(locations)</a></h3>
-
-      <!-- Target: location -->
-      <mat-form-field class="example-full-width">
-        <mat-label>Location</mat-label>
-        <input [(ngModel)]="campaign.target_location" placeholder="1234,5678,9087" matInput>
-      </mat-form-field>
-
-      <!-- Target: age
-      <mat-form-field class="example-full-width">
-        <mat-label>Age</mat-label>
-        <input [(ngModel)]="campaign.target_age" matInput>
-      </mat-form-field> -->
-
-      <!-- Target: user interest
-      <mat-form-field class="example-full-width">
-        <mat-label>User Interest</mat-label>
-        <input [(ngModel)]="campaign.target_user_interest" matInput>
-      </mat-form-field> -->
-
       <br/><br/>
 
-      <button mat-stroked-button [disabled]="!is_all_filled()" (click)="add_single_video(product_keys, configs, campaign)">Create Ad</button>
+      <button mat-stroked-button [disabled]="!is_all_filled()" (click)="add_single_video(product_keys, configs, video_metadata)">Create Asset</button>
     </div>
 
     <!-- Configure bulk video creation -->
@@ -252,66 +216,26 @@
 
         <div class="campaign_config" *ngIf="selected_groups.has(group.key)">
 
-          <!-- Account -->
+          <!-- Name -->
           <mat-form-field class="example-full-width">
-            <mat-label>Account</mat-label>
-            <input [(ngModel)]="selected_groups.get(group.key).account" placeholder="123-456-7890" matInput>
+            <mat-label>Name</mat-label>
+            <input [(ngModel)]="selected_groups.get(group.key).name" placeholder="Name" matInput>
           </mat-form-field>
 
-          <!-- Campaign -->
+          <!-- Description -->
           <mat-form-field class="example-full-width">
-            <mat-label>Campaign</mat-label>
-            <input [(ngModel)]="selected_groups.get(group.key).campaign" placeholder="Created Campaign Name" matInput>
+            <mat-label>Description</mat-label>
+            <input [(ngModel)]="selected_groups.get(group.key).description" placeholder="Description" matInput>
           </mat-form-field>
 
-          <!-- URL -->
+          <!-- Visibility -->
           <mat-form-field class="example-full-width">
-            <mat-label>URL (after click)</mat-label>
-            <input [(ngModel)]="selected_groups.get(group.key).url" placeholder="https://google.com" matInput>
-          </mat-form-field>
-
-          <!-- Call to Action -->
-          <mat-form-field class="example-full-width">
-            <mat-label>Call To Action (button text)</mat-label>
-            <input [(ngModel)]="selected_groups.get(group.key).call_to_action" placeholder="Check Now" matInput>
-          </mat-form-field>
-
-          <!-- AdGroup Type -->
-          <mat-form-field class="example-full-width">
-            <mat-label>Type of Ad</mat-label>
-            <mat-select [(ngModel)]="selected_groups.get(group.key).adgroup_type">
-              <mat-option *ngFor="let type of ad_group_types" [value]="type[0]">
-                {{type[1]}}
+            <mat-label>Visibility</mat-label>
+            <mat-select [(ngModel)]="selected_groups.get(group.key).visibility">
+              <mat-option *ngFor="let visibility of visibilities" [value]="visibility">
+                {{visibility}}
               </mat-option>
             </mat-select>
-          </mat-form-field>
-
-          <br/>
-
-          <h3>Targets <a href="https://developers.google.com/adwords/api/docs/appendix/geotargeting" target="_blank">(locations)</a></h3>
-
-          <!-- Target: location -->
-          <mat-form-field class="example-full-width">
-            <mat-label>Location</mat-label>
-            <input [(ngModel)]="selected_groups.get(group.key).target_location" placeholder="1234,5678,9087" matInput>
-          </mat-form-field>
-
-          <!-- Target: age
-          <mat-form-field class="example-full-width">
-            <mat-label>Age</mat-label>
-            <input [(ngModel)]="selected_groups.get(group.key).target_age" matInput>
-          </mat-form-field> -->
-
-          <!-- Target: user interest
-          <mat-form-field class="example-full-width">
-            <mat-label>User Interest</mat-label>
-            <input [(ngModel)]="selected_groups.get(group.key).target_user_interest" matInput>
-          </mat-form-field> -->
-
-          <!-- Audience Lists -->
-          <mat-form-field class="example-full-width">
-            <mat-label>Audience</mat-label>
-            <input [(ngModel)]="selected_groups.get(group.key).audience_list" placeholder="audience1,audience2" matInput>
           </mat-form-field>
 
         </div>
@@ -323,6 +247,6 @@
 
       <br/><br/>
 
-      <button mat-stroked-button (click)="create_bulk()">Create Ads</button>
+      <button mat-stroked-button (click)="create_bulk()">Create Assets</button>
     </div>
   </div>

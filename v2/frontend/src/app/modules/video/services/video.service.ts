@@ -20,7 +20,6 @@ import { Video } from 'app/models/video'
 import { CachedConfigurationRepository } from 'app/repositories/implementations/googleapi/cached-configuration.repository'
 import { LoginService } from 'app/modules/login/services/login.service'
 import { Config } from 'app/models/config'
-import { Campaign } from 'app/models/campaign'
 
 @Injectable({providedIn: 'root'})
 export class VideoService {
@@ -51,15 +50,23 @@ export class VideoService {
     }
 
     add_preview_video(configs : Array<Config>, base : string, name : string) {
-        return this.add_video(configs, base, 'Preview', name)
+        return this.add_video(configs, base, 'Preview', {'name': name })
     }
 
-    add_production_video(configs : Array<Config>, base : string, campaign : Campaign, name : string) {
-        return this.add_video(configs, base, 'On', name, campaign)
+    add_production_video(configs : Array<Config>, base : string, video_metadata : any) {
+        return this.add_video(configs, base, 'On', video_metadata)
     }
 
-    private add_video(configs : Array<Config>, base : string, status : string, name : string, campaign? : Campaign) {
-        this._videos.next([...this.videos, new Video(new Date().toLocaleString('pt-BR'), name, configs, base, status, campaign)])
+    private add_video(configs : Array<Config>, base : string, status : string, video_metadata : any) {
+        this._videos.next([...this.videos, new Video(
+            new Date().toLocaleString('pt-BR'), 
+            video_metadata.name, 
+            video_metadata.description, 
+            video_metadata.visibility,
+            configs, 
+            base, 
+            status
+        )])
         return this.repository.save_videos(this.videos)
     }
 

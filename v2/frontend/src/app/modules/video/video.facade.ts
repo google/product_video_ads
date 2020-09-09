@@ -23,7 +23,6 @@ import { Config } from 'app/models/config';
 import { VideoService } from './services/video.service';
 import { Product } from 'app/models/product';
 import { Base } from 'app/models/base';
-import { Campaign } from 'app/models/campaign';
 
 @Injectable()
 export class VideoFacade {
@@ -94,21 +93,8 @@ export class VideoFacade {
             return this.videoService.add_preview_video(configs, base.title, name)
         }
 
-        add_production_video(configs : Array<Config>, base : Base, campaign_configs : any, name : string) {
-
-            const campaign = new Campaign(
-                campaign_configs.account,
-                campaign_configs.campaign,
-                campaign_configs.target_location,
-                campaign_configs.target_age,
-                campaign_configs.target_user_interest,
-                campaign_configs.url,
-                campaign_configs.call_to_action,
-                campaign_configs.adgroup_type,
-                campaign_configs.audience_list
-            )
-
-            return this.videoService.add_production_video(configs, base.title, campaign, name)
+        add_production_video(configs : Array<Config>, base : Base, video_metadata : any) {
+            return this.videoService.add_production_video(configs, base.title, video_metadata)
         }
         
         get_available_groups_for_base() : Map<string, Product[]> {

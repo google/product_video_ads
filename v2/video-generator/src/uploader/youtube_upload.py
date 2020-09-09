@@ -89,15 +89,14 @@ class YoutubeUploader():
 
         return response["id"]
 
-    def upload_video(self, output_file_path):
+    def upload_video(self, name, description, visibility, output_file_path):
 
         body = dict(
             snippet=dict(
-                title=output_file_path.split('/')[-1],
-                # description=options["description"],
-                # categoryId=options["category"]),
+                title=name,
+                description=description
             ),
-            status=dict(privacyStatus='unlisted'))
+            status=dict(privacyStatus=visibility))
 
         # Call the API's videos.insert method to create and upload the video.
         insert_request = self.youtube.videos().insert(

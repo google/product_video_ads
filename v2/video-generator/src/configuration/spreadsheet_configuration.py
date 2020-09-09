@@ -106,9 +106,9 @@ class SpreadsheetConfiguration(object):
 
     def get_campaign_config(self):
         """Return will be in the following format:
-       [configs, base_name, status]
+       [name, description, visibility, configs, base_name, status]
     """
-        return map(lambda c: [json.loads(c[0]), c[1], c[2]],
+        return map(lambda c: [c[0], c[1], c[2], json.loads(c[3]), c[4], c[5]],
                    self.__get_named_range_values(self.CAMPAIGN_NAMED_RANGE)
                    )
 

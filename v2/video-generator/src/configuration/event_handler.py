@@ -46,7 +46,7 @@ class EventHandler():
         # Go through all configured ads
         for row, campaign in enumerate(campaign_config):
 
-            (configs, base_name, status) = campaign
+            (name, description, visibility, configs, base_name, status) = campaign
 
             # Not handled
             if status not in self.HANDLED_STATUS:
@@ -58,6 +58,9 @@ class EventHandler():
             base_file_name = base_videos.get(base_name)
 
             config = {
+                'name': name,
+                'description': description,
+                'visibility': visibility,
                 'base_file': base_file_name,
                 'configs': configs,
                 'products_data': products_data

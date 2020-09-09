@@ -35,11 +35,7 @@ export class VideoCampaignsComponent implements OnInit {
   drive_url = 'https://drive.google.com/uc?export=download&id='
   yt_url = 'https://www.youtube.com/embed/'
 
-  ad_group_types = [['TRUE_VIEW_IN_STREAM', 'TRUE_VIEW_IN_STREAM'],
-  ['TRUE_VIEW_IN_STREAM', 'TRUE_VIEW_FOR_ACTION'],
-  ['TRUE_VIEW_IN_DISPLAY', 'TRUE_VIEW_IN_DISPLAY'],
-  ['NON_SKIPPABLE_IN_STREAM', 'NON_SKIPPABLE_IN_STREAM'],
-  ['BUMPER', 'BUMPER']]
+ visibilities = ['unlisted', 'public']
   
   // Data to view
   bases : Observable<Base[]>
@@ -57,7 +53,7 @@ export class VideoCampaignsComponent implements OnInit {
   base : Base
   configs : Array<any>
   product_keys: Array<any>
-  campaign : any = {}
+  video_metadata : any = {}
   
   constructor(private facade : VideoFacade, public sanitizer: DomSanitizer, private _snackBar: MatSnackBar) {
       this.offer_types = this.facade.offer_types$
@@ -100,13 +96,13 @@ export class VideoCampaignsComponent implements OnInit {
       return !this.configs.includes(undefined) && !this.product_keys.includes(undefined)
     }
 
-    add_single_video(product_keys, configs, campaign_configs) {
-      this.add_video(this.facade.generate_final_configs(configs, this.base, product_keys), campaign_configs, 'Single')
+    add_single_video(product_keys, configs, video_metadata) {
+      this.add_video(this.facade.generate_final_configs(configs, this.base, product_keys), video_metadata)
       this._snackBar.open('Single ad scheduled (check Ads section above)', 'OK', { duration: 4000 })
     }
     
-    private add_video(configs, campaign_configs, name) {
-      this.facade.add_production_video(configs, this.base, campaign_configs, name).then(response => {
+    private add_video(configs, video_metadata) {
+      this.facade.add_production_video(configs, this.base, video_metadata).then(response => {
         this.mode = ''
       })
     }
@@ -131,7 +127,7 @@ export class VideoCampaignsComponent implements OnInit {
 
     create_bulk() {
 
-      for(let [group, campaign_configs] of this.selected_groups.entries()) {
+      for(let [group, video_metadata] of this.selected_groups.entries()) {
 
         const group_products = this.product_groups.get(group)
 
@@ -149,8 +145,7 @@ export class VideoCampaignsComponent implements OnInit {
 
           this.add_video(
             this.facade.generate_final_configs(configs, this.base, product_keys),
-            campaign_configs,
-            group
+            video_metadata
           )
         }
       }

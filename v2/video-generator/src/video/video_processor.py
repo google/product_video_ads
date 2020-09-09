@@ -46,7 +46,12 @@ class VideoProcessor():
                 video_id = self.storage.upload_to_preview(output_video)
             else:
                 # Uploads video to YouTube and retrieve the ID
-                video_id = self.uploader.upload_video(output_video)
+                video_id = self.uploader.upload_video(
+                    config['name'] or output_video.split('/')[-1],
+                    config['description'],
+                    config['visibility'],
+                    output_video
+                )
 
             # Finally, deletes local file since it's not needed anymore
             self.storage.delete_file(output_video)
