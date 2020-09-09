@@ -1,34 +1,16 @@
 # Product Video Ads
 
-## About
+## Check out go/cse-pva
 
-This solution was created by **gTech CSEs** and the main purpose it to **enable
-retailers to use video ads for performance, advertising their products**.
+## Templates (need to make a manual copy for now)
+**Spreadsheet**: https://docs.google.com/spreadsheets/d/1yqn2zyCCIluXUEmlMcvCgWxQdTPTaAuherozaFjJzFQ
 
-PVA creates videos by connecting any product feed to a base
-video (which is basically a plain video with some blank spaces where dynamic
-content will be placed). It **uploads generated video to Youtube and also create
-video ad on Google Ads, keeping track of price changes automatically**!
+**Drive**: https://drive.google.com/corp/drive/u/0/folders/1fG2pUo5obYJDkZmyoxhjVc_h9-WuW5Xr
 
-Note that "product feed" may be anything as long it's integrated to the configuration spreadsheet.
-The one integration already available is **Merchant Center products** retrieve using Content API, which makes it a lot easier to retailers to create their videos!
+## Run this command on Cloud Shell to start:
+ ```gsutil cp gs://product-video-ads/install.sh . && sh install.sh```
 
-That's Product Video Ads - and remember `This is not an officially supported
-Google product.`
+## To grant customer access to repository:
 
-## Resources
-
-Installation and usage guide:
-https://docs.google.com/presentation/d/1cfPnbv_4WRU4dfzzzJZqEkmqPg9hSzL30xuAwTPOcSQ
-
-## Project
-
-It's composed by following folders:
-
--   **adscripts**: Google Ads scripts to manage AdGroups and video ads on MCC
--   **appscripts**: Google AppsScripts linked to configuration folder which
-    tracks prices and load products from Merchant Center
--   **video-generator**: Python application which generates videos
--   **pva-frontend**: Web interface to manage all configuration (using Spreadsheet as database)
--   **authenticator**: Simple AppEngine Flask webpage to authenticate user on
-    Google Account and download token to be used by video-generator
+```gob-ctl acl cse --reader email/user@customer.com```
+```gob-ctl acl cse/solutions/product-video-ads --reader email/user@customer.com```
