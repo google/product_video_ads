@@ -53,6 +53,7 @@ export class OfferTypeComponent implements OnInit {
   base_specs
 
   constructor(public facade: OfferTypeFacade, private helper: InterfaceHelper, private _snackBar: MatSnackBar) {
+
     this.offer_types = this.facade.offer_types$
 
     this.facade.bases.subscribe(bases => {
@@ -231,14 +232,13 @@ export class OfferTypeComponent implements OnInit {
     this.finish()
   }
 
-  public delete_element(id) {
+  public delete_element({ id, event }) {
 
-    event.preventDefault();
+    // Need to hold shift in order to delete element
+    if(event && event.shiftKey)
+      this.elements = this.elements.filter(e => e.id != id)
 
-    // Delete from screen
-    this.elements = this.elements.filter(e => e.id != id)
-
-    return false;
+    return false
   }
 
   public send_to_back(element) {

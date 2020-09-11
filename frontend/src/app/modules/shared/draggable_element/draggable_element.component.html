@@ -4,7 +4,7 @@
     *ngIf="element.view_type == 'text'" 
      id="{{element.id}}" 
      innerHTML={{element.content}} 
-     (dblclick)="dblclick.emit(element.id)"
+     (dblclick)="dblclick.emit({id: element.id, event: $event})"
      (click)="singleclick.emit(element)"
      (cdkDragEnded)="on_drag_element({event: $event, element: element})"
      [ngStyle]="{
@@ -31,7 +31,7 @@
   *ngIf="element.view_type == 'image'" 
     id="{{element.id}}"
     cdkDrag
-    (dblclick)="dblclick.emit(element.id)"
+    (dblclick)="dblclick.emit({id: element.id, event: $event})"
     (click)="singleclick.emit(element)"
     (cdkDragEnded)="on_drag_element({event: $event, element: element})"
   [ngStyle]="{

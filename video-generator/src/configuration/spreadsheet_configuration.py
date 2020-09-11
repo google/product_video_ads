@@ -25,7 +25,7 @@ class SpreadsheetConfiguration(object):
     # Configuration ranges
     BASE_VIDEOS_NAMED_RANGE = 'Bases'
     CAMPAIGN_NAMED_RANGE = 'ProductsBaseStatus'
-    # PRODUCTS_NAMED_RANGE = 'ProductsCustom'
+    STOP_GENERATION = 'StopGeneration'
     PRODUCTS_RANGE = 'Prices!A1:ZZ'
     ASSETS_NAMED_RANGE = 'Assets'
     STATUS_VIDEO_NAMED_RANGE = 'StatusVideoId'
@@ -69,6 +69,22 @@ class SpreadsheetConfiguration(object):
             body={
                 'values': [[message[:4900]]]
             }).execute()
+
+    '''def stop_processing(self):
+        current_value = self.__get_named_range_values(self.STOP_GENERATION)[0][0]
+
+        if current_value == 'TRUE':
+            range_a1_notation = self.__get_named_range_A1_notation(self.STOP_GENERATION)
+
+            self.sheet.values().update(
+                spreadsheetId=self.spreadsheet_id,
+                range=range_a1_notation['str'](),
+                valueInputOption='RAW',
+                body={'values': ['FALSE']}).execute()
+
+            self.logger.info('Updating stop processing to FALSE')
+
+        return current_value == 'TRUE'''
 
     def update_status(self, row, video_id, status):
 

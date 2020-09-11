@@ -30,6 +30,7 @@
   
       <!-- Content -->
       <button mat-stroked-button (click)="update_video()">Update</button>
+      <button mat-stroked-button color="warn" style="margin-left: 0.5%" (click)="delete_all_videos()">Delete all</button>
 
       <br/><br/>
 
@@ -65,6 +66,10 @@
           <div style="border:1px solid #000; margin: 10% 0; padding: 5%">
             <mat-icon aria-hidden="false" aria-label="access_time icon">access_time</mat-icon>
             <p>Generating asset...</p>
+            <br/>
+            <span style="cursor: pointer" (click)="delete_video(video)">
+              <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
+            </span>
           </div>
         </div>
 

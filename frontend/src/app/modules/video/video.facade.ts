@@ -136,6 +136,10 @@ export class VideoFacade {
             return this.videoService.delete_video(generated_video)
         }
 
+        delete_all_videos() {
+            return this.videoService.delete_all_videos()
+        }
+
         get_products_by_offer_group(group : string) {
             return this.productsService.products.filter(prod => prod.group === group)
         }

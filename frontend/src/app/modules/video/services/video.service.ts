@@ -90,4 +90,9 @@ export class VideoService {
         this._videos.next(this.videos.filter(v => v.generated_video != generated_video))
         return this.repository.save_videos(this.videos)
     }
+
+    delete_all_videos() {
+        this._videos.next([])
+        return this.repository.save_videos(this.videos)
+    }
 }

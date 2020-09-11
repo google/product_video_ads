@@ -197,9 +197,9 @@ export class VideoComponent implements OnInit {
     delete_video(video : Video) {
 
       // Block deletions when videos are being generated
-      if(this.facade.is_generating()) {
-        this._snackBar.open('Cannot make deletions while videos are being generated', 'OK')
-        return
+      if (this.facade.is_generating()) {
+       this._snackBar.open('Cannot make deletions while videos are being generated', 'OK')
+       return
       }
 
       const video_name = video.generated_video || 'being generated'
@@ -208,7 +208,18 @@ export class VideoComponent implements OnInit {
         duration: 4000,
       }).onAction().subscribe(() => {
         this.facade.delete_video(video.generated_video).then(response => {
-          this._snackBar.open("Asset deleted (" + response.status + ')', 'OK', {
+          this._snackBar.open("Asset deleted (" + response.status + ')', 'OK', { duration: 2000 })
+        })
+      })
+    }
+
+    delete_all_videos() {
+
+      this._snackBar.open('Confirm deletion of all assets?', 'Confirm', {
+        duration: 4000,
+      }).onAction().subscribe(() => {
+        this.facade.delete_all_videos().then(response => {
+          this._snackBar.open("Assets deleted (" + response.status + ')', 'OK', {
             duration: 2000
           })
         })
