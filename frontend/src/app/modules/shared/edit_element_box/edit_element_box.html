@@ -1,7 +1,14 @@
 <div class="edit_box" *ngIf="element_focused" cdkDrag>
 
-  <div style="text-align: center; margin-top: 5%; font-weight: bold;">{{element_focused.field}}
-    ({{element_focused.type}})</div>
+  <div class="aligned_element">
+    {{element_focused.field}} ({{element_focused.type}})
+  </div>
+
+  <div class="aligned_element">
+    <span>{{element_focused.x.toFixed()}}</span>
+    <span> | </span>
+    <span>{{element_focused.y.toFixed()}}</span>
+  </div>
 
   <!-- Box to edit text element -->
   <div [hidden]="element_focused.view_type != 'text'">
