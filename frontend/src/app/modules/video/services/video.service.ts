@@ -17,6 +17,7 @@
 import { Injectable } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
 import { Video } from 'app/models/video'
+import { VideoMetadata } from 'app/models/video_metadata'
 import { CachedConfigurationRepository } from 'app/repositories/implementations/googleapi/cached-configuration.repository'
 import { LoginService } from 'app/modules/login/services/login.service'
 import { Config } from 'app/models/config'
@@ -49,24 +50,21 @@ export class VideoService {
         })
     }
 
-    add_preview_video(configs : Array<Config>, base : string, name : string) {
-        return this.add_video(configs, base, 'Preview', {'name': name })
+    add_preview_video(video_metadata : VideoMetadata) {
+        return this.add_video('Preview', video_metadata)
     }
 
-    add_production_video(configs : Array<Config>, base : string, video_metadata : any) {
-        return this.add_video(configs, base, 'On', video_metadata)
+    add_production_video(video_metadata : VideoMetadata) {
+        return this.add_video('On', video_metadata)
     }
 
-    private add_video(configs : Array<Config>, base : string, status : string, video_metadata : any) {
+    private add_video(status : string, video_metadata : VideoMetadata) {
         this._videos.next([...this.videos, new Video(
             new Date().toLocaleString('pt-BR'), 
-            video_metadata.name, 
-            video_metadata.description, 
-            video_metadata.visibility,
-            configs, 
-            base, 
+            video_metadata, 
             status
         )])
+        
         return this.repository.save_videos(this.videos)
     }
 

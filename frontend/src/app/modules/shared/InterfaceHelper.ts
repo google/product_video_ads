@@ -5,6 +5,7 @@ import { AssetsService } from '../static_assets/services/assets.service'
 import { ProductService } from '../products/services/product.service'
 import { Config } from 'app/models/config'
 import * as UUID from 'uuid/v4'
+import { Product } from 'app/models/product'
 
 @Injectable({providedIn: 'root'})
 export class InterfaceHelper {
@@ -118,7 +119,7 @@ export class InterfaceHelper {
         return content && (content.startsWith('http') || content.startsWith('gs://'))
     }
 
-    async parse_configs_to_elements(configs : Array<any>) : Promise<Array<any>> {
+    async parse_configs_to_elements(configs : Array<any>, products : Product[]) : Promise<Array<any>> {
 
         const elements = []
         const loaded_fonts : Set<string> = new Set<string>()
@@ -139,7 +140,7 @@ export class InterfaceHelper {
           } else {
     
             // Product
-            const current_product = this.productsService.products.filter(p => p.id == c.key)[0] || this.productsService.products[0]
+            const current_product = products.filter(p => p.id == c.key)[0] || products[0]
             const content = current_product.values[c.field]
     
             if (this.is_image(content))

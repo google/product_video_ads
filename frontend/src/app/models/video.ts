@@ -14,17 +14,13 @@
    limitations under the License.
 */
 
-import { Config } from './config'
+import { VideoMetadata } from './video_metadata'
 
 export class Video {
 
     constructor(
         public date : string = '',
-        public name : string = '',
-        public description : string = '',
-        public visibility : string = '',
-        public configs : Array<Config>,
-        public base_video : string,
+        public video_metadata : VideoMetadata,
         public status : string,
         public generated_video : string = ''
         ) {}
@@ -32,24 +28,16 @@ export class Video {
     public static from_video_array(video_array : Array<any>) : Video {
         return new Video(
             video_array[0],
-            video_array[1],
+            VideoMetadata.from_string_object(video_array[1]),
             video_array[2],
-            video_array[3],
-            JSON.parse(video_array[4] || '[]'),
-            video_array[5],
-            video_array[6],
-            video_array[7]
+            video_array[3]
         )
     }
             
     public static to_video_array(video : Video) : Array<any> {
         return [
             video.date,
-            video.name,
-            video.description,
-            video.visibility,
-            JSON.stringify(video.configs),
-            video.base_video,
+            VideoMetadata.to_string_object(video.video_metadata),
             video.status,
             video.generated_video
         ]

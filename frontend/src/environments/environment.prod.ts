@@ -29,8 +29,8 @@ export const environment = {
   },
 
   configuration: {
-    campaign_range: 'Campaigns!A2:Q',
-    product_range: 'Prices!A1:ZZ',
+    campaign_range: 'Campaigns!A2:D',
+    product_range: '!A1:ZZ',
     drive_folder: 'Configuration!C6',
     static_assets: 'Static!A2:C',
     offer_types_range: 'OfferTypes!A2:C',

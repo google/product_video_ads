@@ -47,7 +47,7 @@ def main():
     authenticator = TokenAuth(bucket_name, CloudStorageHandler())
     credentials = None
 
-    # Tries to retireve token from storage each 5 minutes
+    # Tries to retrieve token from storage each 5 minutes
     while True:
         credentials = authenticator.authenticate()
 

@@ -22,6 +22,7 @@ import { OfferTypeService } from '../offer_type/services/offer_type.service';
 import { Config } from 'app/models/config';
 import { VideoService } from './services/video.service';
 import { Product } from 'app/models/product';
+import { VideoMetadata } from 'app/models/video_metadata'
 import { Base } from 'app/models/base';
 
 @Injectable()
@@ -49,10 +50,6 @@ export class VideoFacade {
             return this.offerTypeService.offer_types$
         }
         
-        get products() {
-            return this.productsService.products$
-        }
-        
         get videos() {
             return this.videoService.videos$
         }
@@ -61,7 +58,15 @@ export class VideoFacade {
             return this.videoService.logs$
         }
 
-        public generate_final_configs(configs : Config[][], base : Base, product_keys : any) : Config[][] {
+        get_products(key? : string) : Promise<Product[]> {
+            return this.productsService.load_products_by_key(key)
+        }
+
+        get products_sheets$() {
+            return this.productsService.products_sheets$
+        }
+
+        public generate_final_configs(configs : Config[][], base : Base, product_keys : any) : Config[] {
             
             let final_configs = []
             
@@ -89,19 +94,19 @@ export class VideoFacade {
             return final_configs
         }
         
-        add_preview_video(configs : Array<Config>, base : Base, name : string) {
-            return this.videoService.add_preview_video(configs, base.title, name)
+        add_preview_video(video_metadata : VideoMetadata) {
+            return this.videoService.add_preview_video(video_metadata)
         }
 
-        add_production_video(configs : Array<Config>, base : Base, video_metadata : any) {
-            return this.videoService.add_production_video(configs, base.title, video_metadata)
+        add_production_video(video_metadata : VideoMetadata) {
+            return this.videoService.add_production_video(video_metadata)
         }
         
-        get_available_groups_for_base() : Map<string, Product[]> {
+        get_available_groups_for_base(products : Product[]) : Map<string, Product[]> {
             
             const groups : Map<string, Product[]> = new Map<string, Product[]>()
 
-            for(let product of this.productsService.products) {
+            for(let product of products) {
                 const group_products = groups.get(product.group) || []
                 group_products.push(product)
                 groups.set(product.group, group_products)
@@ -131,6 +136,10 @@ export class VideoFacade {
         reload_products() : void {
             this.productsService.reload_products()
         }
+
+        reload_products_sheets() : void {
+            this.productsService.load_products_sheets()
+        }
         
         delete_video(generated_video : string) {
             return this.videoService.delete_video(generated_video)
@@ -138,10 +147,6 @@ export class VideoFacade {
 
         delete_all_videos() {
             return this.videoService.delete_all_videos()
-        }
-
-        get_products_by_offer_group(group : string) {
-            return this.productsService.products.filter(prod => prod.group === group)
         }
 
         public validate_groups(product_groups : Map<string, Product[]>, base_product_count : number) : Map<string, string[]> {

@@ -19,7 +19,8 @@ import log
 logger = log.getLogger()
 
 
-class EventHandler():
+class EventHandler:
+
     VIDEO_READY_STATUS = 'Video Ready'
     IMAGE_READY_STATUS = 'Image Ready'
     NOT_STARTED_STATUS = 'Not Started'
@@ -34,9 +35,6 @@ class EventHandler():
     def handle_configuration(self):
         """Generate custom videos/images according to the given configuration."""
 
-        # All products title, price and image url
-        products_data = self.configuration.get_products_data()
-
         # All bases name and files
         base_videos = self.configuration.get_all_bases()
 
@@ -46,7 +44,7 @@ class EventHandler():
         # Go through all configured ads
         for row, campaign in enumerate(campaign_config):
 
-            (name, description, visibility, configs, base_name, status) = campaign
+            (date, metadata, status) = campaign
 
             # Not handled
             if status not in self.HANDLED_STATUS:
@@ -55,15 +53,16 @@ class EventHandler():
             # Skip header and starts on 1 instead of 0
             row = str(row + 2)
 
-            base_file_name = base_videos.get(base_name)
+            # Find base file by its name
+            base_file_name = base_videos.get(metadata['base_video'])
 
             config = {
-                'name': name,
-                'description': description,
-                'visibility': visibility,
+                'name': metadata.get('name', 'Unnamed'),
+                'description': metadata.get('description', ''),
+                'visibility': metadata.get('visibility', ''),
                 'base_file': base_file_name,
-                'configs': configs,
-                'products_data': products_data
+                'configs': metadata['configs'],
+                'products_data': self.configuration.get_products_data(metadata['products_label'])
             }
 
             logger.info('[Event Handler] Handling new creative with base %s' % base_file_name)

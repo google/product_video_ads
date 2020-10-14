@@ -14,11 +14,11 @@
    limitations under the License.
 -->
 
-<h2 class="main_title">Preview</h2>
+<h2 class="main_title">Generate</h2>
 <div class="inner_content">
 
   <!-- Shows generated videos and logs, if there's any -->
-  <div *ngIf="(videos | async).length > 0 && (bases$ | async).length > 0">
+  <div *ngIf="(videos$ | async).length > 0 && (bases$ | async).length > 0">
 
     <!-- Videos already created -->
     <mat-expansion-panel expanded="false">
@@ -34,13 +34,14 @@
 
       <br/><br/>
 
-      <span *ngFor="let video of videos | async">
+      <span *ngFor="let video of videos$ | async">
 
+        <!-- Preview asset ready on Drive-->
         <div *ngIf="video.generated_video && video.status == 'Not Started'" class="added_item video_box" >
           
           <div>{{video.date}}</div>
-          <div><b>{{video.name}}</b></div>
-          <div>({{video.base_video}})</div>
+          <div><b>{{video.video_metadata.name}}</b></div>
+          <div>({{video.video_metadata.base_video}})</div>
 
           <video *ngIf="is_video(video)" width="200" height="150" controls>
               <source [src]="drive_url + video.generated_video" type="video/mp4">
@@ -57,11 +58,12 @@
           </span>
         </div>
 
+        <!-- Preview asset to be generated -->
         <div class="added_item video_box" *ngIf="video.status == 'Preview'">
 
           <div>{{video.date}}</div>
-          <div><b>{{video.name}}</b></div>
-          <div>({{video.base_video}})</div>
+          <div><b>{{video.video_metadata.name}}</b></div>
+          <div>({{video.video_metadata.base_video}})</div>
 
           <div style="border:1px solid #000; margin: 10% 0; padding: 5%">
             <mat-icon aria-hidden="false" aria-label="access_time icon">access_time</mat-icon>
@@ -72,6 +74,51 @@
             </span>
           </div>
         </div>
+
+        <!-- YT video to be generated -->
+        <div *ngIf="video.status == 'On'" class="added_item video_box">
+
+          <div>{{video.date}}</div>
+          <div><b>{{video.video_metadata.name}}</b></div>
+          <div>({{video.video_metadata.base_video}})</div>
+
+          <div><b>{{video.video_metadata.visibility}}</b></div>
+
+          <br/>
+
+          <mat-icon aria-hidden="false" aria-label="access_time icon">access_time</mat-icon>
+          <p style="margin: 1% 0; color: blue"><b>Generating asset</b></p>
+
+          <span style="cursor: pointer" (click)="delete_video(video)">
+            <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
+          </span>
+      </div>
+
+      <!-- YT video ready-->
+      <div *ngIf="video.generated_video && ['Running', 'Video Ready'].indexOf(video.status) >= 0" class="added_item video_box">
+              
+        <div>{{video.date}}</div>
+        <div><b>{{video.video_metadata.name}}</b></div>
+        <div>({{video.video_metadata.base_video}})</div>
+
+        <div style="margin: 1% 0; color: blue"><b>{{video.status}}</b></div>
+
+        <div><b>{{video.video_metadata.visibility}}</b></div>
+
+        <br/>
+
+        <iframe width="300" height="200"
+          [src]="sanitizer.bypassSecurityTrustResourceUrl(yt_url + video.generated_video)" frameborder="0" 
+          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+        </iframe>
+
+        <br/>
+
+        <span style="cursor: pointer" (click)="delete_video(video)">
+          <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
+        </span>
+
+    </div>
 
       </span>
     </mat-expansion-panel>
@@ -91,7 +138,7 @@
 
       <br/><br/>
 
-      <div class="log-line" *ngFor="let log of logs | async">
+      <div class="log-line" *ngFor="let log of logs$ | async">
         <span>{{log}}</span>
       </div>
 
@@ -109,19 +156,40 @@
     </div>
   </div>
 
-  <!-- Configure if it's preview or bulk creation -->
   <div *ngIf="base">
+    <h3>Select products to use:</h3>
+
+    <div class="added_item" [ngClass]="{'selected_box': product_sheet == key}" *ngFor="let key of products_sheets$ | async " (click)="choose_products(key)">
+      <p><b>{{key}}</b></p>
+    </div>
+  </div>
+
+  <!-- Configure if it's preview or bulk creation -->
+  <div *ngIf="products">
+    
     <h3>What do you want to do?</h3>
 
-    <div class="added_item" [ngClass]="{'selected_box': mode == 'single'}" (click)="select_single_video_mode()">
+    <div class="added_item" [ngClass]="{'selected_box': mode == 'single' && !youtube}" (click)="select_single_video_mode()">
       <mat-icon aria-hidden="false" aria-label="video_label icon" title="video_label">video_label</mat-icon>
-      <p>Create <b>one</b><br/>single asset</p>
+      <p>Create <b>one</b><br/>single asset <b>(Preview)</b></p>
     </div>
 
-    <div class="added_item" [ngClass]="{'selected_box': mode == 'bulk'}" (click)="select_bulk_video_mode()">
+    <div class="added_item" [ngClass]="{'selected_box': mode == 'bulk' && !youtube}" (click)="select_bulk_video_mode()">
       <mat-icon aria-hidden="false" aria-label="video_library icon" title="video_library">video_library</mat-icon>
-      <p>Create <b>multiple</b><br/>assets in bulk</p>
+      <p>Create <b>multiple</b><br/>assets in bulk <b>(Preview)</b></p>
     </div>
+
+    <span *ngIf="is_base_video(base)">
+      <div class="added_item" [ngClass]="{'selected_box': mode == 'single' && youtube}" (click)="select_single_video_mode(true)">
+        <mat-icon aria-hidden="false" aria-label="video_label icon" title="video_label">ondemand_video</mat-icon>
+        <p>Create <b>one</b><br/>single asset <b>(YouTube)</b></p>
+      </div>
+
+      <div class="added_item" [ngClass]="{'selected_box': mode == 'bulk' && youtube}" (click)="select_bulk_video_mode(true)">
+        <mat-icon aria-hidden="false" aria-label="video_library icon" title="video_library">video_settings</mat-icon>
+        <p>Create <b>multiple</b><br/>assets in bulk <b>(YouTube)</b></p>
+      </div>
+    </span>
   </div>
 
   <!-- Configure single video -->
@@ -135,7 +203,7 @@
       <mat-form-field>
         <mat-label>Offer Type</mat-label>
         <mat-select [(ngModel)]="configs[i]">
-          <mat-option *ngFor="let type of (offer_types | async | filterOfferTypes: base.title)" [value]="type.configs">
+          <mat-option *ngFor="let type of (offer_types$ | async | filterOfferTypes: base.title)" [value]="type.configs">
             {{type.title}}
           </mat-option>
         </mat-select>
@@ -147,7 +215,7 @@
       <mat-form-field>
         <mat-label>Product</mat-label>
         <mat-select [(ngModel)]="product_keys[i]">
-          <mat-option *ngFor="let product of products | async" [value]="product.id">
+          <mat-option *ngFor="let product of products" [value]="product.id">
             {{product.id}} - {{product.values['Title']}}
           </mat-option>
         </mat-select>
@@ -155,9 +223,36 @@
 
     </div>
 
+    <div *ngIf="youtube">
+
+      <br/>
+
+        <!-- Name -->
+        <mat-form-field class="example-full-width">
+          <mat-label>Name</mat-label>
+          <input [(ngModel)]="video_metadata.name" placeholder="Name" matInput>
+        </mat-form-field>
+
+        <!-- Description -->
+        <mat-form-field class="example-full-width">
+          <mat-label>Description</mat-label>
+          <input [(ngModel)]="video_metadata.description" placeholder="Description" matInput>
+        </mat-form-field>
+
+        <!-- Visibility -->
+        <mat-form-field class="example-full-width">
+          <mat-label>Visibility</mat-label>
+          <mat-select [(ngModel)]="video_metadata.visibility">
+            <mat-option *ngFor="let visibility of visibilities" [value]="visibility">
+              {{visibility}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
     <br/><br/>
 
-    <button mat-stroked-button [disabled]="!is_all_filled()" (click)="add_single_video()">Create Asset</button>
+    <button mat-stroked-button [disabled]="!is_all_filled()" (click)="add_single_video(product_keys, configs, video_metadata)">Create Asset</button>
 
   </div>
 
@@ -184,6 +279,32 @@
                 {{error}}
               </div>
 
+              <div class="campaign_config" *ngIf="selected_groups.has(group.key) && youtube">
+
+                <!-- Name -->
+                <mat-form-field class="example-full-width">
+                  <mat-label>Name</mat-label>
+                  <input [(ngModel)]="selected_groups.get(group.key).name" placeholder="Name" matInput>
+                </mat-form-field>
+      
+                <!-- Description -->
+                <mat-form-field class="example-full-width">
+                  <mat-label>Description</mat-label>
+                  <input [(ngModel)]="selected_groups.get(group.key).description" placeholder="Description" matInput>
+                </mat-form-field>
+      
+                <!-- Visibility -->
+                <mat-form-field class="example-full-width">
+                  <mat-label>Visibility</mat-label>
+                  <mat-select [(ngModel)]="selected_groups.get(group.key).visibility">
+                    <mat-option *ngFor="let visibility of visibilities" [value]="visibility">
+                      {{visibility}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+      
+              </div>
+
           </section>
 
           <br/>
@@ -199,7 +320,7 @@
         <!-- After review -->
         <div *ngIf="final_configs.length > 0">
 
-          <app-video-preview  [base]="base" [configs]="final_configs"></app-video-preview>
+          <app-video-preview [base]="base" [configs]="final_configs" [products]="products"></app-video-preview>
 
           <br/><br/>
           

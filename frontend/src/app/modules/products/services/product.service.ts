@@ -28,12 +28,18 @@ export class ProductService {
     private is_ready : boolean = false
 
     private readonly _products = new BehaviorSubject<Product[]>([])
+    private readonly _products_sheets = new BehaviorSubject<string[]>([])
     
     /** Published state to application **/
     readonly products$ = this._products.asObservable()
+    readonly products_sheets$ = this._products_sheets.asObservable()
 
     get products() {
         return [...this._products.getValue()]
+    }
+
+    get products_sheets() {
+        return [...this._products_sheets.getValue()]
     }
 
     constructor(private productsRepository : CachedConfigurationRepository, loginService : LoginService) {
@@ -42,6 +48,7 @@ export class ProductService {
             if (ready == 1) {
                 this.is_ready = true
                 this.load_products()
+                this.load_products_sheets()
             }
         })
     }
@@ -50,6 +57,15 @@ export class ProductService {
         if (this.is_ready) {
             this._products.next(await this.productsRepository.load_products())
         }
+    }
+
+    public load_products_by_key(key : string) : Promise<Product[]> {
+        return this.productsRepository.load_products(key)
+    }
+
+    public async load_products_sheets() {
+        if (this.is_ready)
+            this._products_sheets.next(await this.productsRepository.load_products_sheets())
     }
 
     public reload_products() : void {

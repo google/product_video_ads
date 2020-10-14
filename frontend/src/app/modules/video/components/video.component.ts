@@ -22,6 +22,8 @@ import { Observable } from 'rxjs';
 import { Base } from 'app/models/base';
 import { OfferType } from 'app/models/offertype';
 import { Video } from 'app/models/video';
+import { VideoMetadata } from 'app/models/video_metadata';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-video',
@@ -32,43 +34,53 @@ import { Video } from 'app/models/video';
 export class VideoComponent implements OnInit {
 
   drive_url = 'https://drive.google.com/uc?export=download&id='
+  yt_url = 'https://www.youtube.com/embed/'
   
-  // Data to view
-  bases$ : Observable<Base[]>
-  products : Observable<Product[]>
-  offer_types : Observable<OfferType[]>
-  videos : Observable<Video[]>
-  logs : Observable<string[]>
+  visibilities = ['unlisted', 'public']
 
+  // Data to view flowing from services
+  bases$ : Observable<Base[]>
+  products_sheets$ : Observable<string[]>
+  offer_types$ : Observable<OfferType[]>
+  videos$ : Observable<Video[]>
+  logs$ : Observable<string[]>
+
+  // Chosen screen options
+  base : Base
+  product_sheet : string
+  products : Product[]
+  mode : string
+  youtube : boolean
+
+  // Video configuration from screen
   product_groups : Map<string, Product[]>
   product_groups_validations : Map<string, string[]>
-  selected_groups : Set<string>
-  mode : string
-  
-  // Chosen
-  base : Base
+  selected_groups : Map<string,  any> = new Map<string, any>()
   configs : Array<any>
   product_keys: Array<any>
   final_configs : Array<any>
+  video_metadata : any
   
-  constructor(private facade : VideoFacade, private _snackBar: MatSnackBar) {
-      this.offer_types = this.facade.offer_types$
-      this.videos = this.facade.videos
-      this.logs = this.facade.logs
-      this.final_configs = []
-      this.selected_groups = new Set<string>()
+  constructor(private facade : VideoFacade, public sanitizer: DomSanitizer, private _snackBar: MatSnackBar) {
+      this.bases$ = this.facade.bases$
+      this.products_sheets$ = this.facade.products_sheets$
+      this.offer_types$ = this.facade.offer_types$
+      this.videos$ = this.facade.videos
+      this.logs$ = this.facade.logs
     }
     
     ngOnInit() {
-      this.bases$ = this.facade.bases$
-      this.products = this.facade.products
-
-      this.facade.reload_products()
+      this.clear_screen_selections()
+      this.facade.reload_products_sheets()
     }
 
     is_video(video : Video) {
-      const video_base = this.facade.bases.filter(b => b.title == video.base_video)[0]
-      return video_base && video_base.file.endsWith('mp4')
+      const video_base = this.facade.bases.filter(b => b.title == video.video_metadata.base_video)[0]
+      return this.is_base_video(video_base)
+    }
+
+    is_base_video(base : Base) {
+      return base && base.file.endsWith('mp4')
     }
     
     choose_base(base : Base) {
@@ -78,26 +90,44 @@ export class VideoComponent implements OnInit {
       this.product_keys = new Array(base.products.length)
 
       this.base = base
+      this.products = undefined
+      this.product_sheet = undefined
       this.mode = ''
     }
 
-    select_single_video_mode() {
-      this.mode = 'single'
+    choose_products(key : string) {
+
+      // Chosen product sheet
+      this.product_sheet = key
+
       this.final_configs = []
+      this.mode = ''
+
+      // Load products chosen
+      this.facade.get_products(key).then(products => this.products = products)
+      this._snackBar.open('Loading products from ' + key, 'OK', { duration: 4000 })
     }
 
-    select_bulk_video_mode() {
-      this.product_groups = this.facade.get_available_groups_for_base()
+    select_single_video_mode(youtube) {
+      this.mode = 'single'
+      this.youtube = youtube != undefined
+    }
+
+    select_bulk_video_mode(youtube) {
+
+      // Load avaiable products groups and their validations already
+      this.product_groups = this.facade.get_available_groups_for_base(this.products)
       this.product_groups_validations = this.facade.validate_groups(this.product_groups, this.base.products.length)
 
       this.mode = 'bulk'
+      this.youtube = youtube != undefined
     }
 
     is_all_filled() {
       return !this.configs.includes(undefined) && !this.product_keys.includes(undefined)
     }
 
-    add_single_video() {
+    add_single_video(product_keys, configs, video_metadata) {
 
       // Block deletions when videos are being generated
       if(this.facade.is_generating()) {
@@ -105,25 +135,18 @@ export class VideoComponent implements OnInit {
         return
       }
 
+      // Create a single video
       this.add_video(
-        this.facade.generate_final_configs(this.configs, this.base, this.product_keys), 
-        this.base, 
-        'Preview'
+        video_metadata.name || 'Preview',
+        this.facade.generate_final_configs(configs, this.base, product_keys),
+        video_metadata.description,
+        video_metadata.visibility
       )
 
-      this._snackBar.open('Single asset scheduled (check assets section above)', 'OK', { duration: 4000 })
-    }
-    
-    private add_video(configs, base, name) {
-      this.facade.add_preview_video(configs, base, name)
-      .then( _ => { this.mode = '' })
-    }
+      // Clear screen selections after all
+      this.clear_screen_selections()
 
-    check_group(element, group) {
-      if (element.checked)
-        this.selected_groups.add(group)
-      else
-        this.selected_groups.delete(group)
+      this._snackBar.open('Single asset scheduled (check assets section above)', 'OK', { duration: 4000 })
     }
 
     check_all(element) {
@@ -134,7 +157,14 @@ export class VideoComponent implements OnInit {
 
       if (element.checked)
         for (let group of valid_groups)
-          this.selected_groups.add(group)
+          this.selected_groups.set(group, {})
+    }
+
+    check_group(element, group) {
+      if (element.checked)
+        this.selected_groups.set(group, {})
+      else
+        this.selected_groups.delete(group)
     }
 
     review_create_bulk() {
@@ -147,7 +177,7 @@ export class VideoComponent implements OnInit {
 
       this.final_configs = []
 
-      for(let group of this.selected_groups) {
+      for(let [group, video_metadata] of this.selected_groups.entries()) {
         
         const group_products = this.product_groups.get(group)
 
@@ -164,8 +194,10 @@ export class VideoComponent implements OnInit {
           let configs = sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type))
 
           this.final_configs.push({
-            configs: this.facade.generate_final_configs(configs, this.base, product_keys),
-            group: group
+            name: video_metadata.name || group,
+            description: video_metadata.description,
+            visibility: video_metadata.visibility,
+            configs: this.facade.generate_final_configs(configs, this.base, product_keys)
           })
         }
       }
@@ -179,11 +211,42 @@ export class VideoComponent implements OnInit {
         return
       }
 
-      for(let { group, configs } of this.final_configs)
-          this.add_video(configs, this.base, group)
+      // Generate all videos
+      this.final_configs.forEach(final_configs => 
+        this.add_video(final_configs.name,
+          final_configs.configs,
+          final_configs.description,
+          final_configs.visibility)
+      )
 
-      this.final_configs = []
+      // Clear selections after all
+      this.clear_screen_selections()
+
       this._snackBar.open('Scheduled for creation (check assets section above)', 'OK', { duration: 4000 })
+    }
+
+    private clear_screen_selections() {
+      this.final_configs = []
+      this.video_metadata = {}
+      this.base = undefined
+      this.products = undefined
+      this.product_sheet = undefined
+      this.mode = ''
+    }
+
+    
+    private add_video(name : string, final_configs : any[], description? : string, visibility? : string) {
+
+      (this.youtube ? this.facade.add_production_video : this.facade.add_preview_video).apply(this.facade, [
+        new VideoMetadata(
+          name,
+          this.base.title,
+          this.product_sheet,
+          final_configs,
+          description,
+          visibility
+        )
+      ])
     }
 
     update_video() {

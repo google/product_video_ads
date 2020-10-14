@@ -20,6 +20,7 @@ import { Base } from 'app/models/base';
 import { InterfaceHelper } from 'app/modules/shared/InterfaceHelper';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import VideoSnapshot from 'video-snapshot';
+import { Product } from 'app/models/product';
 
 @Component({
     selector: 'app-video-preview',
@@ -31,6 +32,7 @@ export class VideoPreviewComponent implements OnInit {
 
     @Input() base: Base
     @Input() configs: Array<any>
+    @Input() products : Product[]
     @Output() on_change: EventEmitter<Array<any>>
 
     snapshoter: VideoSnapshot
@@ -80,7 +82,7 @@ export class VideoPreviewComponent implements OnInit {
 
                 // Take screenshots based on configs
                 for( let c of this.configs) {
-                    console.log('Loading ' + c.group)
+                    console.log('Loading ' + c.name)
                     await this.take_screenshots_from_configs(c)
                 }
             }
@@ -128,14 +130,14 @@ export class VideoPreviewComponent implements OnInit {
         for (let [time, configs] of Object.entries(times)) {
             images.push({
                 image: await this.snapshoter.takeSnapshot(parseFloat(time)),
-                elements: await this.helper.parse_configs_to_elements(configs as any[]),
+                elements: await this.helper.parse_configs_to_elements(configs as any[], this.products),
                 configs: configs
             })
         }
 
         // This is going to screen
         this.screenshots.push({
-            name: video.group,
+            name: video.name,
             images: images
         })
     }

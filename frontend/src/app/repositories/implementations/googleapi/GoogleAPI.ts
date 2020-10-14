@@ -77,6 +77,15 @@ export class GoogleAPI {
     
     return response.result.values
   }
+
+  async get_sheets_names() : Promise<string[]> {
+    
+    const response = await this.gapi.client.sheets.spreadsheets.get({
+      spreadsheetId: this.sheet_id
+    })
+    
+    return response.result.sheets.map(sheet => sheet.properties.title)
+  }
   
   async save_values(data : Array<any>, sheet? : string) : Promise<any> {
     

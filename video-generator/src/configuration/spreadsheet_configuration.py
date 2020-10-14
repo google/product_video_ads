@@ -23,10 +23,9 @@ from log.SpreadsheetHandler import SpreadsheetHandler
 
 class SpreadsheetConfiguration(object):
     # Configuration ranges
+    CAMPAIGN_RANGE = 'Campaigns!A2:C'
+    PRODUCTS_RANGE = '!A1:ZZ'
     BASE_VIDEOS_NAMED_RANGE = 'Bases'
-    CAMPAIGN_NAMED_RANGE = 'ProductsBaseStatus'
-    STOP_GENERATION = 'StopGeneration'
-    PRODUCTS_RANGE = 'Prices!A1:ZZ'
     ASSETS_NAMED_RANGE = 'Assets'
     STATUS_VIDEO_NAMED_RANGE = 'StatusVideoId'
     DRIVE_CONFIG_NAMED_RANGE = 'DriveConfigFolder'
@@ -70,22 +69,6 @@ class SpreadsheetConfiguration(object):
                 'values': [[message[:4900]]]
             }).execute()
 
-    '''def stop_processing(self):
-        current_value = self.__get_named_range_values(self.STOP_GENERATION)[0][0]
-
-        if current_value == 'TRUE':
-            range_a1_notation = self.__get_named_range_A1_notation(self.STOP_GENERATION)
-
-            self.sheet.values().update(
-                spreadsheetId=self.spreadsheet_id,
-                range=range_a1_notation['str'](),
-                valueInputOption='RAW',
-                body={'values': ['FALSE']}).execute()
-
-            self.logger.info('Updating stop processing to FALSE')
-
-        return current_value == 'TRUE'''
-
     def update_status(self, row, video_id, status):
 
         range_a1_notation = self.__get_named_range_A1_notation(
@@ -122,13 +105,12 @@ class SpreadsheetConfiguration(object):
 
     def get_campaign_config(self):
         """Return will be in the following format:
-       [name, description, visibility, configs, base_name, status]
+       [date, metadata, status]
     """
-        return map(lambda c: [c[0], c[1], c[2], json.loads(c[3]), c[4], c[5]],
-                   self.__get_named_range_values(self.CAMPAIGN_NAMED_RANGE)
-                   )
+        return map(lambda c: [c[0], json.loads(c[1]), c[2]],
+                   self.__get_range_values(self.CAMPAIGN_RANGE))
 
-    def get_products_data(self):
+    def get_products_data(self, products_label):
         """Return will be in the following format:
 
        {
@@ -144,7 +126,7 @@ class SpreadsheetConfiguration(object):
 
         # Load products
         products_config = dict()
-        prods = self.__get_range_values(self.PRODUCTS_RANGE)
+        prods = self.__get_range_values(products_label + self.PRODUCTS_RANGE)
         header = prods.pop(0)[1:]
 
         for p in prods:

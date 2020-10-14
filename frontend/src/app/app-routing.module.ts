@@ -23,7 +23,7 @@ const routes: Routes = [
   { path: 'products', loadChildren: () => import('./modules/products/products.module').then(m => m.ProductsModule) },
   { path: 'bases', loadChildren: () => import('./modules/bases/bases.module').then(m => m.BasesModule) },
   { path: 'offer_types', loadChildren: () => import('./modules/offer_type/offer_type.module').then(m => m.OfferTypeModule) },
-  { path: 'videos', loadChildren: () => import('./modules/video/video.module').then(m => m.VideoModule) }
+  { path: 'generate', loadChildren: () => import('./modules/video/video.module').then(m => m.VideoModule) }
 ]
 
 @NgModule({

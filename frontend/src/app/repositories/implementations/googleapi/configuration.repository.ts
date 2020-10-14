@@ -29,6 +29,13 @@ export class ConfigurationRepository implements ConfigurationInterface {
 
     constructor(public googleApi : GoogleAPI) {}
 
+    async load_products_sheets(): Promise<string[]> {
+
+        const sheets = await this.googleApi.get_sheets_names()
+
+        return sheets.filter(sheet => sheet.startsWith('Prices'))
+    }
+
     async upload_font(file: File): Promise<any> {
 
         const drive_folder = await this.load_drive_folder()
@@ -91,9 +98,12 @@ export class ConfigurationRepository implements ConfigurationInterface {
         return assets.map(Asset.from_asset_array)
     }
 
-    async load_products() : Promise<Product[]> {
+    async load_products(key? : string) : Promise<Product[]> {
 
-        const products_array = (await this.googleApi.get_values(environment.configuration.product_range)) || []
+        // Default product range
+        key = key || 'Prices'
+
+        const products_array = (await this.googleApi.get_values(key + environment.configuration.product_range)) || []
 
         // No products to parse
         if (products_array.length == 0)

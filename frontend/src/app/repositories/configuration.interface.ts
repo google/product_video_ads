@@ -35,7 +35,8 @@ export interface ConfigurationInterface {
     load_assets() : Promise<Asset[]>
     save_assets(assets : Asset[]) : Promise<any>
 
-    load_products() : Promise<Product[]>
+    load_products_sheets() : Promise<string[]>
+    load_products(key? : string) : Promise<Product[]>
 
     load_offer_types() : Promise<OfferType[]>
     save_offer_types(bases : OfferType[]) : Promise<any>

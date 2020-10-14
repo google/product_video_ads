@@ -132,7 +132,7 @@ export class OfferTypeComponent implements OnInit {
     }
 
     // Load elements on screen
-    this.elements = await this.helper.parse_configs_to_elements(this.offer_type.configs)
+    this.elements = await this.helper.parse_configs_to_elements(this.offer_type.configs, this.facade.products)
 
     // Set base to this screen
     this.base_asset = img
@@ -156,7 +156,7 @@ export class OfferTypeComponent implements OnInit {
     }
 
     // Load elements on screen
-    this.elements = await this.helper.parse_configs_to_elements(this.offer_type.configs)
+    this.elements = await this.helper.parse_configs_to_elements(this.offer_type.configs, this.facade.products)
 
     // Set base to this screen
     this.base_asset = video
