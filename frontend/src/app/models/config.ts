@@ -17,7 +17,7 @@
 export class Config {
     
     constructor(
-        public key : number = 0,
+        public key : string = '',
         public type : string ='',
         public field : string = '',
         public x : number = 0,

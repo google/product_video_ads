@@ -16,7 +16,7 @@
 
 export class Product {
     
-    constructor(public id : number,
+    constructor(public id : string,
                 public group : string,
                 public offer_type : string,
                 public position : number,

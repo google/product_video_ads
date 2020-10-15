@@ -66,23 +66,28 @@ export class VideoFacade {
             return this.productsService.products_sheets$
         }
 
-        public generate_final_configs(configs : Config[][], base : Base, product_keys : any) : Config[] {
+        public generate_final_configs(offert_types : string[], base : Base, product_keys : string[]) : Config[] {
             
+            // This method is meant to generate final configs
+            // Final configs are offer types configs improved
+            // with base timings and products keys
             let final_configs = []
             
             // Go through each product
             for(let i = 0; i < base.products.length; i++) {
                 
-                let ci : any = configs[i]
+                let ci : Config[] = this.get_configs_from_offer_type(offert_types[i])
                 
                 // Treat each config item
                 for(let config of ci) {
                     
                     let new_config : Config = {...config}
                     
+                    // Correct product key
                     if (new_config.type == 'product')
                         new_config.key = product_keys[i]
                     
+                    // Correct base timings
                     new_config.start_time = base.products[i].start_time
                     new_config.end_time = base.products[i].end_time
                     
@@ -115,14 +120,15 @@ export class VideoFacade {
             return groups
         }
         
-        get_configs_from_offer_type(offer_type_title : string) : Config[] {
+        private get_configs_from_offer_type(offer_type_title : string) : Config[] {
             
             const offer_types = this.offerTypeService.offer_types.filter(o => o.title == offer_type_title)
             
             if (offer_types.length == 0)
                 return []
             
-            return offer_types[0].configs
+            // Recursion to add all parent configs as well
+            return this.get_configs_from_offer_type(offer_types[0].parent).concat(offer_types[0].configs)
         }
         
         update_videos() {

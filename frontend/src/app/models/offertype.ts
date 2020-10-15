@@ -18,15 +18,19 @@ import { Config } from './config'
 
 export class OfferType {
     
-    constructor(public title : string,
+    constructor(
+        public title : string,
         public base : string,
-        public configs : Array<Config>) {}
+        public configs : Array<Config>,
+        public parent? : string
+    ) {}
         
     public static from_offertype_array(offertype_array : Array<any>) {
         return new OfferType(
             offertype_array[0],
             offertype_array[1],
             JSON.parse(offertype_array[2] || '[]') as Array<Config>,
+            offertype_array[3]
         )
     }
             
@@ -34,7 +38,8 @@ export class OfferType {
         return [
             offertype.title, 
             offertype.base, 
-            JSON.stringify(offertype.configs)
+            JSON.stringify(offertype.configs),
+            offertype.parent
         ]
     }
 }

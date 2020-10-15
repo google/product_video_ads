@@ -197,13 +197,13 @@
 
     <h3>The base "{{base.title}}" needs {{base.products.length}} product(s):</h3>
 
-    <div class="added_item" *ngFor="let c of configs; let i = index; trackBy: indexTracker">
+    <div class="added_item" *ngFor="let c of selected_offer_types; let i = index; trackBy: indexTracker">
 
       <!-- Offer Type -->
       <mat-form-field>
         <mat-label>Offer Type</mat-label>
-        <mat-select [(ngModel)]="configs[i]">
-          <mat-option *ngFor="let type of (offer_types$ | async | filterOfferTypes: base.title)" [value]="type.configs">
+        <mat-select [(ngModel)]="selected_offer_types[i]">
+          <mat-option *ngFor="let type of (offer_types$ | async | filterOfferTypes: base.title)" [value]="type.title">
             {{type.title}}
           </mat-option>
         </mat-select>
@@ -214,7 +214,7 @@
       <!-- Product -->
       <mat-form-field>
         <mat-label>Product</mat-label>
-        <mat-select [(ngModel)]="product_keys[i]">
+        <mat-select [(ngModel)]="selected_products[i]">
           <mat-option *ngFor="let product of products" [value]="product.id">
             {{product.id}} - {{product.values['Title']}}
           </mat-option>
@@ -252,7 +252,7 @@
 
     <br/><br/>
 
-    <button mat-stroked-button [disabled]="!is_all_filled()" (click)="add_single_video(product_keys, configs, video_metadata)">Create Asset</button>
+    <button mat-stroked-button [disabled]="!is_all_filled()" (click)="add_single_video(selected_products, selected_offer_types, video_metadata)">Create Asset</button>
 
   </div>
 

@@ -52,13 +52,15 @@ export class VideoComponent implements OnInit {
   mode : string
   youtube : boolean
 
-  // Video configuration from screen
+  // Video configuration from screen (bulk)
   product_groups : Map<string, Product[]>
   product_groups_validations : Map<string, string[]>
   selected_groups : Map<string,  any> = new Map<string, any>()
-  configs : Array<any>
-  product_keys: Array<any>
   final_configs : Array<any>
+
+  // Video configuration from screen (single)
+  selected_offer_types : Array<string>
+  selected_products: Array<string>
   video_metadata : any
   
   constructor(private facade : VideoFacade, public sanitizer: DomSanitizer, private _snackBar: MatSnackBar) {
@@ -84,12 +86,10 @@ export class VideoComponent implements OnInit {
     }
     
     choose_base(base : Base) {
-      this.configs = new Array(base.products.length)
-      this.final_configs = []
-      this.selected_groups.clear()
-      this.product_keys = new Array(base.products.length)
-
       this.base = base
+
+      this.selected_groups.clear()
+      this.final_configs = []
       this.products = undefined
       this.product_sheet = undefined
       this.mode = ''
@@ -109,6 +109,10 @@ export class VideoComponent implements OnInit {
     }
 
     select_single_video_mode(youtube) {
+
+      this.selected_offer_types = new Array(this.base.products.length)
+      this.selected_products = new Array(this.base.products.length)
+
       this.mode = 'single'
       this.youtube = youtube != undefined
     }
@@ -124,10 +128,10 @@ export class VideoComponent implements OnInit {
     }
 
     is_all_filled() {
-      return !this.configs.includes(undefined) && !this.product_keys.includes(undefined)
+      return !this.selected_offer_types.includes(undefined) && !this.selected_products.includes(undefined)
     }
 
-    add_single_video(product_keys, configs, video_metadata) {
+    add_single_video(selected_products : Array<string>, selected_offer_types : Array<string>, video_metadata) {
 
       // Block deletions when videos are being generated
       if(this.facade.is_generating()) {
@@ -138,7 +142,7 @@ export class VideoComponent implements OnInit {
       // Create a single video
       this.add_video(
         video_metadata.name || 'Preview',
-        this.facade.generate_final_configs(configs, this.base, product_keys),
+        this.facade.generate_final_configs(selected_offer_types, this.base, selected_products),
         video_metadata.description,
         video_metadata.visibility
       )
@@ -187,17 +191,17 @@ export class VideoComponent implements OnInit {
           let sorted_products = group_products.slice(video, video + this.base.products.length)
                                               .sort((a, b) => a.position - b.position)
 
-          // Keys
+          // Products Keys
           let product_keys = sorted_products.map(p => p.id)
 
           // Offer Type Configs
-          let configs = sorted_products.map(p => this.facade.get_configs_from_offer_type(p.offer_type))
+          let offer_types = sorted_products.map(p => p.offer_type)
 
           this.final_configs.push({
             name: video_metadata.name || group,
             description: video_metadata.description,
             visibility: video_metadata.visibility,
-            configs: this.facade.generate_final_configs(configs, this.base, product_keys)
+            configs: this.facade.generate_final_configs(offer_types, this.base, product_keys)
           })
         }
       }

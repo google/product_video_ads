@@ -37,7 +37,11 @@
 
       <div class="added_item" *ngFor="let offer of offer_types | async | filter : search_term.value | sortBy: 'asc':'title' | sortBy: 'asc':'base'">
         
-        <p><b>{{offer.title}}</b></p>
+        <div>
+          <b>{{offer.title}}</b>
+          <div *ngIf="offer.parent">[{{offer.parent}}]</div>
+        </div>
+
         <p>({{offer.base}})</p>
         
         <span style="cursor: pointer" (click)="edit_type(offer)" >
@@ -70,7 +74,7 @@
     </div>
   </div>
   
-  <!-- Configure chosen base -->
+  <!-- Third: configure chosen base -->
   <div [hidden]="!base_url">
     
       <h2>How to configure offer type?</h2>
@@ -126,6 +130,16 @@
         <mat-select [(ngModel)]="product_shown" (selectionChange)="choose_product_shown()" [disabled]="!base_asset">
           <mat-option *ngFor="let product of facade.products" [value]="product.id">
             ({{product.id}}) {{product.values['Title']}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Parent offer type -->
+      <mat-form-field class="example-full-width">
+        <mat-label>Parent</mat-label>
+        <mat-select [(ngModel)]="offer_type.parent">
+          <mat-option *ngFor="let offer of offer_types | async | sortBy: 'asc':'title'" [value]="offer.title">
+            {{offer.title}}
           </mat-option>
         </mat-select>
       </mat-form-field>
@@ -239,7 +253,7 @@
         </div>
       </div>
 
-      <!-- Products positions -->
+      <!-- Products positions for visualization purposed only -->
       <div *ngIf="base_asset && is_video">
 
         <h2>Position:</h2>

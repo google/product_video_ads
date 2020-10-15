@@ -33,7 +33,7 @@ export const environment = {
     product_range: '!A1:ZZ',
     drive_folder: 'Configuration!C6',
     static_assets: 'Static!A2:C',
-    offer_types_range: 'OfferTypes!A2:C',
+    offer_types_range: 'OfferTypes!A2:D',
     bases_range: 'Bases!A2:C',
     logs_range: 'Generator!A1:A'
   }
