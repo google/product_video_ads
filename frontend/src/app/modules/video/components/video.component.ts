@@ -100,6 +100,7 @@ export class VideoComponent implements OnInit {
       // Chosen product sheet
       this.product_sheet = key
 
+      this.selected_groups.clear()
       this.final_configs = []
       this.mode = ''
 

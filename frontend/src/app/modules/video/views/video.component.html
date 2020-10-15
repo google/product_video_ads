@@ -317,10 +317,18 @@
 
         <br/><br/>
 
-        <!-- After review -->
+        <!-- When all configs are ready -->
         <div *ngIf="final_configs.length > 0">
 
-          <app-video-preview [base]="base" [configs]="final_configs" [products]="products"></app-video-preview>
+          <!-- Image review screen -->
+          <div *ngIf="!is_base_video(base)">
+            <app-image-preview [base]="base" [configs]="final_configs" [products]="products"></app-image-preview>
+          </div>
+
+          <!-- Video review screen -->
+          <div *ngIf="is_base_video(base)">
+            <app-video-preview [base]="base" [configs]="final_configs" [products]="products"></app-video-preview>
+          </div>
 
           <br/><br/>
           

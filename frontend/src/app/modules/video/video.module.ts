@@ -21,11 +21,13 @@ import { VideoComponent } from './components/video.component';
 import { SharedModule } from '../shared/shared.module';
 import { FilterOfferTypesPipe } from './pipes/filter-offer-types.pipe';
 import { VideoPreviewComponent } from './components/video_preview.component';
+import { ImagePreviewComponent } from './components/image_preview.component';
 
 @NgModule({
   declarations: [
     VideoComponent,
     VideoPreviewComponent,
+    ImagePreviewComponent,
     FilterOfferTypesPipe
   ],
   imports: [

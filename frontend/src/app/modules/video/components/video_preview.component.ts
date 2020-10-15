@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { VideoFacade } from '../video.facade';
 import { Base } from 'app/models/base';
 import { InterfaceHelper } from 'app/modules/shared/InterfaceHelper';
@@ -25,7 +25,7 @@ import { Product } from 'app/models/product';
 @Component({
     selector: 'app-video-preview',
     templateUrl: '../views/video_preview.component.html',
-    styleUrls: ['../views/video_preview.component.scss'],
+    styleUrls: ['../views/preview.component.scss'],
     providers: [VideoFacade]
 })
 export class VideoPreviewComponent implements OnInit {
@@ -33,7 +33,6 @@ export class VideoPreviewComponent implements OnInit {
     @Input() base: Base
     @Input() configs: Array<any>
     @Input() products : Product[]
-    @Output() on_change: EventEmitter<Array<any>>
 
     snapshoter: VideoSnapshot
     base_specs: any
@@ -81,7 +80,7 @@ export class VideoPreviewComponent implements OnInit {
                 }
 
                 // Take screenshots based on configs
-                for( let c of this.configs) {
+                for(let c of this.configs) {
                     console.log('Loading ' + c.name)
                     await this.take_screenshots_from_configs(c)
                 }

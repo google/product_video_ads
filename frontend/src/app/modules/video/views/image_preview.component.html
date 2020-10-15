@@ -10,10 +10,10 @@
 
     <div *ngFor="let i of s.images" style="position: relative; margin: 2%">
 
-      <img [src]="i.image" [width]="base_specs.width" [height]="base_specs.height" />
+      <img [src]="i.image"/>
 
       <app-draggable-element *ngFor="let el of i.elements" [element]="el" (singleclick)="focus_element($event)"
-        [video_pos]="base_specs">
+        [video_pos]="pos">
       </app-draggable-element>
     </div>
 
