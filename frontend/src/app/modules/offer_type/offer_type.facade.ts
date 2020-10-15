@@ -19,9 +19,10 @@ import { LoginService } from '../login/services/login.service';
 import { OfferTypeService } from './services/offer_type.service';
 import { ProductService } from '../products/services/product.service';
 import { OfferType } from 'app/models/offertype';
-import { AssetsService } from '../static_assets/services/assets.service';
+import { AssetsService } from '../products/services/assets.service';
 import { BasesService } from '../bases/services/bases.service';
 import { FontsService } from '../bases/services/fonts.service';
+import { Config } from 'app/models/config';
 
 @Injectable()
 export class OfferTypeFacade {
@@ -73,6 +74,10 @@ export class OfferTypeFacade {
 
     add_offer_type(offer_type : OfferType) {
         this.offerTypeService.add_offer_type(offer_type)
+    }
+
+    get_configs(offer_type_title : string) : Config[] {
+        return this.offerTypeService.get_configs(offer_type_title)
     }
 
     update_products() {

@@ -45,7 +45,6 @@ export class AssetsService {
         })
     }
 
-    /** Actions **/
     async load_assets() {
         if (this.is_ready)
             this._assets.next(await this.repository.load_assets())
@@ -53,17 +52,5 @@ export class AssetsService {
 
     reload_assets() {
         this.load_assets()
-    }
-
-    add_asset(asset : Asset) : Promise<any> {
-        const next_id = Math.max(...this.assets.map(p => p.id)) + 1
-        asset.id = next_id
-        this._assets.next([...this.assets, asset])
-        return this.repository.save_assets(this.assets)
-    }
-
-    delete_asset(id : number) : Promise<any> {
-        this._assets.next(this.assets.filter(a => a.id != id))
-        return this.repository.save_assets(this.assets)
     }
 }

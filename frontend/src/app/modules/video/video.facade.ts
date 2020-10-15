@@ -76,7 +76,7 @@ export class VideoFacade {
             // Go through each product
             for(let i = 0; i < base.products.length; i++) {
                 
-                let ci : Config[] = this.get_configs_from_offer_type(offert_types[i])
+                let ci : Config[] = this.offerTypeService.get_configs(offert_types[i])
                 
                 // Treat each config item
                 for(let config of ci) {
@@ -118,17 +118,6 @@ export class VideoFacade {
             }
             
             return groups
-        }
-        
-        private get_configs_from_offer_type(offer_type_title : string) : Config[] {
-            
-            const offer_types = this.offerTypeService.offer_types.filter(o => o.title == offer_type_title)
-            
-            if (offer_types.length == 0)
-                return []
-            
-            // Recursion to add all parent configs as well
-            return this.get_configs_from_offer_type(offer_types[0].parent).concat(offer_types[0].configs)
         }
         
         update_videos() {

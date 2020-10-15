@@ -25,6 +25,7 @@ export class DraggableElementComponent implements AfterViewInit {
 
     @Input() element : any
     @Input() video_pos : any
+    @Input() disabled? : boolean = false
 
     @Output() dblclick = new EventEmitter<any>()
     @Output() singleclick = new EventEmitter<any>()

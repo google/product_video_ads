@@ -19,6 +19,7 @@ import { BehaviorSubject } from 'rxjs'
 import { OfferType } from 'app/models/offertype'
 import { CachedConfigurationRepository } from 'app/repositories/implementations/googleapi/cached-configuration.repository'
 import { LoginService } from 'app/modules/login/services/login.service'
+import { Config } from 'app/models/config'
 // import * as UUID from 'uuid/v4'
 
 @Injectable({providedIn: 'root'})
@@ -56,6 +57,17 @@ export class OfferTypeService {
     delete_offer_type(title : string, base : string) {
         console.log('Deleting offer type...')
         this._offer_types.next(this.offer_types.filter(o => o.title != title || o.base != base))
+    }
+
+    get_configs(offer_type_title : string) : Config[] {
+            
+        const offer_types = this.offer_types.filter(o => o.title == offer_type_title)
+        
+        if (offer_types.length == 0)
+            return []
+        
+        // Recursion to add all parent configs as well
+        return this.get_configs(offer_types[0].parent).concat(offer_types[0].configs)
     }
 
     download_image_from_gcs(url : string) : Promise<string> {

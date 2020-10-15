@@ -32,15 +32,19 @@ import { first } from 'rxjs/operators'
 })
 export class OfferTypeComponent implements OnInit {
 
-  step: number
+  // Data bindings
   offer_types: Observable<OfferType[]>
   bases: Array<Base>
+
+  // Screen selections
+  step: number
   offer_type: OfferType
   config: any = {}
   fields: Array<string>
   contents: Array<any>
   content: any
   elements: Array<any>
+  parent_elements: Array<any>
   element_focused: any
   loaded_fonts: Set<string>
   locked_name: boolean
@@ -63,6 +67,7 @@ export class OfferTypeComponent implements OnInit {
 
   ngOnInit() {
     this.elements = []
+    this.parent_elements = []
     this.element_focused = undefined
     this.step = 1
     this.locked_name = false
@@ -132,7 +137,7 @@ export class OfferTypeComponent implements OnInit {
     }
 
     // Load elements on screen
-    this.elements = await this.helper.parse_configs_to_elements(this.offer_type.configs, this.facade.products)
+    await this.load_screen_elements()
 
     // Set base to this screen
     this.base_asset = img
@@ -156,10 +161,19 @@ export class OfferTypeComponent implements OnInit {
     }
 
     // Load elements on screen
-    this.elements = await this.helper.parse_configs_to_elements(this.offer_type.configs, this.facade.products)
+    await this.load_screen_elements()
 
     // Set base to this screen
     this.base_asset = video
+  }
+
+  private async load_screen_elements() {
+
+    // Load parent offer type elements
+    this.parent_elements = await this.helper.parse_configs_to_elements(this.facade.get_configs(this.offer_type.parent), this.facade.products)
+
+    // Load chosen offer type elements
+    this.elements = await this.helper.parse_configs_to_elements(this.offer_type.configs, this.facade.products)
   }
 
   select_type(type) {

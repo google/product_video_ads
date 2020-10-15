@@ -1,19 +1,18 @@
 import { Injectable } from '@angular/core'
 import { FontsService } from '../bases/services/fonts.service'
 import { CachedConfigurationRepository } from 'app/repositories/implementations/googleapi/cached-configuration.repository'
-import { AssetsService } from '../static_assets/services/assets.service'
-import { ProductService } from '../products/services/product.service'
+import { AssetsService } from '../products/services/assets.service'
 import { Config } from 'app/models/config'
 import * as UUID from 'uuid/v4'
 import { Product } from 'app/models/product'
+import { OfferType } from 'app/models/offertype'
 
 @Injectable({providedIn: 'root'})
 export class InterfaceHelper {
 
     constructor(private fontsService : FontsService, 
                 private repository : CachedConfigurationRepository,
-                private assetsService : AssetsService,
-                private productsService : ProductService) {}
+                private assetsService : AssetsService) {}
 
     async create_text(product, loaded_fonts) {
 
@@ -119,7 +118,7 @@ export class InterfaceHelper {
         return content && (content.startsWith('http') || content.startsWith('gs://'))
     }
 
-    async parse_configs_to_elements(configs : Array<any>, products : Product[]) : Promise<Array<any>> {
+    async parse_configs_to_elements(configs : Array<Config>, products : Product[]) : Promise<Array<any>> {
 
         const elements = []
         const loaded_fonts : Set<string> = new Set<string>()

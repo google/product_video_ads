@@ -22,7 +22,8 @@
             'white-space': 'nowrap',
             'cursor': 'default',
             'user-select': 'none', 
-            'visibility': 'hidden'
+            'visibility': 'hidden',
+            'pointer-events': disabled ? 'none' : 'auto'
           }">
         </div>
 
@@ -45,7 +46,8 @@
     'transform-origin': 'top left',
     'cursor': 'default',
     'user-select': 'none', 
-    'visibility': 'hidden'
+    'visibility': 'hidden',
+    'pointer-events': disabled ? 'none' : 'auto'
   }" >
   <img 
      src={{element.content}} 

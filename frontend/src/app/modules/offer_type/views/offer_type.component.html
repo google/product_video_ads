@@ -100,13 +100,21 @@
         <!-- Or if it's image base -->
         <img #img1 *ngIf="base_url && !is_video" (load)="on_image_loaded(img1)" [src]="base_url"/>
 
+        <!-- Parent elements on the screen -->
+        <app-draggable-element *ngFor="let el of parent_elements"
+          [element]="el"
+          [video_pos]="base_specs"
+          disabled="true">
+        </app-draggable-element>
+
+        <!-- Offer Type elements on the screen -->
         <app-draggable-element *ngFor="let el of elements"
           [element]="el"
           [video_pos]="base_specs"
           (dblclick)="delete_element($event)"
           (singleclick)="focus_element($event)">
         </app-draggable-element>
-
+        
       </div>
 
       <!-- Box to edit elements on screen -->
@@ -130,16 +138,6 @@
         <mat-select [(ngModel)]="product_shown" (selectionChange)="choose_product_shown()" [disabled]="!base_asset">
           <mat-option *ngFor="let product of facade.products" [value]="product.id">
             ({{product.id}}) {{product.values['Title']}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-      <!-- Parent offer type -->
-      <mat-form-field class="example-full-width">
-        <mat-label>Parent</mat-label>
-        <mat-select [(ngModel)]="offer_type.parent">
-          <mat-option *ngFor="let offer of offer_types | async | sortBy: 'asc':'title'" [value]="offer.title">
-            {{offer.title}}
           </mat-option>
         </mat-select>
       </mat-form-field>
@@ -251,6 +249,24 @@
           
           <button mat-stroked-button (click)="create_image()">Insert Image</button>
         </div>
+      </div>
+
+      <!-- Parent offer type -->
+      <div *ngIf="base_asset">
+
+        <h2>Parent Offer Type:</h2>
+
+        <mat-form-field class="example-full-width">
+          <mat-label>Parent</mat-label>
+          <mat-select [(ngModel)]="offer_type.parent">
+            <mat-option *ngFor="let offer of offer_types | async | sortBy: 'asc':'title'" [value]="offer.title">
+              {{offer.title}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <a style="margin-left: 1%;" mat-stroked-button (click)="offer_type.parent = ''">Clear parent</a>
+        
       </div>
 
       <!-- Products positions for visualization purposed only -->
