@@ -31,7 +31,7 @@ export class DraggableElementComponent implements AfterViewInit {
     @Output() singleclick = new EventEmitter<any>()
     @Output() dragEnd = new EventEmitter<any>()
 
-    @ViewChild('html_element', {static: false}) html_element : ElementRef;
+    @ViewChild('html_element') html_element : ElementRef;
     
     constructor() {}
 

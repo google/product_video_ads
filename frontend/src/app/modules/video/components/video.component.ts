@@ -109,7 +109,7 @@ export class VideoComponent implements OnInit {
       this._snackBar.open('Loading products from ' + key, 'OK', { duration: 4000 })
     }
 
-    select_single_video_mode(youtube) {
+    select_single_video_mode(youtube? : boolean) {
 
       this.selected_offer_types = new Array(this.base.products.length)
       this.selected_products = new Array(this.base.products.length)
@@ -118,7 +118,7 @@ export class VideoComponent implements OnInit {
       this.youtube = youtube != undefined
     }
 
-    select_bulk_video_mode(youtube) {
+    select_bulk_video_mode(youtube? : boolean) {
 
       // Load avaiable products groups and their validations already
       this.product_groups = this.facade.get_available_groups_for_base(this.products)

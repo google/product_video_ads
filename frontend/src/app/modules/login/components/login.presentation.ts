@@ -39,7 +39,7 @@ export class LoginPresentation implements OnInit {
   step = 0;
 
   ngOnInit() {
-    this.sheet = this.sheet_text
+    this.sheet = 'aaaa'//this.sheet_text
   }
 
   login() {

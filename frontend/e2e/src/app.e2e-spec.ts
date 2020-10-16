@@ -10,7 +10,7 @@ describe('workspace-project App', () => {
 
   it('should display welcome message', () => {
     page.navigateTo();
-    expect(page.getTitleText()).toEqual('pva-frontend app is running!');
+    expect(page.getTitleText()).toEqual('Welcome to Product Video Ads');
   });
 
   afterEach(async () => {
