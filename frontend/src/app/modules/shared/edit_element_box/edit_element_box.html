@@ -10,6 +10,10 @@
     <span>{{element_focused.y.toFixed()}}</span>
   </div>
 
+  <div *ngIf="element_focused.condition_to_show_key" class="aligned_element small-text">
+    <span>Element only shown if<br/>{{element_focused.condition_to_show_key}} = {{element_focused.condition_to_show_value}}</span>
+  </div>
+
   <!-- Box to edit text element -->
   <div [hidden]="element_focused.view_type != 'text'">
 

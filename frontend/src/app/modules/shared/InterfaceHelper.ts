@@ -5,7 +5,6 @@ import { AssetsService } from '../products/services/assets.service'
 import { Config } from 'app/models/config'
 import * as UUID from 'uuid/v4'
 import { Product } from 'app/models/product'
-import { OfferType } from 'app/models/offertype'
 
 @Injectable({providedIn: 'root'})
 export class InterfaceHelper {
@@ -164,7 +163,7 @@ export class InterfaceHelper {
             e.align = 'left'
             e.y -= document.getElementById(e.id).offsetWidth
           }
-    
+
           // Add texts
           if (e.view_type == 'text') {
     
@@ -189,7 +188,9 @@ export class InterfaceHelper {
               e.height,
               e.align,
               e.angle,
-              e.keep_ratio
+              e.keep_ratio,
+              e.condition_to_show_key,
+              e.condition_to_show_value
             ))
           }
     
@@ -211,7 +212,9 @@ export class InterfaceHelper {
               e.height * base_specs.y_ratio,
               'left',
               e.angle,
-              e.keep_ratio
+              e.keep_ratio,
+              e.condition_to_show_key,
+              e.condition_to_show_value
             ))
           }
         }

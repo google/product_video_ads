@@ -66,7 +66,12 @@ export class VideoFacade {
             return this.productsService.products_sheets$
         }
 
-        public generate_final_configs(offert_types : string[], base : Base, product_keys : string[]) : Config[] {
+        private meet_condition_to_show(config : Config, product_key : string, products : Product[]) {
+            // If no condition, or product meets condition, we should show
+            return !config.condition_to_show_key || products.filter(p => p.id == product_key && p.values[config.condition_to_show_key] == config.condition_to_show_value).length > 0
+        }
+
+        public generate_final_configs(offert_types : string[], base : Base, product_keys : string[], products : Product[]) : Config[] {
             
             // This method is meant to generate final configs
             // Final configs are offer types configs improved
@@ -82,6 +87,10 @@ export class VideoFacade {
                 for(let config of ci) {
                     
                     let new_config : Config = {...config}
+
+                    // If product does not meet config conditions to show, skip this config!
+                    if (!this.meet_condition_to_show(new_config, product_keys[i], products))
+                        continue
                     
                     // Correct product key
                     if (new_config.type == 'product')

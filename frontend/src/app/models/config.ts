@@ -31,7 +31,9 @@ export class Config {
         public height : number = 20, // setting 20 as default so the image is visible if the user inserts it without changing values
         public align : string = 'center',
         public angle : number = 0,
-        public keep_ratio : boolean = false
+        public keep_ratio : boolean = false,
+        public condition_to_show_key : string = '',
+        public condition_to_show_value : string = ''
         ) {}
         
     public static from_configs_array(config : any) : Config {

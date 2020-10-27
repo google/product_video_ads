@@ -143,7 +143,7 @@ export class VideoComponent implements OnInit {
       // Create a single video
       this.add_video(
         video_metadata.name || 'Preview',
-        this.facade.generate_final_configs(selected_offer_types, this.base, selected_products),
+        this.facade.generate_final_configs(selected_offer_types, this.base, selected_products, this.products),
         video_metadata.description,
         video_metadata.visibility
       )
@@ -202,7 +202,7 @@ export class VideoComponent implements OnInit {
             name: video_metadata.name || group,
             description: video_metadata.description,
             visibility: video_metadata.visibility,
-            configs: this.facade.generate_final_configs(offer_types, this.base, product_keys)
+            configs: this.facade.generate_final_configs(offer_types, this.base, product_keys, this.products)
           })
         }
       }

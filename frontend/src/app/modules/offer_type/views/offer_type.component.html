@@ -218,6 +218,26 @@
           <mat-checkbox class="example-margin" style="margin-left: 2%;" [(ngModel)]="config.flip">
             Flip
           </mat-checkbox>
+
+          <br/>
+
+          <!-- Conditional field to show current element -->
+          <mat-form-field>
+            <mat-label>Conditional field</mat-label>
+            <mat-select [(ngModel)]="config.condition_to_show_key">
+              <mat-option *ngFor="let field of facade.product_headers" [value]="field">
+                {{field}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Value to expect to show element -->
+          <mat-form-field *ngIf="config.condition_to_show_key" class="example-full-width">
+            <mat-label>Value to trigger</mat-label>
+            <input [(ngModel)]="config.condition_to_show_value" matInput>
+          </mat-form-field>
+
+          <a style="margin-left: 1%;" mat-stroked-button (click)="config.condition_to_show_key = config.condition_to_show_value = ''">Clear condition</a>
           
           <br/>
           
@@ -245,6 +265,26 @@
             Keep Ratio
           </mat-checkbox>
 
+          <br/>
+
+          <!-- Conditional field to show current element -->
+          <mat-form-field>
+            <mat-label>Conditional field</mat-label>
+            <mat-select [(ngModel)]="config.condition_to_show_key">
+              <mat-option *ngFor="let field of facade.product_headers" [value]="field">
+                {{field}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Value to expect to show element -->
+          <mat-form-field *ngIf="config.condition_to_show_key" class="example-full-width">
+            <mat-label>Value to trigger</mat-label>
+            <input [(ngModel)]="config.condition_to_show_value" matInput>
+          </mat-form-field>
+
+          <a style="margin-left: 1%;" mat-stroked-button (click)="config.condition_to_show_key = config.condition_to_show_value = ''">Clear condition</a>
+          
           <br/>
           
           <button mat-stroked-button (click)="create_image()">Insert Image</button>
