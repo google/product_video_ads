@@ -189,8 +189,7 @@ export class InterfaceHelper {
               e.align,
               e.angle,
               e.keep_ratio,
-              e.condition_to_show_key,
-              e.condition_to_show_value
+              e.conditions
             ))
           }
     
@@ -213,8 +212,7 @@ export class InterfaceHelper {
               'left',
               e.angle,
               e.keep_ratio,
-              e.condition_to_show_key,
-              e.condition_to_show_value
+              e.conditions
             ))
           }
         }

@@ -17,12 +17,14 @@
 import { NgModule } from '@angular/core';
 import { OfferTypeRoutingModule } from './offer_type-routing.module';
 import { OfferTypeComponent } from './components/offer_type.component';
+import { OfferTypeConditionalComponent } from './components/conditions/conditional.component';
 import { SharedModule } from '../shared/shared.module';
 import { FilterPipe } from './pipes/FilterPipe';
 
 @NgModule({
   declarations: [
     OfferTypeComponent,
+    OfferTypeConditionalComponent,
     FilterPipe
   ],
   imports: [

@@ -213,13 +213,17 @@ export class OfferTypeComponent implements OnInit {
   // Bind from view
   public async create_text(product?) {
     const element = await this.helper.create_text(product ? product : this.config, this.loaded_fonts)
+    
     this.elements.push(element)
+    this.config.conditions = []
   }
 
   // Bind from view
   public async create_image(product?) {
     const element = await this.helper.create_image(product ? product : this.config)
+
     this.elements.push(element)
+    this.config.conditions = []
   }
 
   public on_change_text_width(element_focused) {

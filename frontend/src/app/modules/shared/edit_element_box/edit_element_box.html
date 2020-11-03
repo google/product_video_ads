@@ -10,8 +10,12 @@
     <span>{{element_focused.y.toFixed()}}</span>
   </div>
 
-  <div *ngIf="element_focused.condition_to_show_key" class="aligned_element small-text">
-    <span>Element only shown if<br/>{{element_focused.condition_to_show_key}} = {{element_focused.condition_to_show_value}}</span>
+  <!-- Conditions -->
+  <div *ngFor="let cond of element_focused.conditions" class="aligned_element small-text">
+    <span>When <b>{{cond.key}}</b> = <b>{{cond.value}}</b></span>
+    <br/>
+    <span>Then <b>{{cond.action}}</b></span>
+    <span *ngIf="cond.args">({{cond.args}})</span>
   </div>
 
   <!-- Box to edit text element -->

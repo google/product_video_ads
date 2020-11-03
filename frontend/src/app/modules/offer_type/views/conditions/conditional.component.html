@@ -1,0 +1,71 @@
+<!--------- Add new conditions --------->
+
+<!-- Condition field -->
+<mat-form-field>
+    <mat-label>Conditional field</mat-label>
+    <mat-select [(ngModel)]="condition.key">
+        <mat-option *ngFor="let field of fields" [value]="field">
+            {{field}}
+        </mat-option>
+    </mat-select>
+</mat-form-field>
+
+<!-- Value to expect -->
+<mat-form-field *ngIf="condition.key" class="example-full-width">
+    <mat-label>Value to trigger</mat-label>
+    <input matInput [(ngModel)]="condition.value">
+</mat-form-field>
+
+<!-- Action -->
+<mat-form-field>
+    <mat-label>Action</mat-label>
+    <mat-select [(ngModel)]="condition.action">
+        <mat-option *ngFor="let action of actions | keyvalue" [value]="action.key">
+            {{action.key}}
+        </mat-option>
+    </mat-select>
+</mat-form-field>
+
+<!-- Arguments -->
+<mat-form-field *ngIf="condition.action && actions[condition.action].need_args" class="example-full-width">
+    <mat-label>Args</mat-label>
+    <input matInput [(ngModel)]="condition.args">
+</mat-form-field>
+
+<!-- Add to list -->
+<a style="margin-left: 1%;" mat-stroked-button
+    (click)="add_condition()">
+    Add condition</a>
+
+<!--------- List existing conditions --------->
+<div *ngFor="let cond of conditions; let i = index">
+
+    <!-- Condition field -->
+    <mat-form-field class="example-full-width">
+        <mat-label>Condition Field</mat-label>
+        <input matInput [value]="cond.key" disabled>
+    </mat-form-field>
+
+    <!-- Value to expect -->
+    <mat-form-field class="example-full-width">
+        <mat-label>Value to trigger</mat-label>
+        <input matInput [value]="cond.value" disabled>
+    </mat-form-field>
+
+    <!-- Action -->
+    <mat-form-field class="example-full-width">
+        <mat-label>Action</mat-label>
+        <input matInput [value]="cond.action" disabled>
+    </mat-form-field>
+
+    <!-- Arguments -->
+    <mat-form-field *ngIf="cond.args" class="example-full-width">
+        <mat-label>Args</mat-label>
+        <input matInput [value]="cond.args" disabled>
+    </mat-form-field>
+
+    <!-- Delete -->
+    <span style="cursor: pointer" (click)="delete_condition(i)">
+        <mat-icon aria-hidden="false" aria-label="delete icon" title="Delete">delete</mat-icon>
+      </span>
+</div>

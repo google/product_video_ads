@@ -14,6 +14,8 @@
    limitations under the License.
 */
 
+import { Condition } from './condition'
+
 export class Config {
     
     constructor(
@@ -32,8 +34,7 @@ export class Config {
         public align : string = 'center',
         public angle : number = 0,
         public keep_ratio : boolean = false,
-        public condition_to_show_key : string = '',
-        public condition_to_show_value : string = ''
+        public conditions : Array<Condition> = []
         ) {}
         
     public static from_configs_array(config : any) : Config {

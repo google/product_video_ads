@@ -24,6 +24,7 @@ import { VideoService } from './services/video.service';
 import { Product } from 'app/models/product';
 import { VideoMetadata } from 'app/models/video_metadata'
 import { Base } from 'app/models/base';
+import { ACTION_TYPES } from 'app/models/condition';
 
 @Injectable()
 export class VideoFacade {
@@ -66,9 +67,20 @@ export class VideoFacade {
             return this.productsService.products_sheets$
         }
 
-        private meet_condition_to_show(config : Config, product_key : string, products : Product[]) {
-            // If no condition, or product meets condition, we should show
-            return !config.condition_to_show_key || products.filter(p => p.id == product_key && p.values[config.condition_to_show_key] == config.condition_to_show_value).length > 0
+        private process_conditions_and_action(config : Config, product_key : string, products : Product[]) {
+
+            // No conditions, return same config unchanged
+            if (!config.conditions)
+                return config
+
+            // Go through all conditions
+            for (let condition of config.conditions)
+                // If meets the condition
+                if (products.filter(p => p.id == product_key && p.values[condition.key] == condition.value).length > 0)
+                    // Process action to config
+                    config = ACTION_TYPES[condition.action].action(config, condition.args)
+            
+            return config
         }
 
         public generate_final_configs(offert_types : string[], base : Base, product_keys : string[], products : Product[]) : Config[] {
@@ -86,12 +98,13 @@ export class VideoFacade {
                 // Treat each config item
                 for(let config of ci) {
                     
-                    let new_config : Config = {...config}
-
-                    // If product does not meet config conditions to show, skip this config!
-                    if (!this.meet_condition_to_show(new_config, product_keys[i], products))
-                        continue
+                    // Process conditions and actions
+                    let new_config : Config = this.process_conditions_and_action({...config}, product_keys[i], products)
                     
+                    // Hidden element!
+                    if (new_config == undefined)
+                        continue
+
                     // Correct product key
                     if (new_config.type == 'product')
                         new_config.key = product_keys[i]
