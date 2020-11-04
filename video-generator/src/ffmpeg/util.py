@@ -61,22 +61,6 @@ def convert_text_overlay(config, field_value, storage):
     # Wrap long texts to many smaller texts
     words = _wrap_text(field_value, width)
 
-    logger.debug(config)
-
-    # Check if need to scale font to fit the space
-    if config.get('keep_ratio', False):
-
-        actual_lines = len(words)
-        desired_lines = int(config.get('height', 1))
-
-        if actual_lines > desired_lines:
-
-            # Shrink to less lines
-            font_size, width = _fit_font_size_to_width_height(font_size, width, desired_lines, len(field_value))
-
-            # Wrap content again according to new width
-            words = _wrap_text(field_value, width)
-
     # Create overlays to all lines broken down
     texts = []
 
