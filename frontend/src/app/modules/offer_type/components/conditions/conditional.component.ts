@@ -32,10 +32,11 @@ export class OfferTypeConditionalComponent implements OnInit {
 
   ngOnInit() {}
 
+  public is_filled() {
+    return this.condition.key && this.condition.value && this.condition.action
+  }
+  
   public add_condition() {
-
-    console.log(`Adding condition field ${this.condition.key} to value ${this.condition.value} 
-                with action ${this.condition.action} and args ${this.condition.args}`)
 
     // Add the new condition
     this.conditions.push(

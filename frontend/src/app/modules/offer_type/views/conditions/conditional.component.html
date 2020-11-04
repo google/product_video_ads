@@ -33,9 +33,11 @@
 </mat-form-field>
 
 <!-- Add to list -->
-<a style="margin-left: 1%;" mat-stroked-button
-    (click)="add_condition()">
-    Add condition</a>
+<span (click)="add_condition()">
+    <a style="margin-left: 1%;" mat-stroked-button [disabled]="!is_filled()">
+        Add condition
+    </a>
+</span>
 
 <!--------- List existing conditions --------->
 <div *ngFor="let cond of conditions; let i = index">
