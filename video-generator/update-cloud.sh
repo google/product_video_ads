@@ -14,13 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-gsutil -m cp gs://product-video-ads/c/video-generator/video-generator.tar .
+gsutil -m cp gs://product-video-ads/v2/video-generator/video-generator.tar .
 
 docker load -i video-generator.tar
 
 PROJECT_NAME=video-generator:latest
 PROJECT_ID=$(gcloud config list --format 'value(core.project)' 2>/dev/null)
-#PROJECT_ID=${PROJECT_ID/:/\/}
 IMAGE_NAME=gcr.io/${PROJECT_ID}/${PROJECT_NAME}
 
 docker tag $PROJECT_NAME $IMAGE_NAME

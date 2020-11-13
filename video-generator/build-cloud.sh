@@ -23,21 +23,16 @@ sleep 3
 
 echo 'Running with user account' $(gcloud auth list --format="value(account)")
 
-#PROJECT_ID=${PROJECT_ID/:/\/}
-#IMAGE_NAME=gcr.io/${PROJECT_ID}/$PROJECT_NAME
-#docker tag $PROJECT_NAME $IMAGE_NAME
-#docker save $IMAGE_NAME -o video-generator.tar
-
 docker save $PROJECT_NAME -o video-generator.tar
 
 echo 'Sending docker image as TAR to cloud storage...'
 
 # Copy files to Cloud Storage
-gsutil cp video-generator.tar gs://product-video-ads/c/video-generator/video-generator.tar
-gsutil cp video-generator.yaml gs://product-video-ads/c/video-generator/video-generator.yaml
-gsutil cp install-cloud.sh gs://product-video-ads/c/video-generator/install-cloud.sh
-gsutil cp update-cloud.sh gs://product-video-ads/c/video-generator/update-cloud.sh
-gsutil cp authenticator.py gs://product-video-ads/c/video-generator/authenticator.py
+gsutil cp video-generator.tar gs://product-video-ads/v2/video-generator/video-generator.tar
+gsutil cp video-generator.yaml gs://product-video-ads/v2/video-generator/video-generator.yaml
+gsutil cp install-cloud.sh gs://product-video-ads/v2/video-generator/install-cloud.sh
+gsutil cp update-cloud.sh gs://product-video-ads/v2/video-generator/update-cloud.sh
+gsutil cp authenticator.py gs://product-video-ads/v2/video-generator/authenticator.py
 
 rm video-generator.tar
 
