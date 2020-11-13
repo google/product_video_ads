@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-gsutil -m cp -r gs://product-video-ads/c/frontend/dist .
-gsutil cp gs://product-video-ads/c/frontend/app.yaml app.yaml
+gsutil -m cp -r gs://product-video-ads/v2/frontend/dist .
+gsutil cp gs://product-video-ads/v2/frontend/app.yaml app.yaml
 
 echo -n 'Type the project name: '
 read CLOUD_PROJECT_NAME

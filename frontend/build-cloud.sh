@@ -16,8 +16,8 @@
 
 ng build --configuration=production
 
-gsutil -m cp -r dist/ gs://product-video-ads/c/frontend/
-gsutil cp app.yaml gs://product-video-ads/c/frontend/
-gsutil cp install-cloud.sh gs://product-video-ads/c/frontend/
+gsutil -m cp -r dist/ gs://product-video-ads/v2/frontend/
+gsutil cp app.yaml gs://product-video-ads/v2/frontend/
+gsutil cp install-cloud.sh gs://product-video-ads/v2/frontend/
 
 rm -rf dist
