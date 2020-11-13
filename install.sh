@@ -15,9 +15,9 @@
 # limitations under the License.
 
 # Install frontend
-gsutil cp gs://product-video-ads/c/frontend/install-cloud.sh install-frontend.sh
+gsutil cp gs://product-video-ads/v2/frontend/install-cloud.sh install-frontend.sh
 sh install-frontend.sh
 
 # Install video generator
-gsutil cp gs://product-video-ads/c/video-generator/install-cloud.sh install-video-generator.sh
+gsutil cp gs://product-video-ads/v2/video-generator/install-cloud.sh install-video-generator.sh
 sh install-video-generator.sh
