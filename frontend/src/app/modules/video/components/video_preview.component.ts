@@ -130,14 +130,15 @@ export class VideoPreviewComponent implements OnInit {
             images.push({
                 image: await this.snapshoter.takeSnapshot(parseFloat(time)),
                 elements: await this.helper.parse_configs_to_elements(configs as any[], this.products),
-                configs: configs
+                configs: configs,
+                time: time
             })
         }
 
         // This is going to screen
         this.screenshots.push({
             name: video.name,
-            images: images
+            images: images.sort((a, b) => a.time - b.time)
         })
     }
 
