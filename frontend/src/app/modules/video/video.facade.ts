@@ -25,6 +25,7 @@ import { Product } from 'app/models/product';
 import { VideoMetadata } from 'app/models/video_metadata'
 import { Base } from 'app/models/base';
 import { ACTION_TYPES } from 'app/models/condition';
+import { AdsMetadata } from 'app/models/ads_metadata';
 
 @Injectable()
 export class VideoFacade {
@@ -125,8 +126,8 @@ export class VideoFacade {
             return this.videoService.add_preview_video(video_metadata)
         }
 
-        add_production_video(video_metadata : VideoMetadata) {
-            return this.videoService.add_production_video(video_metadata)
+        add_production_video(video_metadata : VideoMetadata, ads_metadata : AdsMetadata) {
+            return this.videoService.add_production_video(video_metadata, ads_metadata)
         }
         
         get_available_groups_for_base(products : Product[]) : Map<string, Product[]> {

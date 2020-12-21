@@ -223,7 +223,7 @@
 
     </div>
 
-    <div *ngIf="youtube">
+    <div *ngIf="youtube" class="ads-fields">
 
       <br/>
 
@@ -248,7 +248,58 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
-      </div>
+
+      <br/>
+
+      <!-- Account -->
+      <mat-form-field class="example-full-width">
+        <mat-label>Account</mat-label>
+        <input [(ngModel)]="ads_metadata.account_id" placeholder="123-456-7890" matInput>
+      </mat-form-field>
+
+      <!-- Campaign -->
+      <mat-form-field class="example-full-width">
+        <mat-label>Campaign</mat-label>
+        <input [(ngModel)]="ads_metadata.campaign_name" placeholder="Campaign" matInput>
+      </mat-form-field>
+
+      <!-- AdGroup Type -->
+      <mat-form-field class="example-full-width">
+        <mat-label>Type of Ad</mat-label>
+        <mat-select [(ngModel)]="ads_metadata.ad_group_type">
+          <mat-option *ngFor="let type of ad_group_types" [value]="type[0]">
+            {{type[1]}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <br/>
+      
+      <!-- URL -->
+      <mat-form-field class="example-full-width">
+        <mat-label>URL</mat-label>
+        <input [(ngModel)]="ads_metadata.url" placeholder="URL" matInput>
+      </mat-form-field>
+
+      <!-- Call to Action -->
+      <mat-form-field class="example-full-width">
+        <mat-label>Call To Action</mat-label>
+        <input [(ngModel)]="ads_metadata.call_to_action" placeholder="Call to Action" matInput>
+      </mat-form-field>
+
+      <!-- Target Location -->
+      <mat-form-field class="example-full-width">
+        <mat-label>Target Location</mat-label>
+        <input [(ngModel)]="ads_metadata.target_location" placeholder="Location" matInput>
+      </mat-form-field>
+
+      <!-- Audience Name -->
+      <mat-form-field class="example-full-width">
+        <mat-label>Audience Name</mat-label>
+        <input [(ngModel)]="ads_metadata.audience_name" placeholder="Audience Name" matInput>
+      </mat-form-field>
+
+    </div>
 
     <br/><br/>
 
@@ -279,7 +330,7 @@
                 {{error}}
               </div>
 
-              <div class="campaign_config" *ngIf="selected_groups.has(group.key) && youtube">
+              <div class="campaign_config ads-fields" *ngIf="selected_groups.has(group.key) && youtube">
 
                 <!-- Name -->
                 <mat-form-field class="example-full-width">
@@ -301,6 +352,56 @@
                       {{visibility}}
                     </mat-option>
                   </mat-select>
+                </mat-form-field>
+
+                <br/>
+
+                <!-- Account -->
+                <mat-form-field class="example-full-width">
+                  <mat-label>Account</mat-label>
+                  <input [(ngModel)]="selected_groups.get(group.key).account" placeholder="123-456-7890" matInput>
+                </mat-form-field>
+
+                <!-- Campaign -->
+                <mat-form-field class="example-full-width">
+                  <mat-label>Campaign</mat-label>
+                  <input [(ngModel)]="selected_groups.get(group.key).campaign" placeholder="Campaign" matInput>
+                </mat-form-field>
+
+                <!-- AdGroup Type -->
+                <mat-form-field class="example-full-width">
+                  <mat-label>Type of Ad</mat-label>
+                  <mat-select [(ngModel)]="selected_groups.get(group.key).adgroup_type">
+                    <mat-option *ngFor="let type of ad_group_types" [value]="type[0]">
+                      {{type[1]}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <br/>
+                
+                <!-- URL -->
+                <mat-form-field class="example-full-width">
+                  <mat-label>URL</mat-label>
+                  <input [(ngModel)]="selected_groups.get(group.key).url" placeholder="URL" matInput>
+                </mat-form-field>
+
+                <!-- Call to Action -->
+                <mat-form-field class="example-full-width">
+                  <mat-label>Call To Action</mat-label>
+                  <input [(ngModel)]="selected_groups.get(group.key).call_to_action" placeholder="Call to Action" matInput>
+                </mat-form-field>
+
+                <!-- Target Location -->
+                <mat-form-field class="example-full-width">
+                  <mat-label>Target Location</mat-label>
+                  <input [(ngModel)]="selected_groups.get(group.key).target_location" placeholder="Location" matInput>
+                </mat-form-field>
+
+                <!-- Audience Name -->
+                <mat-form-field class="example-full-width">
+                  <mat-label>Audience Name</mat-label>
+                  <input [(ngModel)]="selected_groups.get(group.key).audience_name" placeholder="Audience Name" matInput>
                 </mat-form-field>
       
               </div>

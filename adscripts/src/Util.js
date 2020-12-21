@@ -12,16 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var NAMED_RANGES = {
-	AccountIds: 'AccountIds'
-}
-
 var Util = {
   
   	findAccountIds: function(sheet) {
-    	return sheet.getNamedRanges().filter(function(n) {
-      		return n.getName() == NAMED_RANGES.AccountIds
-    	})[0].getRange().getValues()
+      return sheet.getRange('B2:B').getValues()
     },
   
     findVideoCampaign: function(campaign_name) {

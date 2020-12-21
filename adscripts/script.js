@@ -1,11 +1,11 @@
 // Copyright 2020 Google LLC
-//
+
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//
-//   https://www.apache.org/licenses/LICENSE-2.0
-//
+
+//     https://www.apache.org/licenses/LICENSE-2.0
+
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,6 +25,20 @@ function main() {
     .withLimit(ACCOUNTS_LIMIT)
     .executeInParallel('processAccount', 'finalize')
 }
+// Copyright 2020 Google LLC
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     https://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 function finalize() {
   
 	var sheet = SpreadsheetApp.openByUrl(SPREADSHEET_URL).getSheetByName(SHEET_NAME)
@@ -42,10 +56,10 @@ function finalize() {
       // Start processing line matching account ID
       for (var row = 0; row < accountIds.length; row++) {
 
-        var accountId = accountIds[row][0]
+        var accountId = accountIds[row] != '' ? JSON.parse(accountIds[row])['account_id'] : ''
 
-        if (accountId == '')
-          break
+        if (!accountId || accountId == '')
+          continue
 
         // + 2 because we need to skip header, and sheet rows start at 1 (instead of 0)
         processGenericRow(new Row(row + 2, sheet), accountId, accountSelector)
@@ -82,6 +96,20 @@ function processGenericRow(row, accountId, accountSelector) {
    // Persist to sheet
    row.save()
 }
+// Copyright 2020 Google LLC
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     https://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 function processAccount() {
   
   var currentAccount = AdsApp.currentAccount().getCustomerId()
@@ -96,9 +124,9 @@ function processAccount() {
     // Start processing line matching account ID
     for (var row = 0; row < accountIds.length; row++) {
 
-      var accountId = accountIds[row][0]
+      var accountId = accountIds[row] != '' ? JSON.parse(accountIds[row])['account_id'] : ''
 
-      if (accountId == '')
+      if (!accountId || accountId == '')
         continue
 
       // + 2 because we need to skip header, and sheet rows start at 1 (instead of 0)
@@ -130,6 +158,20 @@ function processRow(row) {
   // Persist to sheet
   row.save()
 }
+// Copyright 2020 Google LLC
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     https://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 function Row(row, sheet) {
 
   var rowRange = sheet.getRange(row, 1, 1, FIELDS.length)
@@ -156,84 +198,129 @@ function Row(row, sheet) {
   	rowRange.setValues(rowData)
   }
 }
-var FIELDS = ['AccountID', 'CampaignName', 'AdGroupName', 'AdName', 'TargetLocation', 'TargetAge', 'TargetUserInterest', 'Url', 'CallToAction', 'AdGroupType', 'Configs', 'BaseVideo', 'Status', 'GeneratedVideo', 'AudienceName']
+// Copyright 2020 Google LLC
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     https://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+var FIELDS = ['Date', 'AdsMetadata', 'VideoMetadata', 'Status', 'GeneratedVideo']
 
 var STATUS_HANDLERS = {
   
   	'Off': function(row) {
       
-      	Util.pauseAllVideoAds(row.get('AdGroupName'), row.get('CampaignName'))
+        const adsMetadata = JSON.parse(row.get('AdsMetadata'))
+
+      	Util.pauseAllVideoAds(adsMetadata['ad_group_name'], adsMetadata['campaign_name'])
       
-      	row.set('AdName', '')
-        row.set('AdGroupName', '')
+      	adsMetadata['ad_name'] = ''
+        adsMetadata['ad_group_name'] = ''
+
         row.set('GeneratedVideo', '')
-  		  row.set('Status', 'Not Started')
+        row.set('Status', 'Not Started')
+        row.set('AdsMetadata', JSON.stringify(adsMetadata))
     },
   	  
   	'Video Ready': function(row) {
       
-      	var adGroupName = row.get('BaseVideo') + '-' + String(row.get('GeneratedVideo')).replace(/,/g, '-')
+        const adsMetadata = JSON.parse(row.get('AdsMetadata'))
+        const videoMetadata = JSON.parse(row.get('VideoMetadata'))
+
+      	var adGroupName = videoMetadata['base_video'] + '-' + String(row.get('GeneratedVideo')).replace(/,/g, '-')
         
         // Add targets related to Campaign
-        add_campaign_targets(row.get('CampaignName'), row.get('TargetLocation'))        
+        add_campaign_targets(adsMetadata['campaign_name'], adsMetadata['target_location'])        
       
         // Create or simply get adGroup
-        var adGroup = Util.createOrRetrieveVideoAdGroup(row.get('CampaignName'), row.get('AdGroupType'), adGroupName)
-        row.set('AdGroupName', adGroupName)
+        var adGroup = Util.createOrRetrieveVideoAdGroup(adsMetadata['campaign_name'], adsMetadata['ad_group_type'], adGroupName)
+        adsMetadata['ad_group_name'] = adGroupName
 
         // Associate audience with the adGroup
-        Util.associateAudienceWithAdGroup(adGroup, row.get('AudienceName'), Util.videoAdAudienceAssociator)
+        Util.associateAudienceWithAdGroup(adGroup, adsMetadata['audience_name'], Util.videoAdAudienceAssociator)
           
       	// Create video ad
       	var adName = 'Ad ' + (adGroup.videoAds().get().totalNumEntities() + 1)
-      	var videoAd = Util.createOrReactivateVideoAd(adName, adGroup, row.get('GeneratedVideo'), row.get('Url'), row.get('CallToAction'))
+      	var videoAd = Util.createOrReactivateVideoAd(adName, adGroup, row.get('GeneratedVideo'), adsMetadata['url'], adsMetadata['call_to_action'])
         
         // This may be null if video is not available
         if (videoAd != null) {
           
           Logger.log('videoAd %s created with type %s', videoAd.getName(), videoAd.getType())
-          row.set('AdName', videoAd.getName())
+          adsMetadata['ad_name'] = videoAd.getName()
 
           // It's running
           row.set('Status', 'Running')
+          row.set('AdsMetadata', JSON.stringify(adsMetadata))
    		}
     },
 
     'Image Ready': function(row) {
       
-      var adGroupName = row.get('BaseVideo') + '-' + String(row.get('GeneratedVideo')).replace(/,/g, '-')
+      const adsMetadata = JSON.parse(row.get('AdsMetadata'))
+      const videoMetadata = JSON.parse(row.get('VideoMetadata'))
+
+      var adGroupName = videoMetadata['base_video'] + '-' + String(row.get('GeneratedVideo')).replace(/,/g, '-')
       
       // Add targets related to Campaign
-      add_campaign_targets(row.get('CampaignName'), row.get('TargetLocation'))        
+      add_campaign_targets(adsMetadata['campaign_name'], adsMetadata['target_location'])        
     
       // Create or simply get adGroup
-      var adGroup = Util.createOrRetrieveAdGroup(row.get('CampaignName'), adGroupName)
-      row.set('AdGroupName', adGroupName)
+      var adGroup = Util.createOrRetrieveAdGroup(adsMetadata['campaign_name'], adGroupName)
+      adsMetadata['ad_group_name'] = adGroupName
 
       // Associate audience with the adGroup
-      Util.associateAudienceWithAdGroup(adGroup, row.get('AudienceName'), Util.adAudienceAssociator)
+      Util.associateAudienceWithAdGroup(adGroup, adsMetadata['audience_name'], Util.adAudienceAssociator)
         
       // Create video ad
       var adName = 'Ad ' + (adGroup.ads().get().totalNumEntities() + 1)
-      var ad = Util.createOrReactivateAd(adName, adGroup, row.get('GeneratedVideo'), row.get('Url'))
+      var ad = Util.createOrReactivateAd(adName, adGroup, row.get('GeneratedVideo'), adsMetadata['url'])
       
       // This may be null if video is not available
       if (ad != null) {
         
         Logger.log('Ad %s created', ad.getName())
-        row.set('AdName', ad.getName())
+        adsMetadata['ad_name'] = ad.getName()
 
         // It's running
         row.set('Status', 'Running')
+        row.set('AdsMetadata', JSON.stringify(adsMetadata))
       }
     },
     
     'Price Changed': function(row) {
-      Util.pauseAllVideoAds(row.get('AdGroupName'), row.get('CampaignName'))
-      row.set('AdName', '')
+
+      const adsMetadata = JSON.parse(row.get('AdsMetadata'))
+
+      Util.pauseAllVideoAds(adsMetadata['ad_group_name'], adsMetadata['campaign_name'])
+
+      adsMetadata['ad_name'] = ''
       row.set('Status', 'Paused')
+      row.set('AdsMetadata', JSON.stringify(adsMetadata))
     }
 }
+// Copyright 2020 Google LLC
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     https://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 function add_campaign_targets(campaign_name, location_targets_string) {
   
   var campaign = Util.findVideoCampaign(campaign_name) || Util.findCampaign(campaign_name) 
@@ -268,16 +355,24 @@ function add_campaign_targets(campaign_name, location_targets_string) {
   //         .withAudienceType(e[0])
   //         .build()                   
   //}) 
-}var NAMED_RANGES = {
-	AccountIds: 'AccountIds'
-}
+}// Copyright 2020 Google LLC
+
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//     https://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 var Util = {
   
   	findAccountIds: function(sheet) {
-    	return sheet.getNamedRanges().filter(function(n) {
-      		return n.getName() == NAMED_RANGES.AccountIds
-    	})[0].getRange().getValues()
+      return sheet.getRange('B2:B').getValues()
     },
   
     findVideoCampaign: function(campaign_name) {

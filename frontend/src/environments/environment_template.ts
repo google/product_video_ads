@@ -32,20 +32,10 @@ export const environment = {
   sheet_id: 'sheet_id',
 
   template_drive_folder: '1fG2pUo5obYJDkZmyoxhjVc_h9-WuW5Xr',
-  template_sheet_id: '1yqn2zyCCIluXUEmlMcvCgWxQdTPTaAuherozaFjJzFQ',
-
-  local_storage_keys: {
-    products: 'products',
-    static_assets: 'static_assets',
-    bases: 'bases',
-    offer_types: 'offer_types',
-    videos: 'videos',
-    drive_folder: 'drive_folder',
-    fonts: 'fonts'
-  },
+  template_sheet_id: '1JAGj6lpR1Ghz943fzBF3SMEuxxMn8aiY77GVNKdP_9Q',
 
   configuration: {
-    campaign_range: 'Campaigns!A2:D',
+    campaign_range: 'Campaigns!A2:E',
     product_range: '!A1:ZZ',
     drive_folder: 'Configuration!C6',
     static_assets: 'Static!A2:C',

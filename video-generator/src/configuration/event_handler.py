@@ -44,7 +44,7 @@ class EventHandler:
         # Go through all configured ads
         for row, campaign in enumerate(campaign_config):
 
-            (date, metadata, status) = campaign
+            (metadata, status) = campaign
 
             # Not handled
             if status not in self.HANDLED_STATUS:

@@ -29,10 +29,10 @@ function finalize() {
       // Start processing line matching account ID
       for (var row = 0; row < accountIds.length; row++) {
 
-        var accountId = accountIds[row][0]
+        var accountId = accountIds[row] != '' ? JSON.parse(accountIds[row])['account_id'] : ''
 
-        if (accountId == '')
-          break
+        if (!accountId || accountId == '')
+          continue
 
         // + 2 because we need to skip header, and sheet rows start at 1 (instead of 0)
         processGenericRow(new Row(row + 2, sheet), accountId, accountSelector)

@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+import { AdsMetadata } from './ads_metadata'
 import { VideoMetadata } from './video_metadata'
 
 export class Video {
@@ -22,21 +23,25 @@ export class Video {
         public date : string = '',
         public video_metadata : VideoMetadata,
         public status : string,
-        public generated_video : string = ''
+        public generated_video : string = '',
+        public ads_metadata? : AdsMetadata
         ) {}
         
     public static from_video_array(video_array : Array<any>) : Video {
         return new Video(
             video_array[0],
-            VideoMetadata.from_string_object(video_array[1]),
-            video_array[2],
-            video_array[3]
+            VideoMetadata.from_string_object(video_array[2]),
+            video_array[3],
+            video_array[4],
+            AdsMetadata.from_string_object(video_array[1])
+            
         )
     }
             
     public static to_video_array(video : Video) : Array<any> {
         return [
             video.date,
+            AdsMetadata.to_string_object(video.ads_metadata),
             VideoMetadata.to_string_object(video.video_metadata),
             video.status,
             video.generated_video

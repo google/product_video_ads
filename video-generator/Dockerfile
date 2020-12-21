@@ -1,7 +1,7 @@
 FROM python:3-alpine
 
 # Unzip and ImageMagick dependencies
-RUN apk update && apk add unzip imagemagick==7.0.10.12-r0
+RUN apk update && apk add unzip imagemagick==7.0.10.48-r0
 
 # Create empty folder to custom credentials mapping
 RUN mkdir -p /credentials
@@ -10,7 +10,7 @@ RUN mkdir -p /credentials
 ADD src/ /usr/src/app
 
 # Zip with ffmpeg binary
-ADD ffmpeg_latest.zip /
+ADD third_party/ffmpeg_latest.zip /
 RUN unzip -o /ffmpeg_latest.zip -d /usr/src/app
 
 # Install app

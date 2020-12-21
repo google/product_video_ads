@@ -47,7 +47,7 @@ video-generator-cluster
 sleep 5
 
 # Get docker image
-gsutil cp gs://product-video-ads/v2/video-generator/video-generator.tar .
+gsutil cp gs://product-video-ads/oss/video-generator/video-generator.tar .
 docker load -i video-generator.tar
 
 PROJECT_ID=$(gcloud config list --format 'value(core.project)' 2>/dev/null)
@@ -59,7 +59,7 @@ docker push $IMAGE_NAME
 # Install application to cluster
 echo 'Apply application to cluster...'
 
-gsutil cp gs://product-video-ads/v2/video-generator/video-generator.yaml video-generator.yaml
+gsutil cp gs://product-video-ads/oss/video-generator/video-generator.yaml video-generator.yaml
 
 echo -n 'Type the spreadsheet ID: '
 read SPREADSHEET_ID
@@ -69,7 +69,7 @@ echo 'Create a OAuth client ID credential with type Other/Desktop, then press en
 read
 
 # Generate auth token
-gsutil cp gs://product-video-ads/v2/video-generator/authenticator.py authenticator.py
+gsutil cp gs://product-video-ads/oss/video-generator/authenticator.py authenticator.py
 pip3 install google-auth-oauthlib==0.4.0
 python3 authenticator.py
 

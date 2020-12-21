@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-gsutil -m cp gs://product-video-ads/v2/video-generator/video-generator.tar .
+gsutil -m cp gs://product-video-ads/oss/video-generator/video-generator.tar .
 
 docker load -i video-generator.tar
 

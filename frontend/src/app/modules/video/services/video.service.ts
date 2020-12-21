@@ -21,6 +21,7 @@ import { VideoMetadata } from 'app/models/video_metadata'
 import { CachedConfigurationRepository } from 'app/repositories/implementations/googleapi/cached-configuration.repository'
 import { LoginService } from 'app/modules/login/services/login.service'
 import { Config } from 'app/models/config'
+import { AdsMetadata } from 'app/models/ads_metadata'
 
 @Injectable({providedIn: 'root'})
 export class VideoService {
@@ -54,15 +55,17 @@ export class VideoService {
         return this.add_video('Preview', video_metadata)
     }
 
-    add_production_video(video_metadata : VideoMetadata) {
-        return this.add_video('On', video_metadata)
+    add_production_video(video_metadata : VideoMetadata, ads_metadata : AdsMetadata) {
+        return this.add_video('On', video_metadata, ads_metadata)
     }
 
-    private add_video(status : string, video_metadata : VideoMetadata) {
+    private add_video(status : string, video_metadata : VideoMetadata, ads_metadata? : AdsMetadata) {
         this._videos.next([...this.videos, new Video(
             new Date().toLocaleString('pt-BR'), 
             video_metadata, 
-            status
+            status,
+            '',
+            ads_metadata
         )])
         
         return this.repository.save_videos(this.videos)

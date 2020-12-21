@@ -24,6 +24,7 @@ import { OfferType } from 'app/models/offertype';
 import { Video } from 'app/models/video';
 import { VideoMetadata } from 'app/models/video_metadata';
 import { DomSanitizer } from '@angular/platform-browser';
+import { AdsMetadata } from 'app/models/ads_metadata';
 
 @Component({
   selector: 'app-video',
@@ -37,6 +38,11 @@ export class VideoComponent implements OnInit {
   yt_url = 'https://www.youtube.com/embed/'
   
   visibilities = ['unlisted', 'public']
+  ad_group_types = [['TRUE_VIEW_IN_STREAM', 'TRUE_VIEW_IN_STREAM'],
+  ['TRUE_VIEW_IN_STREAM', 'TRUE_VIEW_FOR_ACTION'],
+  ['TRUE_VIEW_IN_DISPLAY', 'TRUE_VIEW_IN_DISPLAY'],
+  ['NON_SKIPPABLE_IN_STREAM', 'NON_SKIPPABLE_IN_STREAM'],
+  ['BUMPER', 'BUMPER']]
 
   // Data to view flowing from services
   bases$ : Observable<Base[]>
@@ -62,6 +68,7 @@ export class VideoComponent implements OnInit {
   selected_offer_types : Array<string>
   selected_products: Array<string>
   video_metadata : any
+  ads_metadata : any
   
   constructor(private facade : VideoFacade, public sanitizer: DomSanitizer, private _snackBar: MatSnackBar) {
       this.bases$ = this.facade.bases$
@@ -141,11 +148,12 @@ export class VideoComponent implements OnInit {
       }
 
       // Create a single video
+      video_metadata.name = video_metadata.name || 'Preview'
+
       this.add_video(
-        video_metadata.name || 'Preview',
         this.facade.generate_final_configs(selected_offer_types, this.base, selected_products, this.products),
-        video_metadata.description,
-        video_metadata.visibility
+        video_metadata,
+        this.ads_metadata
       )
 
       // Clear screen selections after all
@@ -218,10 +226,10 @@ export class VideoComponent implements OnInit {
 
       // Generate all videos
       this.final_configs.forEach(final_configs => 
-        this.add_video(final_configs.name,
-          final_configs.configs,
-          final_configs.description,
-          final_configs.visibility)
+        this.add_video(final_configs.configs,
+          final_configs,
+          final_configs
+        )
       )
 
       // Clear selections after all
@@ -233,6 +241,7 @@ export class VideoComponent implements OnInit {
     private clear_screen_selections() {
       this.final_configs = []
       this.video_metadata = {}
+      this.ads_metadata = {}
       this.base = undefined
       this.products = undefined
       this.product_sheet = undefined
@@ -240,16 +249,25 @@ export class VideoComponent implements OnInit {
     }
 
     
-    private add_video(name : string, final_configs : any[], description? : string, visibility? : string) {
+    private add_video(final_configs : any[], video_metadata : any, ads_metadata : any) {
 
       (this.youtube ? this.facade.add_production_video : this.facade.add_preview_video).apply(this.facade, [
         new VideoMetadata(
-          name,
+          video_metadata.name,
           this.base.title,
           this.product_sheet,
           final_configs,
-          description,
-          visibility
+          video_metadata.description,
+          video_metadata.visibility
+        ),
+        new AdsMetadata(
+          ads_metadata.account_id,
+          ads_metadata.campaign_name,
+          ads_metadata.ad_group_type,
+          ads_metadata.url,
+          ads_metadata.call_to_action,
+          ads_metadata.target_location,
+          ads_metadata.audience_name
         )
       ])
     }
