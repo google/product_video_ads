@@ -28,7 +28,7 @@ class SpreadsheetConfiguration(object):
     STATUS_VIDEO_RANGE = 'Campaigns!D%s:E%s'
     PRODUCTS_RANGE = '!A1:ZZ'
     BASE_VIDEOS_RANGE = 'Bases!A2:C'
-    ASSETS_RANGE = 'Static!A2:C'
+    ASSETS_RANGE = 'Static!A1:C'
     DRIVE_CONFIG_RANGE = 'Configuration!C6'
     INTERVAL_IN_MINUTES_RANGE = 'Configuration!C7'
 
