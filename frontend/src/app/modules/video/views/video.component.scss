@@ -26,3 +26,19 @@
     background-color: rgba(0,0,0, 0.1);
     margin-bottom: 3px;
 }
+
+.click-icon {
+    cursor: pointer;
+}
+
+mat-table {
+    margin-bottom: 2vh;
+
+    mat-header-cell, mat-cell {
+        justify-content: center;
+    }
+
+    .mat-column-info, .mat-column-view, .mat-column-delete, .mat-column-download {
+        flex: 0 0 6%;
+    }
+}

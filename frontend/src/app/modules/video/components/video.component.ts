@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Product } from 'app/models/product';
 import { VideoFacade } from '../video.facade';
@@ -25,6 +25,8 @@ import { Video } from 'app/models/video';
 import { VideoMetadata } from 'app/models/video_metadata';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AdsMetadata } from 'app/models/ads_metadata';
+import {MatDialog} from '@angular/material/dialog';
+import { InfoVideoDialog } from './info_video.component';
 
 @Component({
   selector: 'app-video',
@@ -36,7 +38,7 @@ export class VideoComponent implements OnInit {
 
   drive_url = 'https://drive.google.com/uc?export=download&id='
   yt_url = 'https://www.youtube.com/embed/'
-  
+  displayedColumns = ['date', 'name', 'base', 'status', 'download', 'delete', 'info']
   visibilities = ['unlisted', 'public']
   ad_group_types = [['TRUE_VIEW_IN_STREAM', 'TRUE_VIEW_IN_STREAM'],
   ['TRUE_VIEW_IN_STREAM', 'TRUE_VIEW_FOR_ACTION'],
@@ -70,7 +72,7 @@ export class VideoComponent implements OnInit {
   video_metadata : any
   ads_metadata : any
   
-  constructor(private facade : VideoFacade, public sanitizer: DomSanitizer, private _snackBar: MatSnackBar) {
+  constructor(private facade : VideoFacade, public sanitizer: DomSanitizer, public dialog: MatDialog, private _snackBar: MatSnackBar) {
       this.bases$ = this.facade.bases$
       this.products_sheets$ = this.facade.products_sheets$
       this.offer_types$ = this.facade.offer_types$
@@ -178,7 +180,7 @@ export class VideoComponent implements OnInit {
 
       this.final_configs = []
 
-      for(let [group, video_metadata] of this.selected_groups.entries()) {
+      for(let [group, metadata] of this.selected_groups.entries()) {
         
         const group_products = this.product_groups.get(group)
 
@@ -195,10 +197,19 @@ export class VideoComponent implements OnInit {
           let offer_types = sorted_products.map(p => p.offer_type)
 
           this.final_configs.push({
-            name: video_metadata.name || group,
-            description: video_metadata.description,
-            visibility: video_metadata.visibility,
-            configs: this.facade.generate_final_configs(offer_types, this.base, product_keys, this.products)
+            name: metadata.name || group,
+            description: metadata.description,
+            visibility: metadata.visibility,
+            configs: this.facade.generate_final_configs(offer_types, this.base, product_keys, this.products),
+            account_id: metadata.account_id,
+            campaign_name: metadata.campaign_name,
+            ad_group_type: metadata.ad_group_type,
+            url: metadata.url,
+            call_to_action: metadata.call_to_action,
+            target_location: metadata.target_location,
+            audience_name: metadata.audience_name,
+            ad_group_name: metadata.ad_group_name,
+            ad_name: metadata.ad_name
           })
         }
       }
@@ -264,9 +275,9 @@ export class VideoComponent implements OnInit {
 
     delete_video(video : Video) {
 
-      const video_name = video.generated_video || ''
+      const video_name = video.video_metadata.name
 
-      this._snackBar.open('Confirm deletion of asset ' + video_name + '?', 'Confirm', {
+      this._snackBar.open('Confirm deletion of ' + video_name + '?', 'Confirm', {
         duration: 4000,
       }).onAction().subscribe(() => {
         this.facade.delete_video(video.id).then(response => {
@@ -288,7 +299,52 @@ export class VideoComponent implements OnInit {
       })
     }
 
+    find_status_color(status : string) {
+      switch(status) {
+        case 'Done':
+          return 'green'
+        case 'Running':
+          return 'purple'
+        case 'Video Ready':
+            return 'green'
+        case 'Processing':
+          return 'orange'
+        case 'Preview':
+          return 'blue'
+        case 'On':
+          return 'blue'
+        case 'Error':
+          return 'red'
+      }
+
+      return 'black'
+    }
+
+    info_asset(video : Video) {
+
+      let url, type
+
+      // Reason if it's youtube or drive video hosted
+      if (['Running', 'Video Ready', 'On'].indexOf(video.status) >= 0) {
+        url = this.sanitizer.bypassSecurityTrustResourceUrl(this.yt_url + video.generated_video)
+        type = 'youtube'
+      } else {
+        url = this.drive_url + video.generated_video
+        type = 'drive'
+      }     
+
+      this.dialog.open(InfoVideoDialog, {
+        width: '800px',
+        data: {
+          video: video,
+          type: type,
+          url: url
+        }
+      })
+    }
+
     indexTracker(index: number, value: any) {
       return index;
     }
   }
+

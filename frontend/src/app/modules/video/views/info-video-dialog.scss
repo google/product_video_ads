@@ -1,0 +1,18 @@
+.title {
+    font-weight: bold;
+}
+
+.container {
+
+    display: flex;
+    justify-content: center;
+
+    .column {
+        flex: 0 0 30%;
+    }
+}
+
+.video-content {
+    margin-top: 4%;
+    text-align: center;
+}

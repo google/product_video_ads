@@ -183,8 +183,8 @@ function findProductsBeingUsed(productsVideo) {
       case 'On (Preview)':
         return 'Preview'
   
-      case 'Not Started':
-        return 'Not Started'
+      case 'Done':
+        return 'Done'
   
       default:
         

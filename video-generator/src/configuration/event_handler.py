@@ -22,7 +22,7 @@ logger = log.getLogger()
 class EventHandler:
     VIDEO_READY_STATUS = 'Video Ready'
     IMAGE_READY_STATUS = 'Image Ready'
-    NOT_STARTED_STATUS = 'Not Started'
+    DONE_STATUS = 'Done'
     PROCESSING_STATUS = 'Processing'
     ERROR_STATUS = 'Error'
     PREVIEW_STATUS = 'Preview'
@@ -91,7 +91,7 @@ class EventHandler:
         # If it's a Preview status, preview the video only
         if status == self.PREVIEW_STATUS:
             result_id = processor.process_task(row, config, True)
-            new_status = self.NOT_STARTED_STATUS
+            new_status = self.DONE_STATUS
         else:
             result_id = processor.process_task(row, config)
 
