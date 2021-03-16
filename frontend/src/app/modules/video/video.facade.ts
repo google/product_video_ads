@@ -159,8 +159,8 @@ export class VideoFacade {
             this.productsService.load_products_sheets()
         }
         
-        delete_video(generated_video : string) {
-            return this.videoService.delete_video(generated_video)
+        delete_video(id : string) {
+            return this.videoService.delete_video(id)
         }
 
         delete_all_videos() {
@@ -226,10 +226,6 @@ export class VideoFacade {
             return true
         }
         
-        public is_generating() : boolean {
-            return this.videoService.is_generating()
-        }
-
         public download_base_video(url : string) : Promise<string> {
             return this.videoService.download_base_video(url)
         }

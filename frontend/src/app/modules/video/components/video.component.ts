@@ -141,12 +141,6 @@ export class VideoComponent implements OnInit {
 
     add_single_video(selected_products : Array<string>, selected_offer_types : Array<string>, video_metadata) {
 
-      // Block deletions when videos are being generated
-      if(this.facade.is_generating()) {
-        this._snackBar.open('Cannot add more videos while some are being generated', 'OK')
-        return
-      }
-
       // Create a single video
       video_metadata.name = video_metadata.name || 'Preview'
 
@@ -182,12 +176,6 @@ export class VideoComponent implements OnInit {
 
     review_create_bulk() {
 
-      // Block deletions when videos are being generated
-      if(this.facade.is_generating()) {
-        this._snackBar.open('Cannot add more videos while some are being generated', 'OK')
-        return
-      }
-
       this.final_configs = []
 
       for(let [group, video_metadata] of this.selected_groups.entries()) {
@@ -217,12 +205,6 @@ export class VideoComponent implements OnInit {
     }
 
     create_bulk() {
-
-      // Block deletions when videos are being generated
-      if(this.facade.is_generating()) {
-        this._snackBar.open('Cannot add more videos while some are being generated', 'OK')
-        return
-      }
 
       // Generate all videos
       this.final_configs.forEach(final_configs => 
@@ -282,18 +264,12 @@ export class VideoComponent implements OnInit {
 
     delete_video(video : Video) {
 
-      // Block deletions when videos are being generated
-      if (this.facade.is_generating()) {
-       this._snackBar.open('Cannot make deletions while videos are being generated', 'OK')
-       return
-      }
-
-      const video_name = video.generated_video || 'being generated'
+      const video_name = video.generated_video || ''
 
       this._snackBar.open('Confirm deletion of asset ' + video_name + '?', 'Confirm', {
         duration: 4000,
       }).onAction().subscribe(() => {
-        this.facade.delete_video(video.generated_video).then(response => {
+        this.facade.delete_video(video.id).then(response => {
           this._snackBar.open("Asset deleted (" + response.status + ')', 'OK', { duration: 2000 })
         })
       })

@@ -24,7 +24,8 @@ from log.SpreadsheetHandler import SpreadsheetHandler
 class SpreadsheetConfiguration(object):
 
     # Configuration ranges
-    CAMPAIGN_RANGE = 'Campaigns!C2:E'
+    CAMPAIGN_RANGE = 'Campaigns!D2:D'
+    CAMPAIGN_SINGLE_RANGE = 'Campaigns!C%s:D%s'
     STATUS_VIDEO_RANGE = 'Campaigns!D%s:E%s'
     PRODUCTS_RANGE = '!A1:ZZ'
     BASE_VIDEOS_RANGE = 'Bases!A2:C'
@@ -92,9 +93,12 @@ class SpreadsheetConfiguration(object):
 
         return bases
 
-    def get_campaign_config(self):
-        return map(lambda c: [json.loads(c[0]), c[1]],
-                   self.__get_range_values(self.CAMPAIGN_RANGE))
+    def get_campaign_status(self):
+        return map(lambda c: c[0], self.__get_range_values(self.CAMPAIGN_RANGE))
+
+    def get_single_campaign_config(self, row):
+        values = self.__get_range_values(self.CAMPAIGN_SINGLE_RANGE % (row, row))[0]
+        return json.loads(values[0]), values[1]
 
     def get_products_data(self, products_label):
         # Load products

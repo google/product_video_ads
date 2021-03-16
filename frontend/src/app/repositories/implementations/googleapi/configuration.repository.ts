@@ -188,4 +188,17 @@ export class ConfigurationRepository implements ConfigurationInterface {
         
         return this.googleApi.save_values(data)
     }
+
+    async save_video(videos: Video[], id : string): Promise<any> {
+
+        const data = []
+        const index = videos.findIndex(v => v.id == id)
+  
+        data.push({
+            range: environment.configuration.campaign_single_range.replace(/\$INDEX/g, String(index + 2)),
+            values: [Video.to_video_array(videos[index])]
+        })
+
+        return this.googleApi.save_values(data)
+    }
 }

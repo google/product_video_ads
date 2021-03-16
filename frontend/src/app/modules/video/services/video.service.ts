@@ -20,7 +20,7 @@ import { Video } from 'app/models/video'
 import { VideoMetadata } from 'app/models/video_metadata'
 import { CachedConfigurationRepository } from 'app/repositories/implementations/googleapi/cached-configuration.repository'
 import { LoginService } from 'app/modules/login/services/login.service'
-import { Config } from 'app/models/config'
+import * as UUID from 'uuid/v4'
 import { AdsMetadata } from 'app/models/ads_metadata'
 
 @Injectable({providedIn: 'root'})
@@ -60,15 +60,18 @@ export class VideoService {
     }
 
     private add_video(status : string, video_metadata : VideoMetadata, ads_metadata? : AdsMetadata) {
-        this._videos.next([...this.videos, new Video(
-            new Date().toLocaleString('pt-BR'), 
+
+        const new_video = new Video(
+            UUID(),
+            ads_metadata,
             video_metadata, 
             status,
-            '',
-            ads_metadata
-        )])
+            ''
+        )
+
+        this._videos.next([...this.videos, new_video])
         
-        return this.repository.save_videos(this.videos)
+        return this.repository.save_video(this.videos, new_video.id)
     }
 
     public download_base_video(url : string) : Promise<string> {
@@ -83,13 +86,9 @@ export class VideoService {
         this._logs.next(await this.repository.load_logs())
     }
 
-    is_generating() : boolean {
-        return this.videos.some(video => ['Preview', 'On'].indexOf(video.status) >= 0)
-    }
-
-    delete_video(generated_video : string) {
-        this._videos.next(this.videos.filter(v => v.generated_video != generated_video))
-        return this.repository.save_videos(this.videos)
+    delete_video(id : string) {
+        this.videos.find(v => v.id == id).status = 'Deleted'
+        return this.repository.save_video(this.videos, id)
     }
 
     delete_all_videos() {

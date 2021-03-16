@@ -20,10 +20,11 @@ logger = log.getLogger()
 
 
 class EventHandler:
-
     VIDEO_READY_STATUS = 'Video Ready'
     IMAGE_READY_STATUS = 'Image Ready'
     NOT_STARTED_STATUS = 'Not Started'
+    PROCESSING_STATUS = 'Processing'
+    ERROR_STATUS = 'Error'
     PREVIEW_STATUS = 'Preview'
     HANDLED_STATUS = ['On', 'Paused', 'Preview']
 
@@ -38,51 +39,61 @@ class EventHandler:
         # All bases name and files
         base_videos = self.configuration.get_all_bases()
 
-        # All configured ads: config info, base name and status to process
-        campaign_config = self.configuration.get_campaign_config()
+        while True:
 
-        # Go through all configured ads
-        for row, campaign in enumerate(campaign_config):
+            # Load all status and filter only the handled rows
+            rows = [i for i, s in enumerate(self.configuration.get_campaign_status()) if s in self.HANDLED_STATUS]
 
-            (metadata, status) = campaign
+            logger.info('Found %s rows to process', len(rows))
 
-            # Not handled
-            if status not in self.HANDLED_STATUS:
-                continue
+            if len(rows) == 0:
+                break
 
-            # Skip header and starts on 1 instead of 0
-            row = str(row + 2)
+            # Go through all status lines, handle expected status
+            for row in rows:
+                self.handle_row(row, base_videos)
 
-            # Find base file by its name
-            base_file_name = base_videos.get(metadata['base_video'])
+    def handle_row(self, row, base_videos):
 
-            config = {
-                'name': metadata.get('name', 'Unnamed'),
-                'description': metadata.get('description', ''),
-                'visibility': metadata.get('visibility', ''),
-                'base_file': base_file_name,
-                'configs': metadata['configs'],
-                'products_data': self.configuration.get_products_data(metadata['products_label'])
-            }
+        row = str(row + 2)
+        (metadata, status) = self.configuration.get_single_campaign_config(row)
 
-            logger.info('[Event Handler] Handling new creative with base %s' % base_file_name)
-            logger.debug('Configs: %s' % config)
+        # Just in case frontend changed this row until I read it
+        if status not in self.HANDLED_STATUS:
+            return
 
-            # Choose the correct processor to do the job (image or video)
-            if base_file_name and base_file_name.endswith('.mp4'):
-                processor = self.video_processor
-                new_status = self.VIDEO_READY_STATUS
-            else:
-                processor = self.image_processor
-                new_status = self.IMAGE_READY_STATUS
+        # Started processing, mark it
+        self.configuration.update_status(row, '', self.PROCESSING_STATUS)
 
-            # If it's a Preview status, preview the video only
-            if status == self.PREVIEW_STATUS:
-                result_id = processor.process_task(row, config, True)
-                new_status = self.NOT_STARTED_STATUS
-            else:
-                result_id = processor.process_task(row, config)
+        # Find base file by its name
+        base_file_name = base_videos.get(metadata['base_video'])
 
-            # When processed with success, update configuration status
-            if result_id is not None:
-                self.configuration.update_status(row, result_id, new_status)
+        config = {
+            'name': metadata.get('name', 'Unnamed'),
+            'description': metadata.get('description', ''),
+            'visibility': metadata.get('visibility', ''),
+            'base_file': base_file_name,
+            'configs': metadata['configs'],
+            'products_data': self.configuration.get_products_data(metadata['products_label'])
+        }
+
+        logger.info('[Event Handler] Handling new creative with base %s' % base_file_name)
+        logger.debug('Configs: %s' % config)
+
+        # Choose the correct processor to do the job (image or video)
+        if base_file_name and base_file_name.endswith('.mp4'):
+            processor = self.video_processor
+            new_status = self.VIDEO_READY_STATUS
+        else:
+            processor = self.image_processor
+            new_status = self.IMAGE_READY_STATUS
+
+        # If it's a Preview status, preview the video only
+        if status == self.PREVIEW_STATUS:
+            result_id = processor.process_task(row, config, True)
+            new_status = self.NOT_STARTED_STATUS
+        else:
+            result_id = processor.process_task(row, config)
+
+        # When processed, update configuration status
+        self.configuration.update_status(row, result_id, self.ERROR_STATUS if result_id is None else new_status)

@@ -44,5 +44,6 @@ export interface ConfigurationInterface {
 
     load_videos() : Promise<Video[]>
     save_videos(videos : Video[]) : Promise<any>
+    save_video(videos : Video[], id : string) : Promise<any>
     download_base_video_from_drive(url : string) : Promise<string>
 }

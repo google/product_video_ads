@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+TS=$(date +"%s")
+
+mkdir $TS && cd $TS
+
 gsutil -m cp -r gs://product-video-ads/oss/frontend/dist .
 gsutil cp gs://product-video-ads/oss/frontend/app.yaml app.yaml
 
@@ -21,7 +25,6 @@ echo -n 'Type the project name: '
 read CLOUD_PROJECT_NAME
 
 gcloud config set project $CLOUD_PROJECT_NAME
-gcloud config list
 
 echo 'Enabling some needed APIs...'
 gcloud services enable drive.googleapis.com

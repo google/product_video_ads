@@ -17,7 +17,7 @@ import pickle
 import log
 
 
-class TokenAuth():
+class TokenAuth:
     FILE = 'token'
 
     logger = log.getLogger()

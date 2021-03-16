@@ -19,6 +19,7 @@ import { LoginFacade } from '../login.facade';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { of } from 'rxjs/internal/observable/of';
 
 @Component({
   selector: 'app-login',
@@ -43,6 +44,7 @@ export class LoginComponent implements OnInit {
   drive_folder : Observable<string>
 
   sheet_text : string = ''
+  error_message : string = ''
 
   constructor(private loginFacade : LoginFacade, private route : ActivatedRoute, private _snackBar: MatSnackBar) {}
 
@@ -75,10 +77,6 @@ export class LoginComponent implements OnInit {
   }
 
   generate_new() {
-    this.loginFacade.generate_new().then(response => {
-      if (!response) {
-        this._snackBar.open("The user does not have access to the PVA Template or there was an error trying to read the spreasheet. Please contact the admin.", 'OK', { duration: 10000 })
-      } 
-    });
+    this.loginFacade.generate_new()
   }
 }

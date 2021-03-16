@@ -14,16 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
-
-CREDENTIALS_FOLDER=$(pwd)/credentials
-SPREADSHEET_ID=1AKJrMmPaOz1oZrUTPTFf9nlFLKFvPI8eS2hJSw1gD0U
-BUCKET_NAME=video-generator-test-123
-
-export GOOGLE_APPLICATION_CREDENTIALS=$CREDENTIALS_FOLDER/credentials.json
-export SPREADSHEET_ID=$SPREADSHEET_ID
-export BUCKET_NAME=$BUCKET_NAME
+shopt -s extglob
 
 cd src
-pipenv run python main.py
+
+cat Main.js > ../script.js
+cat -- !(Main).js >> ../script.js
+
+gsutil cp -r * gs://product-video-ads/oss/appscript/

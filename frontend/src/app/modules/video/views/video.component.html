@@ -36,10 +36,10 @@
 
       <span *ngFor="let video of videos$ | async">
 
-        <!-- Preview asset ready on Drive-->
+        <!-- Preview video ready -->
         <div *ngIf="video.generated_video && video.status == 'Not Started'" class="added_item video_box" >
           
-          <div>{{video.date}}</div>
+          <div>{{video.video_metadata.date}}</div>
           <div><b>{{video.video_metadata.name}}</b></div>
           <div>({{video.video_metadata.base_video}})</div>
 
@@ -58,27 +58,68 @@
           </span>
         </div>
 
-        <!-- Preview asset to be generated -->
+        <!-- YT video ready-->
+        <div *ngIf="video.generated_video && ['Running', 'Video Ready'].indexOf(video.status) >= 0" class="added_item video_box">
+                
+          <div>{{video.video_metadata.date}}</div>
+          <div><b>{{video.video_metadata.name}}</b></div>
+          <div>({{video.video_metadata.base_video}})</div>
+
+          <div style="margin: 1% 0; color: blue"><b>{{video.status}}</b></div>
+
+          <div><b>{{video.video_metadata.visibility}}</b></div>
+
+          <br/>
+
+          <iframe width="300" height="200"
+            [src]="sanitizer.bypassSecurityTrustResourceUrl(yt_url + video.generated_video)" frameborder="0" 
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+          </iframe>
+
+          <br/>
+
+          <span style="cursor: pointer" (click)="delete_video(video)">
+            <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
+          </span>
+
+        </div>
+
+        <!-- Assets with other states-->
+        <div *ngIf="['Error'].indexOf(video.status) >= 0" class="added_item video_box">
+                
+          <div>{{video.video_metadata.date}}</div>
+          <div><b>{{video.video_metadata.name}}</b></div>
+          <div>({{video.video_metadata.base_video}})</div>
+
+          <div style="margin: 1% 0; color: red"><b>{{video.status}}</b></div>
+
+          <br/>
+
+          <span style="cursor: pointer" (click)="delete_video(video)">
+            <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
+          </span>
+
+        </div>
+
+        <!-- Preview video to be generated -->
         <div class="added_item video_box" *ngIf="video.status == 'Preview'">
 
-          <div>{{video.date}}</div>
+          <div>{{video.video_metadata.date}}</div>
           <div><b>{{video.video_metadata.name}}</b></div>
           <div>({{video.video_metadata.base_video}})</div>
 
           <div style="border:1px solid #000; margin: 10% 0; padding: 5%">
             <mat-icon aria-hidden="false" aria-label="access_time icon">access_time</mat-icon>
-            <p>Generating asset...</p>
+            <p>Scheduled</p>
             <br/>
-            <span style="cursor: pointer" (click)="delete_video(video)">
-              <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
-            </span>
+            <button mat-stroked-button color="warn" (click)="delete_video(video)">Cancel</button>
           </div>
         </div>
 
         <!-- YT video to be generated -->
         <div *ngIf="video.status == 'On'" class="added_item video_box">
 
-          <div>{{video.date}}</div>
+          <div>{{video.video_metadata.date}}</div>
           <div><b>{{video.video_metadata.name}}</b></div>
           <div>({{video.video_metadata.base_video}})</div>
 
@@ -87,38 +128,23 @@
           <br/>
 
           <mat-icon aria-hidden="false" aria-label="access_time icon">access_time</mat-icon>
-          <p style="margin: 1% 0; color: blue"><b>Generating asset</b></p>
+          <p style="margin: 1% 0; color: blue"><b>Scheduled</b></p>
 
-          <span style="cursor: pointer" (click)="delete_video(video)">
-            <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
-          </span>
-      </div>
+          <button mat-stroked-button color="warn" (click)="delete_video(video)">Cancel</button>
+        </div>
 
-      <!-- YT video ready-->
-      <div *ngIf="video.generated_video && ['Running', 'Video Ready'].indexOf(video.status) >= 0" class="added_item video_box">
-              
-        <div>{{video.date}}</div>
-        <div><b>{{video.video_metadata.name}}</b></div>
-        <div>({{video.video_metadata.base_video}})</div>
+        <!-- Being processed -->
+        <div class="added_item video_box" *ngIf="video.status == 'Processing'">
 
-        <div style="margin: 1% 0; color: blue"><b>{{video.status}}</b></div>
+          <div>{{video.video_metadata.date}}</div>
+          <div><b>{{video.video_metadata.name}}</b></div>
+          <div>({{video.video_metadata.base_video}})</div>
 
-        <div><b>{{video.video_metadata.visibility}}</b></div>
-
-        <br/>
-
-        <iframe width="300" height="200"
-          [src]="sanitizer.bypassSecurityTrustResourceUrl(yt_url + video.generated_video)" frameborder="0" 
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
-        </iframe>
-
-        <br/>
-
-        <span style="cursor: pointer" (click)="delete_video(video)">
-          <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
-        </span>
-
-    </div>
+          <div style="border:1px solid #000; margin: 10% 0; padding: 5%">
+            <mat-icon aria-hidden="false" aria-label="movie_creation icon">movie_creation</mat-icon>
+            <p>Generating...</p>
+          </div>
+        </div>
 
       </span>
     </mat-expansion-panel>

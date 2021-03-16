@@ -129,7 +129,10 @@ def convert_image_overlay(config, field_value, storage, cloud_storage):
     _download_image_to_file(field_value, tmp_file_name, cloud_storage)
 
     # Find out file's extension
-    extension = imghdr.what(tmp_file_name) or 'jpg'
+    extension = imghdr.what(tmp_file_name)
+
+    if extension is None:
+        raise ValueError('Invalid image %s' % field_value)
 
     # Save product image to image folder
     image_path = storage.get_absolute_path(config['type'] + str(config['key']) + str(config['field']) + '.' + extension)
@@ -165,7 +168,8 @@ def _download_image_to_file(url, tmp_file_name, cloud_storage):
     else:
 
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/39.0.2171.95 Safari/537.36'}
 
         r = requests.get(url, stream=True, headers=headers, timeout=20)
         r.raw.decode_content = True
