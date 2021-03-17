@@ -334,7 +334,7 @@ export class VideoComponent implements OnInit {
       }     
 
       this.dialog.open(InfoVideoDialog, {
-        width: '800px',
+        width: '1000px',
         data: {
           video: video,
           type: type,

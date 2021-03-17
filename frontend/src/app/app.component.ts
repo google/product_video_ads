@@ -15,10 +15,20 @@
 */
 
 import { Component } from '@angular/core';
+import { Observable } from 'rxjs';
+import { LoginFacade } from './modules/login/login.facade';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  providers: [ LoginFacade ]
 })
-export class AppComponent {}
+export class AppComponent {
+
+  ready : Observable<number>
+
+  constructor(private loginFacade : LoginFacade) {
+    this.ready = loginFacade.ready
+  }
+}

@@ -19,7 +19,6 @@ import { LoginFacade } from '../login.facade';
 import { Observable } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { of } from 'rxjs/internal/observable/of';
 
 @Component({
   selector: 'app-login',
