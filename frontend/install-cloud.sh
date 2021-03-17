@@ -18,10 +18,10 @@ TS=$(date +"%s")
 
 mkdir $TS && cd $TS
 
-gsutil -m cp -r gs://product-video-ads/oss/frontend/dist .
-gsutil cp gs://product-video-ads/oss/frontend/app.yaml app.yaml
+gsutil -m cp -r gs://product-video-ads/main/frontend/dist .
+gsutil cp gs://product-video-ads/main/frontend/app.yaml app.yaml
 
-echo -n 'Type the project name: '
+echo -n 'Type the cloud project name: '
 read CLOUD_PROJECT_NAME
 
 gcloud config set project $CLOUD_PROJECT_NAME
@@ -32,7 +32,7 @@ gcloud services enable sheets.googleapis.com
 
 echo 'Installing Web Frontend on App Engine...'
 
-echo -n 'Type the (OAuth Web) Client ID: '
+echo -n 'Type the Client ID: '
 read FRONTEND_CLIENT_ID
 export FRONTEND_CLIENT_ID=$FRONTEND_CLIENT_ID
 
