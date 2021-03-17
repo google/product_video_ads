@@ -18,11 +18,10 @@ PROJECT_NAME=video-generator:latest
 
 echo 'About to install Video Generator on Kubernetes Engine...'
 
-echo -n 'Type the project name: '
+echo -n 'Type the cloud project name: '
 read -r CLOUD_PROJECT_NAME
 
 gcloud config set project "$CLOUD_PROJECT_NAME"
-gcloud config list
 
 # Enable APIs
 echo 'Enabling APIs...'
@@ -41,14 +40,12 @@ gcloud container clusters create video-generator-cluster \
 --no-enable-autoupgrade \
 --scopes=https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/youtube.upload,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/devstorage.read_write
 
-gcloud container clusters get-credentials \
---zone us-west1-a \
-video-generator-cluster
+gcloud container clusters get-credentials --zone us-west1-a video-generator-cluster
 
 sleep 5
 
 # Get docker image
-gsutil cp gs://product-video-ads/oss/video-generator/video-generator.tar .
+gsutil cp gs://product-video-ads/main/video-generator/video-generator.tar .
 docker load -i video-generator.tar
 
 PROJECT_ID=$(gcloud config list --format 'value(core.project)' 2>/dev/null | tr ":" "/")
@@ -61,7 +58,7 @@ docker push "$IMAGE_NAME"
 echo 'Apply application to cluster...'
 
 # Generate auth token
-gsutil cp gs://product-video-ads/oss/video-generator/authenticator.py authenticator.py
+gsutil cp gs://product-video-ads/main/video-generator/authenticator.py authenticator.py
 pip3 install google-auth-oauthlib==0.4.0
 python3 authenticator.py
 
@@ -71,7 +68,9 @@ BUCKET_NAME=$(echo "${SPREADSHEET_ID}-token" | tr '[:upper:]' '[:lower:]')
 # Uploads token there
 gsutil mb -b on gs://"$BUCKET_NAME"/
 echo "Created bucket $BUCKET_NAME to store token"
+
 gsutil cp token gs://"$BUCKET_NAME"/
+echo "Copied token into bucket $BUCKET_NAME"
 
 export BUCKET_NAME=$BUCKET_NAME
 export IMAGE_NAME=$IMAGE_NAME
@@ -80,11 +79,10 @@ echo -n 'Type the spreadsheet ID: '
 read -r SPREADSHEET_ID
 export SPREADSHEET_ID=$SPREADSHEET_ID
 
-gsutil cp gs://product-video-ads/oss/video-generator/video-generator.yaml video-generator.yaml
+gsutil cp gs://product-video-ads/main/video-generator/video-generator.yaml video-generator.yaml
 envsubst < video-generator.yaml | kubectl apply -f -
 
 echo 'Deploying video-generator to cluster...'
-
 sleep 10
 
 echo 'Done'

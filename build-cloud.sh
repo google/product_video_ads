@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-gsutil cp install.sh gs://product-video-ads/oss/
+gsutil cp install.sh gs://product-video-ads/main/
 
 gsutil cp logo.png gs://product-video-ads/
 gsutil cp bar.png gs://product-video-ads/

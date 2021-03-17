@@ -21,4 +21,4 @@ cd src
 cat Main.js > ../script.js
 cat -- !(Main).js >> ../script.js
 
-gsutil cp -r * gs://product-video-ads/oss/adscripts/
+gsutil cp -r * gs://product-video-ads/main/adscripts/
