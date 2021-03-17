@@ -45,14 +45,19 @@ gcloud container clusters get-credentials --zone us-west1-a video-generator-clus
 sleep 5
 
 # Get docker image
-gsutil cp gs://product-video-ads/main/video-generator/video-generator.tar .
-docker load -i video-generator.tar
+TS=$(date +"%s")
+mkdir $TS && cd $TS
 
 PROJECT_ID=$(gcloud config list --format 'value(core.project)' 2>/dev/null | tr ":" "/")
 IMAGE_NAME=gcr.io/${PROJECT_ID}/${PROJECT_NAME}
 
+# Image is not there yet
+#if [[ "$(docker images -q $IMAGE_NAME 2> /dev/null)" == "" ]]; then
+gsutil cp gs://product-video-ads/main/video-generator/video-generator.tar .
+docker load -i video-generator.tar
 docker tag $PROJECT_NAME "$IMAGE_NAME"
 docker push "$IMAGE_NAME"
+#fi
 
 # Install application to cluster
 echo 'Apply application to cluster...'
@@ -61,6 +66,10 @@ echo 'Apply application to cluster...'
 gsutil cp gs://product-video-ads/main/video-generator/authenticator.py authenticator.py
 pip3 install google-auth-oauthlib==0.4.0
 python3 authenticator.py
+
+echo -n 'Type the spreadsheet ID: '
+read -r SPREADSHEET_ID
+export SPREADSHEET_ID=$SPREADSHEET_ID
 
 # Crete bucket for token
 BUCKET_NAME=$(echo "${SPREADSHEET_ID}-token" | tr '[:upper:]' '[:lower:]')
@@ -74,10 +83,6 @@ echo "Copied token into bucket $BUCKET_NAME"
 
 export BUCKET_NAME=$BUCKET_NAME
 export IMAGE_NAME=$IMAGE_NAME
-
-echo -n 'Type the spreadsheet ID: '
-read -r SPREADSHEET_ID
-export SPREADSHEET_ID=$SPREADSHEET_ID
 
 gsutil cp gs://product-video-ads/main/video-generator/video-generator.yaml video-generator.yaml
 envsubst < video-generator.yaml | kubectl apply -f -
