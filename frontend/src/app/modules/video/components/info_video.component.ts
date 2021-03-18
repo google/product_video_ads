@@ -7,7 +7,5 @@ import { MAT_DIALOG_DATA } from "@angular/material/dialog";
     styleUrls: ['../views/info-video-dialog.scss']
   })
   export class InfoVideoDialog {
-    constructor(@Inject(MAT_DIALOG_DATA) public data: any) {
-      console.log(data)
-    }
+    constructor(@Inject(MAT_DIALOG_DATA) public data: any) {}
   }

@@ -42,7 +42,8 @@ export const environment = {
     static_assets: 'Static!A2:C',
     offer_types_range: 'OfferTypes!A2:D',
     bases_range: 'Bases!A2:C',
-    logs_range: 'Generator!A1:A'
+    logs_range: 'Generator!A1:A',
+    ads_defaults: 'Ads!C3:C9'
   }
 }
 

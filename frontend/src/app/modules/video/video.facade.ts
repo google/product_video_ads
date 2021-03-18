@@ -60,6 +60,10 @@ export class VideoFacade {
             return this.videoService.logs$
         }
 
+        load_ads_defaults() : Promise<AdsMetadata> {
+            return this.videoService.load_ads_defaults()
+        }
+
         get_products(key? : string) : Promise<Product[]> {
             return this.productsService.load_products_by_key(key)
         }

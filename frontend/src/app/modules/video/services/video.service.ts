@@ -82,6 +82,10 @@ export class VideoService {
         this._videos.next(await this.repository.load_videos())
     }
 
+    async load_ads_defaults() : Promise<AdsMetadata> {
+        return this.repository.load_ads_defaults()
+    }
+
     async update_logs() {
         this._logs.next(await this.repository.load_logs())
     }

@@ -124,7 +124,9 @@ export class VideoComponent implements OnInit {
       this.selected_products = new Array(this.base.products.length)
 
       this.mode = 'single'
-      this.youtube = youtube != undefined
+
+      if (youtube != undefined)
+        this.prepare_video_ads_metadata()
     }
 
     select_bulk_video_mode(youtube? : boolean) {
@@ -134,7 +136,14 @@ export class VideoComponent implements OnInit {
       this.product_groups_validations = this.facade.validate_groups(this.product_groups, this.base.products.length)
 
       this.mode = 'bulk'
-      this.youtube = youtube != undefined
+
+      if (youtube != undefined)
+        this.prepare_video_ads_metadata()
+    }
+
+    async prepare_video_ads_metadata() {
+      this.youtube = true
+      this.ads_metadata = await this.facade.load_ads_defaults()
     }
 
     is_all_filled() {
@@ -166,14 +175,18 @@ export class VideoComponent implements OnInit {
 
       if (element.checked)
         for (let group of valid_groups)
-          this.selected_groups.set(group, {})
+          this.selected_groups.set(group, this.create_default_selected_group(group))
     }
 
     check_group(element, group) {
       if (element.checked)
-        this.selected_groups.set(group, {})
+        this.selected_groups.set(group, this.create_default_selected_group(group))
       else
         this.selected_groups.delete(group)
+    }
+
+    create_default_selected_group(group : string) {
+      return {...this.ads_metadata, name: group}
     }
 
     review_create_bulk() {
