@@ -124,8 +124,9 @@ export class VideoComponent implements OnInit {
       this.selected_products = new Array(this.base.products.length)
 
       this.mode = 'single'
+      this.youtube = youtube != undefined
 
-      if (youtube != undefined)
+      if (this.youtube)
         this.prepare_video_ads_metadata()
     }
 
@@ -136,13 +137,13 @@ export class VideoComponent implements OnInit {
       this.product_groups_validations = this.facade.validate_groups(this.product_groups, this.base.products.length)
 
       this.mode = 'bulk'
+      this.youtube = youtube != undefined
 
-      if (youtube != undefined)
+      if (this.youtube)
         this.prepare_video_ads_metadata()
     }
 
     async prepare_video_ads_metadata() {
-      this.youtube = true
       this.ads_metadata = await this.facade.load_ads_defaults()
     }
 
