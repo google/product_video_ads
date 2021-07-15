@@ -480,48 +480,58 @@ class FFMPEGGenerator(object):
         resized_images = set()
 
         # adds images as video starting on overlay time and finishing on overlay end
+        img_formats = ['gif', 'jpg', 'jpeg', 'png']
         for ovl in images_and_videos:
             filename = ovl['image']
 
-            duration = str(float(ovl['end_time']) - float(ovl['start_time']))
+            # checks if overlay is image or video
+            is_img = False
+            for img_fmt in img_formats:
+                is_img = filename.lower().endswith(img_fmt)
+                if is_img:
+                    break
 
-            is_gif = filename.lower().endswith('.gif')
-            has_fade = (float(ovl.get('fade_in_duration', 0)) +
-                        float(ovl.get('fade_out_duration', 0))) > 0
+            # treats image overlay
+            if is_img:
+                duration = str(float(ovl['end_time']) - float(ovl['start_time']))
 
-            # A GIF with no fade is treated as an animated GIF should.
-            # It works even if it is not animated.
-            # An animated GIF cannot have fade in or out effects.
-            if is_gif and not has_fade:
-                include_args = ['-ignore_loop', '0']
-            else:
-                include_args = ['-f', 'image2', '-loop', '1']
+                is_gif = filename.lower().endswith('.gif')
+                has_fade = (float(ovl.get('fade_in_duration', 0)) +
+                            float(ovl.get('fade_out_duration', 0))) > 0
 
-            include_args += ['-itsoffset', str(ovl['start_time']), '-t', duration]
+                # A GIF with no fade is treated as an animated GIF should.
+                # It works even if it is not animated.
+                # An animated GIF cannot have fade in or out effects.
+                if is_gif and not has_fade:
+                    include_args = ['-ignore_loop', '0']
+                else:
+                    include_args = ['-f', 'image2', '-loop', '1']
 
-            # GIFs should have a special input decoder for FFMPEG.
-            if is_gif:
-                include_args += ['-c:v', 'gif']
+                include_args += ['-itsoffset', str(ovl['start_time']), '-t', duration]
 
-            # include_args += ['-analyzeduration', '2147483647', '-probesize', '2147483647']
-            # include_args += ['-thread_queue_size', str(self.thread_queue_size), '-re']
-            include_args += ['-i']
+                # GIFs should have a special input decoder for FFMPEG.
+                if is_gif:
+                    include_args += ['-c:v', 'gif']
 
-            # Resize all images to avoid FFMPEG to run with unecessary large images
-            if (filename not in resized_images) and filename.endswith('png'):
-                self.resize_images(filename, filename, ovl['width'], ovl['height'], ovl['keep_ratio'],
-                                   self.convert_executable[0])
+                # include_args += ['-analyzeduration', '2147483647', '-probesize', '2147483647']
+                # include_args += ['-thread_queue_size', str(self.thread_queue_size), '-re']
+                include_args += ['-i']
 
-                resized_images.add(filename)
+                # Resize all images to avoid FFMPEG to run with unecessary large images
+                if (filename not in resized_images) and filename.endswith('png'):
+                    self.resize_images(filename, filename, ovl['width'], ovl['height'], ovl['keep_ratio'],
+                                       self.convert_executable[0])
 
-            include_cmd += include_args + ['%s' % filename]
+                    resized_images.add(filename)
+
+                include_cmd += include_args + ['%s' % filename]
 
             # treats video overlays
-            # else:
-            #    duration = str(float(ovl['end_time']) - float(ovl['start_time']))
-            #    include_args = ['-itsoffset', str(ovl['start_time']), '-t', duration]
-            #    include_args += ['-i']
-            #    include_cmd += include_args + ['%s' % (filename)]
+            else:
+                duration = str(float(ovl['end_time']) - float(ovl['start_time']))
+                include_args = ['-itsoffset', str(ovl['start_time']), '-t', duration]
+                include_args += ['-i']
+                include_cmd += include_args + ['%s' % (filename)]
 
         # adds texts as video starting and finishing on their overlay timing
         for img2 in text_tmp_images:
