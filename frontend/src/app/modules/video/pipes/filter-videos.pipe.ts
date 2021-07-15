@@ -14,21 +14,14 @@
    limitations under the License.
 */
 
-import { Component } from '@angular/core';
-import { Observable } from 'rxjs';
-import { LoginFacade } from './modules/login/login.facade';
+import { Pipe, PipeTransform } from '@angular/core';
+import { Video } from 'app/models/video';
 
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  providers: [ LoginFacade ]
-})
-export class AppComponent {
+@Pipe({name: 'filterVideos'})
+export class FilterVideosPipe implements PipeTransform {
 
-  ready : Observable<number>
-
-  constructor(private loginFacade : LoginFacade) {
-    this.ready = loginFacade.ready
+  transform(videos: Video[]) : Video[] {
+    return videos.filter(v => v.status != 'Deleted')
   }
+  
 }

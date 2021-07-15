@@ -116,7 +116,7 @@
     <!-- Spinner -->
     <br/>
 
-    <mat-spinner *ngIf="video_url && !video"></mat-spinner>
+    <mat-spinner *ngIf="loading"></mat-spinner>
 
     <!-- Configure chosen base video -->
     <div [hidden]="!video">
@@ -127,9 +127,9 @@
         <p>You'll end up with same number of positions as number of products you'll use in this base.</p>
         <p>It's only needed to configure this timings once per base video, then you can generate multiple videos from it.</p>
 
-        <video #vd1 *ngIf="video_url" class="video" (canplay)="on_video_loaded(vd1)" muted>
-            <source [src]="video_url" type="video/mp4">
-            </video>
+        <video #vd1 *ngIf="video_data" class="video" (canplay)="on_video_loaded(vd1)" muted>
+            <source [src]="video_data" type="video/mp4">
+        </video>
 
             <br><br>
 

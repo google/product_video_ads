@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var FIELDS = ['Date', 'AdsMetadata', 'VideoMetadata', 'Status', 'GeneratedVideo']
+var FIELDS = ['ID', 'AdsMetadata', 'VideoMetadata', 'Status', 'GeneratedVideo']
 
 var STATUS_HANDLERS = {
   
@@ -26,7 +26,7 @@ var STATUS_HANDLERS = {
         adsMetadata['ad_group_name'] = ''
 
         row.set('GeneratedVideo', '')
-        row.set('Status', 'Not Started')
+        row.set('Status', 'Done')
         row.set('AdsMetadata', JSON.stringify(adsMetadata))
     },
   	  

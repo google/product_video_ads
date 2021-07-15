@@ -55,6 +55,7 @@ export class OfferTypeComponent implements OnInit {
   base_asset
   base_url
   base_specs
+  base_data
 
   constructor(public facade: OfferTypeFacade, private helper: InterfaceHelper, private _snackBar: MatSnackBar) {
 
@@ -73,6 +74,7 @@ export class OfferTypeComponent implements OnInit {
     this.locked_name = false
     this.locked_save = false
     this.base_url = ''
+    this.base_data = undefined
     this.loaded_fonts = new Set()
     this.config = new Config()
     this.config.font = 'Ubuntu-Regular.ttf'
@@ -90,7 +92,7 @@ export class OfferTypeComponent implements OnInit {
     this.step = step
   }
 
-  choose_base(base: Base) {
+  async choose_base(base: Base) {
 
     this.base_url = base.url
     this.base_products_timings = [...base.products]
@@ -103,6 +105,8 @@ export class OfferTypeComponent implements OnInit {
     this.offer_type.base = base.title
     this.is_video = base.file.endsWith('.mp4')
     this.move_step(3)
+
+    this.base_data = await `data:video/mp4;base64,${btoa(await this.facade.download_video(base.id))}`
   }
 
   edit_type(offer_type: OfferType) {

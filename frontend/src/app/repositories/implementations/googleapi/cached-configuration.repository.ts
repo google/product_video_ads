@@ -31,8 +31,8 @@ export class CachedConfigurationRepository extends ConfigurationRepository {
         return (await this.load_data(url, super.download_image_from_gcs.bind(this, url)))
     }
 
-    async download_base_video_from_drive(url : string) : Promise<any> {
-        return (await this.load_data(url, super.download_base_video_from_drive.bind(this, url)))
+    async download_video_from_drive(url : string) : Promise<any> {
+        return (await this.load_data(url, super.download_video_from_drive.bind(this, url)))
     }
 
     private save_to_cache(key : string, value : any) {

@@ -36,7 +36,8 @@ export class BasessComponents implements OnInit {
   seconds : any
   video
   video_duration
-  video_url
+  video_data
+  loading : boolean
   
   constructor(private router: Router, public facade : BasesFacade, private _snackBar : MatSnackBar) {
     this.bases = facade.bases$
@@ -46,9 +47,10 @@ export class BasessComponents implements OnInit {
     this.new_base = false
     this.new_font = false
     this.is_edit_base_file = false
+    this.loading = false
     this.video = undefined
+    this.video_data = undefined
     this.base = undefined
-    this.video_url = ''
     this.seconds = 0.0
 
     window.scrollTo(0, 0)
@@ -58,17 +60,19 @@ export class BasessComponents implements OnInit {
     return file.endsWith('.mp4')
   }
   
-  choose_base(base : Base) {
+  async choose_base(base : Base) {
+    this.loading = true
     this.base = base
-    this.video_url = base.url
+    this.video_data = `data:video/mp4;base64,${btoa(await this.facade.download_video(base.id))}`
   }
   
   on_video_loaded(video) {
-    this.video = video
-    
     this.video_duration = video.duration.toFixed(1)
     video.width = 800
     video.height = 450
+
+    this.video = video
+    this.loading = false
   }
   
   play_pause() {

@@ -47,7 +47,7 @@ export class VideoPreviewComponent implements OnInit {
 
     ngOnInit() {
 
-        const video_data = this.facade.download_base_video(this.base.url.substr(this.base.url.indexOf('id=') + 3))
+        const video_data = this.facade.download_base_video(this.base.id)
 
         // Load Base video
         video_data.then(async data => {

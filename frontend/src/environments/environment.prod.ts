@@ -27,7 +27,8 @@ export const environment = {
   
   discovery_docs: ["https://sheets.googleapis.com/$discovery/rest?version=v4", "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest", "https://www.googleapis.com/discovery/v1/apis/storage/v1/rest"],
   scopes: "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/devstorage.read_only",
-  drive_file_prefix: 'https://drive.google.com/uc?export=download&id=',
+  drive_file_prefix: 'https://drive.google.com/u/0/uc?export=download&id=',
+  youtube_prefix: 'https://www.youtube.com/embed/',
 
   sheet_id: 'sheet_id',
 
@@ -36,12 +37,14 @@ export const environment = {
 
   configuration: {
     campaign_range: 'Campaigns!A2:E',
+    campaign_single_range: 'Campaigns!A$INDEX:E$INDEX',
     product_range: '!A1:ZZ',
     drive_folder: 'Configuration!C6',
     static_assets: 'Static!A2:C',
     offer_types_range: 'OfferTypes!A2:D',
     bases_range: 'Bases!A2:C',
-    logs_range: 'Generator!A1:A'
+    logs_range: 'Generator!A1:A',
+    ads_defaults: 'Ads!C3:C9'
   }
 }
 

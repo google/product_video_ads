@@ -85,6 +85,10 @@ export class OfferTypeFacade {
         this.productsService.reload_products()
     }
 
+    download_video(id : string) {
+        return this.basesService.download_video(id)
+    }
+
     save() {
         return this.offerTypeService.save()
     }

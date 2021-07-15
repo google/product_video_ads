@@ -58,7 +58,7 @@ def main():
         time.sleep(5 * 60)
 
     # Starts processing only after token authenticated!
-    logger.info('Started processing...')
+    logger.info('[v2] Started processing...')
 
     # Dependencies
     configuration = Configuration(spreadsheet_id, credentials)

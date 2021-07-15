@@ -79,12 +79,11 @@
     
       <h2>How to configure offer type?</h2>
 
-      <p>This is where you place elements like images and texts on your base.</p>
-      <p>Drag and Drop elements to position them on screen. Use SHIFT + double-click to delete elements.</p>
-      <p>"Product" elements are dynamic and replaced when generating preview/ads during next step.</p>
-      <p>Values you choose under "Products" elements are just examples texts/images.</p>
+      <p>This is where you place elements on your base, just drag and drop elements to position them.</p>
+      <p>Use SHIFT + double-click to delete elements.</p>
+      <p>"Product" elements are just examples and will be dynamic replaced when generating videos in the next step.</p>
       <p>"Assets" elements are static and fixed, so will stay as you see here.</p>
-      <p>The selected color for the inserted texts will be applied when the element is dragged and dropped in the base area.</p>
+      
       <br/>
 
       <!-- Spinner -->
@@ -93,8 +92,8 @@
       <div class="asset-container">
 
         <!-- If it's video base -->
-        <video #vd1 *ngIf="base_url && is_video" class="video" (loadedmetadata)="on_video_loaded(vd1)" muted>
-          <source [src]="base_url" type="video/mp4">
+        <video #vd1 *ngIf="base_data && is_video" class="video" (loadedmetadata)="on_video_loaded(vd1)" muted>
+          <source [src]="base_data" type="video/mp4">
         </video>
 
         <!-- Or if it's image base -->
@@ -261,10 +260,14 @@
         </div>
       </div>
 
+      <br/><br/>
+
       <!-- Parent offer type -->
       <div *ngIf="base_asset">
 
         <h2>Parent Offer Type:</h2>
+
+        <p>All elements present on parent will be inherited by this offer type.</p>
 
         <mat-form-field class="example-full-width">
           <mat-label>Parent</mat-label>

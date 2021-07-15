@@ -19,6 +19,7 @@ export class Base {
     constructor(public title : string,
         public file : string,
         public products : Array<any>,
+        public id? : string,
         public url? : string) {}
         
     public static from_base_array(base_array : Array<any>) {

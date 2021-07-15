@@ -57,6 +57,10 @@ export class BasesService {
         return this.save()
     }
 
+    download_video(id : string) : Promise<any> {
+        return this.repository.download_video_from_drive(id)
+    }
+
     upload_base_file(file : File) : Promise<any> {
         return this.repository.upload_base_file(file)
     }

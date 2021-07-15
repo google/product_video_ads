@@ -65,6 +65,10 @@ export class BasesFacade {
         return this.fontService.reload_fonts()
     }
 
+    download_video(id : string) : Promise<any> {
+        return this.service.download_video(id)
+    }
+
     save() {
         return this.service.save()
     }

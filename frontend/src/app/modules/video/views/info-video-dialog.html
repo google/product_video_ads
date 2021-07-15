@@ -1,0 +1,97 @@
+<h1 mat-dialog-title>
+    {{data.video.video_metadata.name}}
+</h1>
+
+<hr/>
+
+<div mat-dialog-content>
+
+    <div class="container">
+
+        <div class="column">
+            <p>
+                <span class="title">Date: </span>
+                {{data.video.video_metadata.date}}
+            </p>
+
+            <p>
+                <span class="title">Base Video: </span>
+                {{data.video.video_metadata.base_video}}
+            </p>
+
+            <p>
+                <span class="title">Status: </span>
+                {{data.video.status}}
+            </p>
+
+            <p>
+                <span class="title">Products: </span>
+                {{data.video.video_metadata.products_label}}
+            </p>
+        </div>
+
+        <div class="column" *ngIf="data.type == 'youtube'">
+            <p>
+                <span class="title">Account ID: </span>
+                {{data.video.ads_metadata.account_id}}
+            </p>
+
+            <p>
+                <span class="title">Campaign: </span>
+                {{data.video.ads_metadata.campaign_name}}
+            </p>
+
+            <p>
+                <span class="title">Type: </span>
+                {{data.video.ads_metadata.ad_group_type}}
+            </p>
+            <p>
+                <span class="title">URL: </span>
+                <a href="data.video.ads_metadata.url">
+                    {{data.video.ads_metadata.url}}
+                </a>
+            </p>
+        </div>
+
+        <div class="column" *ngIf="data.type == 'youtube'">
+            <p>
+                <span class="title">Call to Action: </span>
+                {{data.video.ads_metadata.call_to_action}}
+            </p>
+
+            <p>
+                <span class="title">Target location: </span>
+                {{data.video.ads_metadata.target_location}}
+            </p>
+
+            <p>
+                <span class="title">Ad Group: </span>
+                {{data.video.ads_metadata.ad_group_name}}
+            </p>
+
+            <p>
+                <span class="title">Ad: </span>
+                {{data.video.ads_metadata.ad_name}}
+            </p>
+        </div>
+    </div>
+
+    <div class="video-content">
+        <video *ngIf="data.type == 'drive'" width="700" height="390" controls>
+            <source [src]="data.url" type="video/mp4">
+        </video>
+
+        <!-- <iframe *ngIf="data.type == 'drive'"
+            [src]="data.url" width="700" height="390">
+        </iframe> -->
+
+        <iframe *ngIf="data.type == 'youtube'" width="700" height="390"
+                [src]="data.url" frameborder="0" 
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+        </iframe>
+    </div>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-stroked-button mat-dialog-close>Close</button>
+</div>
