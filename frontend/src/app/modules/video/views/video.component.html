@@ -34,93 +34,72 @@
 
       <br/><br/>
 
-      <span *ngFor="let video of videos$ | async">
+      <!-- Videos table -->
+      <mat-table [dataSource]="videos$ | async | filterVideos">
 
-        <!-- Preview asset ready on Drive-->
-        <div *ngIf="video.generated_video && video.status == 'Not Started'" class="added_item video_box" >
-          
-          <div>{{video.date}}</div>
-          <div><b>{{video.video_metadata.name}}</b></div>
-          <div>({{video.video_metadata.base_video}})</div>
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{element.video_metadata.name}} </mat-cell>
+        </ng-container>
 
-          <video *ngIf="is_video(video)" width="200" height="150" controls>
-              <source [src]="drive_url + video.generated_video" type="video/mp4">
-          </video>
+        <!-- Date Column -->
+        <ng-container matColumnDef="date">
+          <mat-header-cell *matHeaderCellDef> Date </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{element.video_metadata.date}} </mat-cell>
+        </ng-container>
 
-          <a *ngIf="!is_video(video)" [href]="drive_url + video.generated_video">
-            <img width="300" height="200" [src]="drive_url + video.generated_video"/>
-          </a>
+        <!-- Base Column -->
+        <ng-container matColumnDef="base">
+          <mat-header-cell *matHeaderCellDef> Base </mat-header-cell>
+          <mat-cell *matCellDef="let element"> {{element.video_metadata.base_video}} </mat-cell>
+        </ng-container>
 
-          <br/>
-          
-          <span style="cursor: pointer" (click)="delete_video(video)">
-            <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
-          </span>
-        </div>
-
-        <!-- Preview asset to be generated -->
-        <div class="added_item video_box" *ngIf="video.status == 'Preview'">
-
-          <div>{{video.date}}</div>
-          <div><b>{{video.video_metadata.name}}</b></div>
-          <div>({{video.video_metadata.base_video}})</div>
-
-          <div style="border:1px solid #000; margin: 10% 0; padding: 5%">
-            <mat-icon aria-hidden="false" aria-label="access_time icon">access_time</mat-icon>
-            <p>Generating asset...</p>
-            <br/>
-            <span style="cursor: pointer" (click)="delete_video(video)">
-              <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+          <mat-cell *matCellDef="let element"> 
+            <span [ngStyle]="{'color': find_status_color(element.status), 'fontWeight': 'bold'}">
+              {{element.status}} 
             </span>
-          </div>
-        </div>
+          </mat-cell>
+        </ng-container>
 
-        <!-- YT video to be generated -->
-        <div *ngIf="video.status == 'On'" class="added_item video_box">
+        <!-- Download Column -->
+        <ng-container matColumnDef="download">
+          <mat-header-cell *matHeaderCellDef> Download </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <a [href]="drive_url + element.generated_video" *ngIf="element.generated_video && element.status == 'Done'">
+              <mat-icon aria-hidden="false" aria-label="download icon">download</mat-icon>
+            </a>
+          </mat-cell>
+        </ng-container>
 
-          <div>{{video.date}}</div>
-          <div><b>{{video.video_metadata.name}}</b></div>
-          <div>({{video.video_metadata.base_video}})</div>
+        <!-- Delete Column -->
+        <ng-container matColumnDef="delete">
+          <mat-header-cell *matHeaderCellDef> Delete </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <mat-icon class="click-icon" aria-hidden="false" aria-label="delete icon" 
+                      *ngIf="element.status != 'Processing'"
+                      (click)="delete_video(element)">delete
+            </mat-icon> 
+          </mat-cell>
+        </ng-container>
 
-          <div><b>{{video.video_metadata.visibility}}</b></div>
+        <!-- Info Column -->
+        <ng-container matColumnDef="info">
+          <mat-header-cell *matHeaderCellDef> Info </mat-header-cell>
+          <mat-cell *matCellDef="let element">
+            <mat-icon class="click-icon" aria-hidden="false" aria-label="info icon" 
+                      *ngIf="is_video(element)" 
+                      (click)="info_asset(element)">info</mat-icon> 
+          </mat-cell>
+        </ng-container>
 
-          <br/>
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+      </mat-table>
 
-          <mat-icon aria-hidden="false" aria-label="access_time icon">access_time</mat-icon>
-          <p style="margin: 1% 0; color: blue"><b>Generating asset</b></p>
-
-          <span style="cursor: pointer" (click)="delete_video(video)">
-            <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
-          </span>
-      </div>
-
-      <!-- YT video ready-->
-      <div *ngIf="video.generated_video && ['Running', 'Video Ready'].indexOf(video.status) >= 0" class="added_item video_box">
-              
-        <div>{{video.date}}</div>
-        <div><b>{{video.video_metadata.name}}</b></div>
-        <div>({{video.video_metadata.base_video}})</div>
-
-        <div style="margin: 1% 0; color: blue"><b>{{video.status}}</b></div>
-
-        <div><b>{{video.video_metadata.visibility}}</b></div>
-
-        <br/>
-
-        <iframe width="300" height="200"
-          [src]="sanitizer.bypassSecurityTrustResourceUrl(yt_url + video.generated_video)" frameborder="0" 
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
-        </iframe>
-
-        <br/>
-
-        <span style="cursor: pointer" (click)="delete_video(video)">
-          <mat-icon aria-hidden="false" aria-label="delete icon">delete</mat-icon>
-        </span>
-
-    </div>
-
-      </span>
     </mat-expansion-panel>
 
     <br/>
@@ -359,19 +338,19 @@
                 <!-- Account -->
                 <mat-form-field class="example-full-width">
                   <mat-label>Account</mat-label>
-                  <input [(ngModel)]="selected_groups.get(group.key).account" placeholder="123-456-7890" matInput>
+                  <input [(ngModel)]="selected_groups.get(group.key).account_id" placeholder="123-456-7890" matInput>
                 </mat-form-field>
 
                 <!-- Campaign -->
                 <mat-form-field class="example-full-width">
                   <mat-label>Campaign</mat-label>
-                  <input [(ngModel)]="selected_groups.get(group.key).campaign" placeholder="Campaign" matInput>
+                  <input [(ngModel)]="selected_groups.get(group.key).campaign_name" placeholder="Campaign" matInput>
                 </mat-form-field>
 
                 <!-- AdGroup Type -->
                 <mat-form-field class="example-full-width">
                   <mat-label>Type of Ad</mat-label>
-                  <mat-select [(ngModel)]="selected_groups.get(group.key).adgroup_type">
+                  <mat-select [(ngModel)]="selected_groups.get(group.key).ad_group_type">
                     <mat-option *ngFor="let type of ad_group_types" [value]="type[0]">
                       {{type[1]}}
                     </mat-option>

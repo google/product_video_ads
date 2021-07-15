@@ -18,17 +18,21 @@ import { NgModule } from '@angular/core';
 
 import { VideoRoutingModule } from './video-routing.module';
 import { VideoComponent } from './components/video.component';
+import { InfoVideoDialog } from './components/info_video.component';
 import { SharedModule } from '../shared/shared.module';
 import { FilterOfferTypesPipe } from './pipes/filter-offer-types.pipe';
+import { FilterVideosPipe } from './pipes/filter-videos.pipe';
 import { VideoPreviewComponent } from './components/video_preview.component';
 import { ImagePreviewComponent } from './components/image_preview.component';
 
 @NgModule({
   declarations: [
     VideoComponent,
+    InfoVideoDialog,
     VideoPreviewComponent,
     ImagePreviewComponent,
-    FilterOfferTypesPipe
+    FilterOfferTypesPipe,
+    FilterVideosPipe
   ],
   imports: [
     SharedModule,

@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Product } from 'app/models/product';
 import { VideoFacade } from '../video.facade';
@@ -25,6 +25,8 @@ import { Video } from 'app/models/video';
 import { VideoMetadata } from 'app/models/video_metadata';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AdsMetadata } from 'app/models/ads_metadata';
+import {MatDialog} from '@angular/material/dialog';
+import { InfoVideoDialog } from './info_video.component';
 
 @Component({
   selector: 'app-video',
@@ -36,7 +38,7 @@ export class VideoComponent implements OnInit {
 
   drive_url = 'https://drive.google.com/uc?export=download&id='
   yt_url = 'https://www.youtube.com/embed/'
-  
+  displayedColumns = ['date', 'name', 'base', 'status', 'download', 'delete', 'info']
   visibilities = ['unlisted', 'public']
   ad_group_types = [['TRUE_VIEW_IN_STREAM', 'TRUE_VIEW_IN_STREAM'],
   ['TRUE_VIEW_IN_STREAM', 'TRUE_VIEW_FOR_ACTION'],
@@ -70,7 +72,7 @@ export class VideoComponent implements OnInit {
   video_metadata : any
   ads_metadata : any
   
-  constructor(private facade : VideoFacade, public sanitizer: DomSanitizer, private _snackBar: MatSnackBar) {
+  constructor(private facade : VideoFacade, public sanitizer: DomSanitizer, public dialog: MatDialog, private _snackBar: MatSnackBar) {
       this.bases$ = this.facade.bases$
       this.products_sheets$ = this.facade.products_sheets$
       this.offer_types$ = this.facade.offer_types$
@@ -123,6 +125,9 @@ export class VideoComponent implements OnInit {
 
       this.mode = 'single'
       this.youtube = youtube != undefined
+
+      if (this.youtube)
+        this.prepare_video_ads_metadata()
     }
 
     select_bulk_video_mode(youtube? : boolean) {
@@ -133,6 +138,13 @@ export class VideoComponent implements OnInit {
 
       this.mode = 'bulk'
       this.youtube = youtube != undefined
+
+      if (this.youtube)
+        this.prepare_video_ads_metadata()
+    }
+
+    async prepare_video_ads_metadata() {
+      this.ads_metadata = await this.facade.load_ads_defaults()
     }
 
     is_all_filled() {
@@ -140,12 +152,6 @@ export class VideoComponent implements OnInit {
     }
 
     add_single_video(selected_products : Array<string>, selected_offer_types : Array<string>, video_metadata) {
-
-      // Block deletions when videos are being generated
-      if(this.facade.is_generating()) {
-        this._snackBar.open('Cannot add more videos while some are being generated', 'OK')
-        return
-      }
 
       // Create a single video
       video_metadata.name = video_metadata.name || 'Preview'
@@ -170,27 +176,25 @@ export class VideoComponent implements OnInit {
 
       if (element.checked)
         for (let group of valid_groups)
-          this.selected_groups.set(group, {})
+          this.selected_groups.set(group, this.create_default_selected_group(group))
     }
 
     check_group(element, group) {
       if (element.checked)
-        this.selected_groups.set(group, {})
+        this.selected_groups.set(group, this.create_default_selected_group(group))
       else
         this.selected_groups.delete(group)
     }
 
-    review_create_bulk() {
+    create_default_selected_group(group : string) {
+      return {...this.ads_metadata, name: group}
+    }
 
-      // Block deletions when videos are being generated
-      if(this.facade.is_generating()) {
-        this._snackBar.open('Cannot add more videos while some are being generated', 'OK')
-        return
-      }
+    review_create_bulk() {
 
       this.final_configs = []
 
-      for(let [group, video_metadata] of this.selected_groups.entries()) {
+      for(let [group, metadata] of this.selected_groups.entries()) {
         
         const group_products = this.product_groups.get(group)
 
@@ -207,22 +211,25 @@ export class VideoComponent implements OnInit {
           let offer_types = sorted_products.map(p => p.offer_type)
 
           this.final_configs.push({
-            name: video_metadata.name || group,
-            description: video_metadata.description,
-            visibility: video_metadata.visibility,
-            configs: this.facade.generate_final_configs(offer_types, this.base, product_keys, this.products)
+            name: metadata.name || group,
+            description: metadata.description,
+            visibility: metadata.visibility,
+            configs: this.facade.generate_final_configs(offer_types, this.base, product_keys, this.products),
+            account_id: metadata.account_id,
+            campaign_name: metadata.campaign_name,
+            ad_group_type: metadata.ad_group_type,
+            url: metadata.url,
+            call_to_action: metadata.call_to_action,
+            target_location: metadata.target_location,
+            audience_name: metadata.audience_name,
+            ad_group_name: metadata.ad_group_name,
+            ad_name: metadata.ad_name
           })
         }
       }
     }
 
     create_bulk() {
-
-      // Block deletions when videos are being generated
-      if(this.facade.is_generating()) {
-        this._snackBar.open('Cannot add more videos while some are being generated', 'OK')
-        return
-      }
 
       // Generate all videos
       this.final_configs.forEach(final_configs => 
@@ -282,18 +289,12 @@ export class VideoComponent implements OnInit {
 
     delete_video(video : Video) {
 
-      // Block deletions when videos are being generated
-      if (this.facade.is_generating()) {
-       this._snackBar.open('Cannot make deletions while videos are being generated', 'OK')
-       return
-      }
+      const video_name = video.video_metadata.name
 
-      const video_name = video.generated_video || 'being generated'
-
-      this._snackBar.open('Confirm deletion of asset ' + video_name + '?', 'Confirm', {
+      this._snackBar.open('Confirm deletion of ' + video_name + '?', 'Confirm', {
         duration: 4000,
       }).onAction().subscribe(() => {
-        this.facade.delete_video(video.generated_video).then(response => {
+        this.facade.delete_video(video.id).then(response => {
           this._snackBar.open("Asset deleted (" + response.status + ')', 'OK', { duration: 2000 })
         })
       })
@@ -312,7 +313,52 @@ export class VideoComponent implements OnInit {
       })
     }
 
+    find_status_color(status : string) {
+      switch(status) {
+        case 'Done':
+          return 'green'
+        case 'Running':
+          return 'purple'
+        case 'Video Ready':
+            return 'green'
+        case 'Processing':
+          return 'orange'
+        case 'Preview':
+          return 'blue'
+        case 'On':
+          return 'blue'
+        case 'Error':
+          return 'red'
+      }
+
+      return 'black'
+    }
+
+    info_asset(video : Video) {
+
+      let url, type
+
+      // Reason if it's youtube or drive video hosted
+      if (['Running', 'Video Ready', 'On'].indexOf(video.status) >= 0) {
+        url = this.sanitizer.bypassSecurityTrustResourceUrl(this.yt_url + video.generated_video)
+        type = 'youtube'
+      } else {
+        url = this.drive_url + video.generated_video
+        type = 'drive'
+      }     
+
+      this.dialog.open(InfoVideoDialog, {
+        width: '1000px',
+        data: {
+          video: video,
+          type: type,
+          url: url
+        }
+      })
+    }
+
     indexTracker(index: number, value: any) {
       return index;
     }
   }
+

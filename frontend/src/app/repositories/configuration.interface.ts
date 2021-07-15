@@ -19,11 +19,13 @@ import { Product } from 'app/models/product';
 import { Video } from 'app/models/video';
 import { Asset } from 'app/models/asset';
 import { Base } from 'app/models/base';
+import { AdsMetadata } from 'app/models/ads_metadata';
 
 export interface ConfigurationInterface {
 
     load_drive_folder() : Promise<string>
     load_logs() : Promise<string[]>
+    load_ads_defaults() : Promise<AdsMetadata>
 
     upload_font(file : File) : Promise<any>
     load_fonts() : Promise<Map<string, any>>
@@ -44,5 +46,6 @@ export interface ConfigurationInterface {
 
     load_videos() : Promise<Video[]>
     save_videos(videos : Video[]) : Promise<any>
+    save_video(videos : Video[], id : string) : Promise<any>
     download_base_video_from_drive(url : string) : Promise<string>
 }

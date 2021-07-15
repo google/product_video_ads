@@ -49,7 +49,7 @@ class VideoProcessor():
                 video_id = self.uploader.upload_video(
                     config['name'] or output_video.split('/')[-1],
                     config['description'],
-                    config['visibility'],
+                    config['visibility'] or 'unlisted',
                     output_video
                 )
 

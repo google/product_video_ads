@@ -36,12 +36,14 @@ export const environment = {
 
   configuration: {
     campaign_range: 'Campaigns!A2:E',
+    campaign_single_range: 'Campaigns!A$INDEX:E$INDEX',
     product_range: '!A1:ZZ',
     drive_folder: 'Configuration!C6',
     static_assets: 'Static!A2:C',
     offer_types_range: 'OfferTypes!A2:D',
     bases_range: 'Bases!A2:C',
-    logs_range: 'Generator!A1:A'
+    logs_range: 'Generator!A1:A',
+    ads_defaults: 'Ads!C3:C9'
   }
 }
 

@@ -24,7 +24,8 @@ export class VideoMetadata {
         public products_label : string,
         public configs : Array<Config>,
         public description : string = '',
-        public visibility : string = ''
+        public visibility : string = '',
+        public date : string = new Date().toLocaleString('pt-BR')
         ) {}
         
     public static from_string_object(string_object : string) : VideoMetadata {

@@ -36,13 +36,16 @@
       <div>
         <span><b>If it's your first time, go ahead and:</b></span>
       </div>
+      
       <div class="pva-template-note">
-        <strong>Note: </strong>
-        <span>
-          Since the new spreadsheet is a copy of the PVA Template spreadsheet, 
-          you must request access to the PVA Template before generating a new one.
+        <span *ngIf="sheet_id" class="error-message">
+          Please, ask for viewer on the following documents: 
+        <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}">here</a>
+        and 
+        <a target="_blank" href="https://drive.google.com/corp/drive/u/0/folders/{{drive_folder}}">also here</a>
         </span>
       </div>
+
       <button (click)="generate_one()">Generate new Sheet ID</button>
     </div>
   </div>

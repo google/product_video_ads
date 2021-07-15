@@ -23,11 +23,19 @@ import { OfferType } from 'app/models/offertype';
 import { Video } from 'app/models/video';
 import { Asset } from 'app/models/asset';
 import { Base } from 'app/models/base';
+import { AdsMetadata } from 'app/models/ads_metadata';
 
 @Injectable({providedIn: 'root'})
 export class ConfigurationRepository implements ConfigurationInterface {
 
     constructor(public googleApi : GoogleAPI) {}
+
+    async load_ads_defaults(): Promise<AdsMetadata> {
+        const ads_defaults = (await this.googleApi.get_values(environment.configuration.ads_defaults)) || []
+
+        // @ts-ignore
+        return new AdsMetadata(...ads_defaults.map(a => a[0]))
+    }
 
     async load_products_sheets(): Promise<string[]> {
 
@@ -186,6 +194,19 @@ export class ConfigurationRepository implements ConfigurationInterface {
             values: videos.map(Video.to_video_array)
         })
         
+        return this.googleApi.save_values(data)
+    }
+
+    async save_video(videos: Video[], id : string): Promise<any> {
+
+        const data = []
+        const index = videos.findIndex(v => v.id == id)
+  
+        data.push({
+            range: environment.configuration.campaign_single_range.replace(/\$INDEX/g, String(index + 2)),
+            values: [Video.to_video_array(videos[index])]
+        })
+
         return this.googleApi.save_values(data)
     }
 }

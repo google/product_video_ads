@@ -17,11 +17,10 @@
 CREDENTIALS_FOLDER=$(pwd)/credentials
 
 echo 'SPREADSHEET_ID: '
-read SPREADSHEET_ID
+read -r SPREADSHEET_ID
 
 echo 'Bucket Name:'
-#read BUCKET_NAME
-BUCKET_NAME=video-generator-test-123
+read -r BUCKET_NAME
 
 if [[ "$(docker images -q video-generator:latest 2> /dev/null)" == "" ]]; then
   echo 'Image video-generator:latest not found - You must build it first!'
@@ -29,10 +28,10 @@ if [[ "$(docker images -q video-generator:latest 2> /dev/null)" == "" ]]; then
 fi
 
 docker run --rm \
-  -e SPREADSHEET_ID=$SPREADSHEET_ID \
+  -e SPREADSHEET_ID="$SPREADSHEET_ID" \
   -e GOOGLE_APPLICATION_CREDENTIALS='/credentials/credentials.json' \
-  -e BUCKET_NAME=$BUCKET_NAME \
-  -v $CREDENTIALS_FOLDER:/credentials \
+  -e BUCKET_NAME="$BUCKET_NAME" \
+  -v "$CREDENTIALS_FOLDER":/credentials \
   -m 6g \
   --name video-generator \
   video-generator
