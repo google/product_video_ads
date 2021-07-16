@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Product } from 'app/models/product';
 import { VideoFacade } from '../video.facade';
