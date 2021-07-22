@@ -16,9 +16,6 @@
 
 All code calling the video manipulation library (currently ffmpeg) should be
 here.
-
-The path to the ffmpeg executable is currently hard-coded to
-$HOME/video-generator/ffmpeg/bin/ffmpeg.
 """
 
 import datetime
@@ -41,7 +38,7 @@ class FFMPEGGenerator(object):
         self.thread_queue_size = 8000
 
         # FFMPEG installed
-        self.ffmpeg_executable = 'ffmpeg_latest/bin/ffmpeg'
+        self.ffmpeg_executable = 'ffmpeg'
 
         # Imagemagick installed
         self.convert_executable = ['convert']
