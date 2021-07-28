@@ -14,14 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-CREDENTIALS_FOLDER=$(pwd)/credentials
-
 echo 'SPREADSHEET_ID: '
 read -r SPREADSHEET_ID
-
-echo 'Bucket Name:'
-read -r BUCKET_NAME
-
+s
 if [[ "$(docker images -q video-generator:latest 2> /dev/null)" == "" ]]; then
   echo 'Image video-generator:latest not found - You must build it first!'
   exit 1
@@ -29,9 +24,6 @@ fi
 
 docker run --rm \
   -e SPREADSHEET_ID="$SPREADSHEET_ID" \
-  -e GOOGLE_APPLICATION_CREDENTIALS='/credentials/credentials.json' \
-  -e BUCKET_NAME="$BUCKET_NAME" \
-  -v "$CREDENTIALS_FOLDER":/credentials \
   -m 6g \
   --name video-generator \
   video-generator

@@ -18,7 +18,7 @@ import os
 import time
 
 import log
-from authentication.token_auth import TokenAuth
+from auth import authentication
 # Handle "events" from configuration
 from configuration.event_handler import EventHandler as EventHandler
 from configuration.spreadsheet_configuration import SpreadsheetConfiguration as Configuration
@@ -38,19 +38,14 @@ logger = log.getLogger()
 def main():
     # Read environment parameters
     spreadsheet_id = os.environ.get('SPREADSHEET_ID')
-    bucket_name = os.environ.get('BUCKET_NAME')
 
-    if spreadsheet_id is None or bucket_name is None:
-        print('Please set environment variable SPREADSHEET_ID and BUCKET_NAME')
+    if spreadsheet_id is None:
+        print('Please set environment variable SPREADSHEET_ID.')
         exit(1)
-
-    authenticator = TokenAuth(bucket_name, CloudStorageHandler())
-    credentials = None
 
     # Tries to retrieve token from storage each 5 minutes
     while True:
-        credentials = authenticator.authenticate()
-
+        credentials = authentication.get_credentials_from_local_file()
         if credentials is not None:
             break
 
@@ -64,16 +59,15 @@ def main():
     configuration = Configuration(spreadsheet_id, credentials)
     storage = StorageHandler(configuration.get_drive_folder(), credentials)
     cloud_storage = CloudStorageHandler(credentials)
-    video_processor = VideoProcessor(storage, VideoGenerator(), Uploader(credentials), cloud_storage)
+    video_processor = VideoProcessor(
+        storage, VideoGenerator(), Uploader(credentials), cloud_storage)
     image_processor = ImageProcessor(storage, ImageGenerator(), cloud_storage)
 
     # Handler acts as facade
     handler = EventHandler(configuration, video_processor, image_processor)
 
     while True:
-
         try:
-
             # Sync drive files to local tmp
             storage.update_local_files()
 

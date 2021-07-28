@@ -1,23 +1,26 @@
-#!/bin/bash
-
-# Copyright 2020 Google LLC
-
+# Copyright 2019 Google LLC
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-
-#    https://www.apache.org/licenses/LICENSE-2.0
-
+#
+#   https://www.apache.org/licenses/LICENSE-2.0
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-TOKEN_FILE=token
+import log
+import os
+import pickle
 
-if ! test -f "$TOKEN_FILE"; then
-  python3 authenticator.py
-fi
 
-docker build -t video-generator .
+def get_credentials_from_local_file():
+    if not os.path.exists('token'):
+        log.getLogger().error('Token file not found')
+        return None
+
+    with open('token', 'rb') as token_file:
+        return pickle.loads(token_file.read())

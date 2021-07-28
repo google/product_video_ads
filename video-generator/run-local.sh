@@ -17,17 +17,10 @@
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
-CREDENTIALS_FOLDER=$(pwd)/credentials
-
 echo 'SPREADSHEET_ID: '
 read -r SPREADSHEET_ID
 
-echo 'Bucket Name:'
-read -r BUCKET_NAME
-
-export GOOGLE_APPLICATION_CREDENTIALS=$CREDENTIALS_FOLDER/credentials.json
 export SPREADSHEET_ID=$SPREADSHEET_ID
-export BUCKET_NAME=$BUCKET_NAME
 
 cd src || exit
-pipenv run python main.py
+pipenv install; pipenv run python main.py
