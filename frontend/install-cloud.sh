@@ -14,12 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-TS=$(date +"%s")
-
-mkdir $TS && cd $TS
-
-gsutil -m cp -r gs://product-video-ads/main/frontend/dist .
-gsutil cp gs://product-video-ads/main/frontend/app.yaml app.yaml
+npm install --legacy-peer-deps
+npm run build
 
 echo -n 'Type the cloud project name: '
 read CLOUD_PROJECT_NAME
@@ -45,4 +41,8 @@ envsubst < dist/assets/js/env.js.orig > dist/assets/js/env.js
 rm dist/assets/js/env.js.orig
 
 gcloud app deploy
+
+rm -rf dist node_modules
+rm package-lock.json
+
 gcloud app browse
