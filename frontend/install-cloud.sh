@@ -15,7 +15,7 @@
 # limitations under the License.
 
 npm install --legacy-peer-deps
-npm run build
+npm run build --configuration=production
 
 echo -n 'Type the cloud project name: '
 read CLOUD_PROJECT_NAME
