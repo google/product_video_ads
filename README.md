@@ -25,7 +25,8 @@ Please ensure that you have the following in place within your GCP Project befor
 * Create an API key and copy the key
 * Create an OAuth Client ID as a Desktop app
 	* Copy the Client ID and Client Secret (we will need this later)
-* Request access to the templates
+* Request access to the templates - [Config sheet](https://docs.google.com/spreadsheets/d/1JAGj6lpR1Ghz943fzBF3SMEuxxMn8aiY77GVNKdP_9Q/edit?resourcekey=0-ht2AXur6faTs_Jt6vUJgaQ#gid=6031590) and [Drive folder](https://drive.google.com/drive/u/0/folders/1fG2pUo5obYJDkZmyoxhjVc_h9-WuW5Xr)
+	* [Optional] Create a copy of both in your Google Drive
 
 ## Installation
 
@@ -36,4 +37,5 @@ Please ensure that you have the following in place within your GCP Project befor
 	* Follow the on-screen instructions to continue the installation
 4. When prompted for Spreadsheet ID, 
 	* Navigate to the UI link from the previous step (ensure cookies and pop-ups are allowed)
-	* Generate a new spreadsheet ID (request access to the templates using the links on the web interface)
+	* Generate a new spreadsheet ID using the web interface, or use the id of a copy of the Config template
+	* Ensure that the Service Account has access to spreadsheet and Drive folder
