@@ -19,7 +19,7 @@ from pathlib import Path
 
 # @see https://developers.google.com/identity/protocols/oauth2/scopes
 SCOPES = [
-    'https://www.googleapis.com/auth/drive',
+    'https://www.googleapis.com/auth/drive.file',
     'https://www.googleapis.com/auth/spreadsheets',
     'https://www.googleapis.com/auth/script.projects',
 ]
@@ -57,8 +57,6 @@ def main(args):
     credentials = None  # Use Cloud Shell defaults
     if args.secrets:
         flow = InstalledAppFlow.from_client_secrets_file(args.secrets, scopes=SCOPES)
-        flow.run_local_server()
-        credentials = flow.credentials
     else:
         client_id = input('Desktop Client Id: ')
         client_secret = input('Client Secret: ')
@@ -76,10 +74,11 @@ def main(args):
             }
         }
         flow = InstalledAppFlow.from_client_config(desktop_config, scopes=SCOPES)
-        flow.run_local_server()
-        credentials = flow.credentials
+        
+    flow.run_console()
+    credentials = flow.credentials
 
-    drive_id = create_drive(credentials, args.drive_fonts) if not args.drive_id else args.drive_id
+    drive_id = args.drive_id if args.drive_id else create_drive(credentials, args.drive_fonts)
     
     sheet_id = args.sheet_id
     if not sheet_id:
@@ -264,11 +263,9 @@ def create_appscript(credentials, sheet_id):
 
     service = build('script', 'v1', credentials=credentials)
 
-    # Create a new project
     request = {'title': CONFIGS['title'], 'parentId': sheet_id}
     response = service.projects().create(body=request).execute()
 
-    # Upload two files to the project
     request = {
         'files': [{
             'name': 'Main.js',

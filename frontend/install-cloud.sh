@@ -17,32 +17,23 @@
 npm install --legacy-peer-deps
 npm run build --configuration=production
 
-echo -n 'Type the cloud project name: '
-read CLOUD_PROJECT_NAME
-
-gcloud config set project $CLOUD_PROJECT_NAME
-
 echo 'Enabling some needed APIs...'
 gcloud services enable drive.googleapis.com
 gcloud services enable sheets.googleapis.com
 
 echo 'Installing Web Frontend on App Engine...'
 
-echo -n 'Type the Client ID: '
+echo -n 'Enter the Web Client Id: '
 read FRONTEND_CLIENT_ID
-export FRONTEND_CLIENT_ID=$FRONTEND_CLIENT_ID
 
-echo -n 'Type API Key: '
+echo -n 'Enter the API Key: '
 read FRONTEND_API_KEY
-export FRONTEND_API_KEY=$FRONTEND_API_KEY
 
+export FRONTEND_API_KEY FRONTEND_CLIENT_ID
 mv dist/assets/js/env.js dist/assets/js/env.js.orig
 envsubst < dist/assets/js/env.js.orig > dist/assets/js/env.js
 rm dist/assets/js/env.js.orig
 
-gcloud app deploy
+gcloud app deploy -q
 
-rm -rf dist node_modules
-rm package-lock.json
-
-gcloud app browse
+rm -rf dist node_modules package-lock.json
