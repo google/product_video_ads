@@ -38,14 +38,15 @@ def setup_argparse():
 
     parser = argparse.ArgumentParser(
         description='Setup Sheets, AppScripts and Drive for PVA.')
-    parser.add_argument('--drive-fonts', type=str, default='drive/fonts', 
+    parser.add_argument('--drive-fonts', type=str, default='drive/fonts',
                         help='Directory containing fonts to be copied to Drive.')
-    parser.add_argument('--secrets', type=str, help='Your OAuth Secrets file.')
+    parser.add_argument('--secrets', type=str,
+                        help='Your OAuth Secrets file. If empty, the app will ask for your client id and secret.')
     parser.add_argument('--env-out', type=str,
                         help='Full path to where ENV variables will be written.')
-    parser.add_argument('--drive-id', type=str,  
+    parser.add_argument('--drive-id', type=str,
                         help='An existing Drive Id to reuse. If provided, setting up Drive is skipped.')
-    parser.add_argument('--sheet-id', type=str,  
+    parser.add_argument('--sheet-id', type=str,
                         help='An existing Sheet to reuse. If provided, setting up Sheets is skipped.')
 
     return parser.parse_args()
@@ -55,8 +56,26 @@ def main(args):
 
     credentials = None  # Use Cloud Shell defaults
     if args.secrets:
-        flow = InstalledAppFlow.from_client_secrets_file(
-            args.secrets, scopes=SCOPES)
+        flow = InstalledAppFlow.from_client_secrets_file(args.secrets, scopes=SCOPES)
+        flow.run_local_server()
+        credentials = flow.credentials
+    else:
+        client_id = input('Desktop Client Id: ')
+        client_secret = input('Client Secret: ')
+
+        desktop_config = {
+            "installed": {
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "redirect_uris": [
+                    "urn:ietf:wg:oauth:2.0:oob",
+                    "http://localhost"
+                ]
+            }
+        }
+        flow = InstalledAppFlow.from_client_config(desktop_config, scopes=SCOPES)
         flow.run_local_server()
         credentials = flow.credentials
 
@@ -124,7 +143,8 @@ def create_drive(credentials, drive_dir):
                             mimetype='application/x-font-ttf', resumable=True)
     service.files().create(body=file_metadata, media_body=media).execute()
 
-    print('Done. Drive URL: https://drive.google.com/drive/folders/{0}'.format(drive_id))
+    print(
+        'Done. Drive URL: https://drive.google.com/drive/folders/{0}'.format(drive_id))
 
     return drive_id
 
@@ -195,33 +215,36 @@ def create_sheet(credentials, drive_id) -> str:
 
     update_body = {
         'requests': [
-            add_sheet(1, 'Configuration'), 
-            add_sheet(2, 'Prices'), 
-            add_sheet(3, 'Static'), 
-            add_sheet(4, 'Bases', hidden=True), 
-            add_sheet(5, 'OfferTypes', hidden=True), 
-            add_sheet(6, 'Campaigns', hidden=True), 
-            add_sheet(7, 'Generator', hidden=True), 
+            add_sheet(1, 'Configuration'),
+            add_sheet(2, 'Prices'),
+            add_sheet(3, 'Static'),
+            add_sheet(4, 'Bases', hidden=True),
+            add_sheet(5, 'OfferTypes', hidden=True),
+            add_sheet(6, 'Campaigns', hidden=True),
+            add_sheet(7, 'Generator', hidden=True),
             paste_data(1, row=5, col=1, data=f"DriveConfigFolder, {drive_id}"),
             paste_data(1, row=6, col=1, data="Interval In Minutes, {0}".format(
                 CONFIGS['time_interval'])),
             paste_data(
                 1, row=7, col=1, data="MC - Target Country, {0}".format(CONFIGS['country'])),
-            paste_data(1, row=8, col=1, data="MC -  Content Language, {0}".format(CONFIGS['lang'])),
+            paste_data(
+                1, row=8, col=1, data="MC -  Content Language, {0}".format(CONFIGS['lang'])),
             named_range("ContentLanguage", 1, row=8, col=2),
             named_range("TargetCountry", 1, row=7, col=2),
             named_range("Output", 1, row=3, row_end=6, col=4, col_end=7),
-            paste_data(2, row=0, col=None, data="Id, OfferGroup, OfferType, Position, Title, Image, Price"),
+            paste_data(
+                2, row=0, col=None, data="Id, OfferGroup, OfferType, Position, Title, Image, Price"),
             paste_data(3, row=0, col=None, data="Id, Text, Image"),
             paste_data(4, row=0, col=None, data="Title, File, Products"),
             paste_data(5, row=0, col=None,
                        data="Title, Base, Configs, Parent"),
-            paste_data(6, row=0, col=None, data="Date, AdsMetadata, VideoMetadata, Status, GeneratedVideo"),
+            paste_data(
+                6, row=0, col=None, data="Date, AdsMetadata, VideoMetadata, Status, GeneratedVideo"),
             {
-            'deleteSheet': {
-                'sheetId': 0,  # Sheet 1
-            }
-        },
+                'deleteSheet': {
+                    'sheetId': 0,  # Sheet 1
+                }
+            },
         ],
     }
 
@@ -229,7 +252,8 @@ def create_sheet(credentials, drive_id) -> str:
         spreadsheetId=sheet_id, body=update_body)
     request.execute()
 
-    print('Done. Sheet URL: https://docs.google.com/spreadsheets/d/{0}/edit'.format(sheet_id))
+    print(
+        'Done. Sheet URL: https://docs.google.com/spreadsheets/d/{0}/edit'.format(sheet_id))
 
     return sheet_id
 
