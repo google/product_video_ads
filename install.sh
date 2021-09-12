@@ -17,11 +17,17 @@
 # INSTRUCTIONS: This script should be run inside the Cloud Shell of your GCP.
 set -e
 
-echo -e "$(tput bold)Welcome to the Product Video Ads Installer"
-echo -e "Keep your OAuth 2.0 Keys (Web & Desktop) and API Key at hand."
-read -p "Press ENTER to continue"
+RED='\033[1;91m'
+BLUE='\033[1;34m'
+NC='\033[0m' # No Color
+BOLD=$(tput bold)
+NORMAL=$(tput sgr0)
 
-echo 'Enabling some needed APIs...'
+echo -e "${BOLD}Welcome to the Product Video Ads Installer${NORMAL}"
+echo -e "Keep your OAuth 2.0 Keys (Web & Desktop) and API Key at hand."
+read -p "Press ENTER when ready"
+
+echo "Enabling some needed APIs..."
 gcloud services enable \
   drive.googleapis.com \
   script.googleapis.com \
@@ -30,12 +36,12 @@ gcloud services enable \
   storagetransfer.googleapis.com \
   container.googleapis.com
 
-echo -n 'Enter a Spreadsheet Id (Leave blank to create a new one): '
+echo -n "Enter a Spreadsheet Id (Leave blank to create a new one): "
 read -r SPREADSHEET_ID
 
 if [ -z "$SPREADSHEET_ID" ]
 then
-  echo 'Setting up Google Sheets and Drive'
+  echo "Setting up Google Sheets and Drive"
   set -o allexport
   python3 setup.py --env-out='/tmp/pva.env' && source /tmp/pva.env
   set +o allexport
@@ -52,11 +58,6 @@ sh install-cloud.sh
 cd ../
 
 # Important reminder
-RED='\033[1;91m'
-BLUE='\033[1;34m'
-NC='\033[0m' # No Color
-BOLD=$(tput bold)
-NORMAL=$(tput sgr0)
 APP_URL=$(gcloud app browse --no-launch-browser)
 INSTRUCTIONS="
 ${RED}
@@ -75,11 +76,12 @@ ${BOLD}Ensure your Web OAuth Client has authorized the following URL BEFORE laun
 ${BLUE}$APP_URL/${NC}
 
 1. Go to 'APIs & Services' > Credentials (https://console.cloud.google.com/apis/credentials).
-2. Click your Web Client under 'OAuth 2.0 Client IDs'
-3. Ensure '${BOLD}Authorized JavaScript origins${NORMAL}' and '${BOLD}Authorized redirect URIs${NORMAL}' have this URI
+2. Click your Web Client under 'OAuth 2.0 Client IDs'.
+3. Add the URI to '${BOLD}Authorized JavaScript origins${NORMAL}' and '${BOLD}Authorized redirect URIs${NORMAL}'.
 "
 
 echo -e "$INSTRUCTIONS"
 read -p "Press ENTER to continue"
 
-gcloud app browse
+echo "Your application was installated succesfully! Go to:"
+echo -e "${BLUE}$APP_URL/${NC}"
