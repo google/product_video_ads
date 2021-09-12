@@ -17,6 +17,10 @@
 # INSTRUCTIONS: This script should be run inside the Cloud Shell of your GCP.
 set -e
 
+echo -e "$(tput bold)Welcome to the Product Video Ads Installer"
+echo -e "Keep your OAuth 2.0 Keys (Web & Desktop) and API Key at hand."
+read -p "Press ENTER to continue"
+
 echo 'Enabling some needed APIs...'
 gcloud services enable \
   drive.googleapis.com \
@@ -33,7 +37,7 @@ if [ -z "$SPREADSHEET_ID" ]
 then
   echo 'Setting up Google Sheets and Drive'
   set -o allexport
-  python3 setup.py --env-out='/tmp/pva.env' && cat /tmp/pva.env && source /tmp/pva.env
+  python3 setup.py --env-out='/tmp/pva.env' && source /tmp/pva.env
   set +o allexport
 else
   export SPREADSHEET_ID
@@ -51,8 +55,31 @@ cd ../
 RED='\033[1;91m'
 BLUE='\033[1;34m'
 NC='\033[0m' # No Color
+BOLD=$(tput bold)
+NORMAL=$(tput sgr0)
 APP_URL=$(gcloud app browse --no-launch-browser)
-echo -e "${RED}IMPORTANT:${NC} Ensure your Web OAuth Client has authorized the following URL BEFORE launching the app."
-echo -e "App URL: ${BLUE}$APP_URL/${NC}" 
+INSTRUCTIONS="
+${RED}
+#############################################################################
+
+██ ███    ███ ██████   ██████  ██████  ████████  █████  ███    ██ ████████ 
+██ ████  ████ ██   ██ ██    ██ ██   ██    ██    ██   ██ ████   ██    ██    
+██ ██ ████ ██ ██████  ██    ██ ██████     ██    ███████ ██ ██  ██    ██    
+██ ██  ██  ██ ██      ██    ██ ██   ██    ██    ██   ██ ██  ██ ██    ██    
+██ ██      ██ ██       ██████  ██   ██    ██    ██   ██ ██   ████    ██    
+                                                                           
+#############################################################################
+${NC}
+${BOLD}Ensure your Web OAuth Client has authorized the following URL BEFORE launching the app.${NORMAL}
+
+${BLUE}$APP_URL/${NC}
+
+1. Go to 'APIs & Services' > Credentials (https://console.cloud.google.com/apis/credentials).
+2. Click your Web Client under 'OAuth 2.0 Client IDs'
+3. Ensure '${BOLD}Authorized JavaScript origins${NORMAL}' and '${BOLD}Authorized redirect URIs${NORMAL}' have this URI
+"
+
+echo -e "$INSTRUCTIONS"
+read -p "Press ENTER to continue"
 
 gcloud app browse
