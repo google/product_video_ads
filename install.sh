@@ -83,5 +83,6 @@ ${BLUE}$APP_URL/${NC}
 echo -e "$INSTRUCTIONS"
 read -p "Press ENTER to continue"
 
-echo "Your application was installated succesfully! Go to:"
-echo -e "${BLUE}$APP_URL/${NC}"
+echo "Your application was installated succesfully! To login go to:"
+echo -e "\n${BLUE}$APP_URL/${NC}\n"
+echo -e "Sheet Id: $SPREADSHEET_ID"
