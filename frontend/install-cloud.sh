@@ -15,12 +15,10 @@
 # limitations under the License.
 set -e
 
-npm install --legacy-peer-deps
-npm run build --configuration=production
-
 echo 'Enabling some needed APIs...'
 gcloud services enable drive.googleapis.com
 gcloud services enable sheets.googleapis.com
+gcloud app create --region=us-central || true
 
 echo 'Installing Web Frontend on App Engine...'
 
@@ -30,12 +28,14 @@ read FRONTEND_CLIENT_ID
 echo -n 'Enter the API Key: '
 read FRONTEND_API_KEY
 
+npm install --legacy-peer-deps
+npm run build --configuration=production
+
 export FRONTEND_API_KEY FRONTEND_CLIENT_ID
 mv dist/assets/js/env.js dist/assets/js/env.js.orig
 envsubst < dist/assets/js/env.js.orig > dist/assets/js/env.js
 rm dist/assets/js/env.js.orig
 
-gcloud app create || true
 gcloud app deploy -q
 
 rm -rf dist node_modules package-lock.json
