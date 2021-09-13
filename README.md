@@ -13,41 +13,47 @@ you are up and running right away.
 ## Requirements
 You will need a **new** Google Cloud project and a user with atleast **Editor (or Owner) role** to do the install.
 
+Also ensure that '**Google Apps Script API**' is **ENABLED** for this user. You can enable it at: https://script.google.com/home/usersettings
+
 *This user will be the owner of the newly generated Sheet and Drive folders. You can share these with other users after the installation is complete.*
 
 ## How to install
 Installation is in 2 parts:
 
-1. Create authorization keys from the GCP UI
-2. Run the installer with them
+1. Setup the Authorization keys from the GCP UI
+2. Run the installer
 
-### Setup the Keys
-You will need to create an **API Key**, and **2x OAuth Client Ids (Web and Desktop)** from the [GCP dashboard](https://console.cloud.google.com/) as follows:
+### Setup the Authorization Keys
+You will need to create the following keys from the [GCP dashboard](https://console.cloud.google.com/):
+1. An **OAuth Client Id for Web**
+1. An **OAuth Client Id for Desktop**
+1. An **API Key**
 
-#### Create an OAuth Client ID as a **Web Application**
+Instructions are as follows.
+
+#### 1.Create an OAuth Client ID for a 'Web Application'
 1. Go to ['APIs and Services' > 'Credentials'](https://console.cloud.google.com/apis/credentials/)
 1. Click ['Create Credentials' > 'OAuth Client Id'](https://console.cloud.google.com/apis/credentials/oauthclient)
-	1. **Configure the Consent Screen** *If this is the first time you're creating an OAuth client you will be asked to configure an **OAuth Consent Screen**. Configure as follows*:
-		1. Enter an ‘App Name’ and a ‘User Support Email’.
-		1. Skip the optional fields and Save.
-		1. Go to [‘Apis & Services’ > ‘OAuth consent screen’](https://console.cloud.google.com/apis/credentials/consent) and set the following:
+	- If you are asked to configure the '**OAuth Consent Screen**' follow the steps below. Otherwise continue with Step 3.
+		- Enter an ‘App Name’ and a ‘User Support Email’.
+		- Skip the optional fields and Save.
+		- Go to [‘Apis & Services’ > ‘OAuth consent screen’](https://console.cloud.google.com/apis/credentials/consent) and set the following:
 			- Publishing Status: **In production**
 			- User **Type: External**
-		1. *The consent screen is now configured.* Now go to 'APIs and Services' > 'Credentials' > 'Create Credentials' > 'OAuth Client Id'
-1. Configure as follows:
+		- *Consent screen configuraiton is now complete.* Go to ['APIs and Services' > 'Credentials' > 'Create Credentials' > 'OAuth Client Id'](https://console.cloud.google.com/apis/credentials/oauthclient) to continue configuring the client.
+1. Configure your **OAuth Client Id for Web** as follows:
 	- Application Type: `Web Application`
 	- Name: `Web Client 1` *(or anything you prefer)*
-	- Add the AppEngine URL to `Authorized redirect URIs` and `Authorized Javascript Origins` in the Client ID. Your URL is 
-	`PROJECT_ID.REGION_ID.r.appspot.com` ([Reference](https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed)). *If you don't know the exact URL, the installer script will tell you at the end of the install. Make sure you edit this client BEFORE launching the app*.
+	- Click 'Save'
 
-#### Create an OAuth Client ID as a **Desktop app**
+#### 2.Create an OAuth Client ID for a 'Desktop app'
 1. Go to ['APIs and Services' > 'Credentials'](https://console.cloud.google.com/apis/credentials/)
 1. Click ['Create Credentials' > 'OAuth Client Id'](https://console.cloud.google.com/apis/credentials/oauthclient) and configure as follows:
 	- Application Type: `Desktop app`
 	- Name: `Desktop Client 1` *(or anything you prefer)*
 1. Click 'Create'
 
-#### Create an API key
+#### 3.Create an API key
 1. Go to ['APIs and Services' > 'Credentials'](https://console.cloud.google.com/apis/credentials/)
 1. Click 'Create Credentials' > 'API Key'
 1. Click 'Close'	
@@ -61,7 +67,12 @@ You will need to create an **API Key**, and **2x OAuth Client Ids (Web and Deskt
 	./install.sh
 	```
 1. Follow the on-screen instructions to complete the install.
-	- **IMP**: Before you click on the AppEngine URL, add it to `Authorized redirect URIs` and `Authorized Javascript Origins` in the **Web OAuth Client Id**.
+1. **STOP**: Before you click on the AppEngine URL, add the URL to the authorized URIs section in the **Web OAuth Client Id** as follows:
+	1. Go to ['APIs and Services' > 'Credentials'](https://console.cloud.google.com/apis/credentials/)
+	1. Click on the name of your client under 'OAuth 2.0 Client IDs'
+	1. Add the URI to `Authorized redirect URIs` and `Authorized Javascript Origins`
+		- Your URL will be like this: `PROJECT_ID.REGION_ID.r.appspot.com` ([Ref](https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed)).
+	1. Click 'Save'
 1. **Installation is complete!** Click on the AppEngine URL to run your app.
 	- **IMP**: Ensure cookies and pop-ups are allowed. Ref: [Allow pop-ups in Chrome](https://support.google.com/chrome/answer/95472?co=GENIE.Platform%3DDesktop&hl=en)
 
