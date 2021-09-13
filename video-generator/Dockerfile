@@ -11,7 +11,6 @@ RUN mkdir -p /credentials
 
 # Application code
 ADD src/ /usr/src/app
-ADD token /usr/src/app/token
 
 # Install app
 WORKDIR /usr/src/app

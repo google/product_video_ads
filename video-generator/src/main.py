@@ -18,7 +18,7 @@ import os
 import time
 
 import log
-from auth import authentication
+from google.oauth2 import service_account
 # Handle "events" from configuration
 from configuration.event_handler import EventHandler as EventHandler
 from configuration.spreadsheet_configuration import SpreadsheetConfiguration as Configuration
@@ -34,7 +34,6 @@ from video.video_processor import VideoProcessor as VideoProcessor
 
 logger = log.getLogger()
 
-
 def main():
     # Read environment parameters
     spreadsheet_id = os.environ.get('SPREADSHEET_ID')
@@ -43,9 +42,19 @@ def main():
         print('Please set environment variable SPREADSHEET_ID.')
         exit(1)
 
+    SCOPES = [
+        'https://www.googleapis.com/auth/spreadsheets',
+        'https://www.googleapis.com/auth/youtube.upload',
+        'https://www.googleapis.com/auth/drive',
+        'https://www.googleapis.com/auth/devstorage.read_write'
+    ]
+    # Load service account file as secret mount to K8S Pod
+    SERVICE_ACCOUNT_FILE = '/.google/service_account.json'
+
     # Tries to retrieve token from storage each 5 minutes
     while True:
-        credentials = authentication.get_credentials_from_local_file()
+        credentials = service_account.Credentials.from_service_account_file(
+                SERVICE_ACCOUNT_FILE, scopes=SCOPES)
         if credentials is not None:
             break
 
@@ -58,7 +67,7 @@ def main():
     # Dependencies
     configuration = Configuration(spreadsheet_id, credentials)
     storage = StorageHandler(configuration.get_drive_folder(), credentials)
-    cloud_storage = CloudStorageHandler(credentials)
+    cloud_storage = CloudStorageHandler(service_account_file=SERVICE_ACCOUNT_FILE)
     video_processor = VideoProcessor(
         storage, VideoGenerator(), Uploader(credentials), cloud_storage)
     image_processor = ImageProcessor(storage, ImageGenerator(), cloud_storage)

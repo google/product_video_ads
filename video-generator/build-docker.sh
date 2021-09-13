@@ -14,10 +14,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-TOKEN_FILE=token
-
-if ! test -f "$TOKEN_FILE"; then
-  python3 authenticator.py
-fi
-
 docker build -t video-generator .

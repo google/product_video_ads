@@ -25,14 +25,8 @@ API_SCOPES = [
 class CloudStorageHandler():
     logger = log.getLogger()
 
-    def __init__(self, project: str = None, credentials=None):
-        if credentials is None:
-            # Obtains Service Account from environment just to access storage
-            # It comes from GCP or GOOGLE_APPLICATION_CREDENTIALS env variable file
-            credentials, project = google.auth.default(scopes=API_SCOPES)
-
-        self.storage_client = storage.Client(
-            project=project, credentials=credentials)
+    def __init__(self, project: str = None, credentials=None, service_account_file: str = None):
+        self.storage_client = storage.Client.from_service_account_json(service_account_file)
 
     def download_string(self, bucket_name, object_name):
         return self.storage_client.get_bucket(bucket_name).blob(object_name).download_as_string()
