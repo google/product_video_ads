@@ -13,6 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+set -e
 
 npm install --legacy-peer-deps
 npm run build --configuration=production
@@ -34,6 +35,7 @@ mv dist/assets/js/env.js dist/assets/js/env.js.orig
 envsubst < dist/assets/js/env.js.orig > dist/assets/js/env.js
 rm dist/assets/js/env.js.orig
 
+gcloud app create
 gcloud app deploy -q
 
 rm -rf dist node_modules package-lock.json
