@@ -58,7 +58,7 @@ def main(args):
     if args.secrets:
         flow = InstalledAppFlow.from_client_secrets_file(args.secrets, scopes=SCOPES)
     else:
-        client_id = input('Desktop Client Id: ')
+        client_id = input('Desktop Client ID: ')
         client_secret = input('Client Secret: ')
 
         desktop_config = {
@@ -91,7 +91,16 @@ def main(args):
             file.write("DRIVE_ID={}\n".format(drive_id))
 
 
-def create_drive(credentials, drive_dir):
+def create_drive(credentials: google.oauth2.credentials.Credentials, drive_dir: str) -> str:
+    """Creates the folder setup on Google Drive.
+
+    Args:
+      credentials: The credentials used with the API.
+      drive_dir: Upload files from `drive_dir` to the new Drive folder.
+
+    Returns:
+      The Drive ID of the parent folder.
+    """
 
     print('Setting up Drive ... ', end='', flush=True)
 
@@ -142,21 +151,27 @@ def create_drive(credentials, drive_dir):
                             mimetype='application/x-font-ttf', resumable=True)
     service.files().create(body=file_metadata, media_body=media).execute()
 
-    print(
-        'Done. Drive URL: https://drive.google.com/drive/folders/{0}'.format(drive_id))
+    print(f'Done. Drive URL: https://drive.google.com/drive/folders/{drive_id}')
 
     return drive_id
 
 
-def create_sheet(credentials, drive_id) -> str:
-    """ Create a new Google SpreadSheet.
+def create_sheet(credentials: google.oauth2.credentials.Credentials, drive_id: str) -> str:
+    """Creates a new Google SpreadSheet.
 
-    Creates all internal sheets, namedranges, and limited formatting.
+    Creates all internal sheets, namedranges, with limited formatting.
+
+    Args:
+      credentials: The credentials used with the API.
+      drive_id: Set to this Drive folder in the 'Config' sheet.
+
+    Returns:
+      The Sheet ID.
     """
 
     print('Setting up Sheets ... ', end='', flush=True)
 
-    def add_sheet(sheet_id, title, hidden=False):
+    def _add_sheet_request(sheet_id, title, hidden=False):
         return {
             'addSheet': {
                 'properties': {
@@ -168,7 +183,7 @@ def create_sheet(credentials, drive_id) -> str:
             },
         }
 
-    def named_range(name, sheet_id, row, col, row_end=None, col_end=None):
+    def _named_range_request(name, sheet_id, row, col, row_end=None, col_end=None):
         row_end = row_end if row_end else row + 1
         col_end = col_end if col_end else col + 1
 
@@ -187,7 +202,7 @@ def create_sheet(credentials, drive_id) -> str:
             }
         }
 
-    def paste_data(sheet_id, row, col, data):
+    def _paste_data_request(sheet_id, row, col, data):
         return {
             "pasteData": {
                 "data": data,
@@ -214,30 +229,30 @@ def create_sheet(credentials, drive_id) -> str:
 
     update_body = {
         'requests': [
-            add_sheet(1, 'Configuration'),
-            add_sheet(2, 'Prices'),
-            add_sheet(3, 'Static'),
-            add_sheet(4, 'Bases', hidden=True),
-            add_sheet(5, 'OfferTypes', hidden=True),
-            add_sheet(6, 'Campaigns', hidden=True),
-            add_sheet(7, 'Generator', hidden=True),
-            paste_data(1, row=5, col=1, data=f"DriveConfigFolder, {drive_id}"),
-            paste_data(1, row=6, col=1, data="Interval In Minutes, {0}".format(
+            _add_sheet_request(1, 'Configuration'),
+            _add_sheet_request(2, 'Prices'),
+            _add_sheet_request(3, 'Static'),
+            _add_sheet_request(4, 'Bases', hidden=True),
+            _add_sheet_request(5, 'OfferTypes', hidden=True),
+            _add_sheet_request(6, 'Campaigns', hidden=True),
+            _add_sheet_request(7, 'Generator', hidden=True),
+            _paste_data_request(1, row=5, col=1, data=f"DriveConfigFolder, {drive_id}"),
+            _paste_data_request(1, row=6, col=1, data="Interval In Minutes, {0}".format(
                 CONFIGS['time_interval'])),
-            paste_data(
+            _paste_data_request(
                 1, row=7, col=1, data="MC - Target Country, {0}".format(CONFIGS['country'])),
-            paste_data(
+            _paste_data_request(
                 1, row=8, col=1, data="MC -  Content Language, {0}".format(CONFIGS['lang'])),
-            named_range("ContentLanguage", 1, row=8, col=2),
-            named_range("TargetCountry", 1, row=7, col=2),
-            named_range("Output", 1, row=3, row_end=6, col=4, col_end=7),
-            paste_data(
+            _named_range_request("ContentLanguage", 1, row=8, col=2),
+            _named_range_request("TargetCountry", 1, row=7, col=2),
+            _named_range_request("Output", 1, row=3, row_end=6, col=4, col_end=7),
+            _paste_data_request(
                 2, row=0, col=None, data="Id, OfferGroup, OfferType, Position, Title, Image, Price"),
-            paste_data(3, row=0, col=None, data="Id, Text, Image"),
-            paste_data(4, row=0, col=None, data="Title, File, Products"),
-            paste_data(5, row=0, col=None,
+            _paste_data_request(3, row=0, col=None, data="Id, Text, Image"),
+            _paste_data_request(4, row=0, col=None, data="Title, File, Products"),
+            _paste_data_request(5, row=0, col=None,
                        data="Title, Base, Configs, Parent"),
-            paste_data(
+            _paste_data_request(
                 6, row=0, col=None, data="Date, AdsMetadata, VideoMetadata, Status, GeneratedVideo"),
             {
                 'deleteSheet': {
@@ -251,13 +266,21 @@ def create_sheet(credentials, drive_id) -> str:
         spreadsheetId=sheet_id, body=update_body)
     request.execute()
 
-    print(
-        'Done. Sheet URL: https://docs.google.com/spreadsheets/d/{0}/edit'.format(sheet_id))
+    print(f'Done. Sheet URL: https://docs.google.com/spreadsheets/d/{sheet_id}/edit')
 
     return sheet_id
 
 
-def create_appscript(credentials, sheet_id):
+def create_appscript(credentials: google.oauth2.credentials.Credentials, sheet_id: str) -> str:
+    """Create the Merchant Center scripts as an AppScript Project and assign it a Sheet.
+
+    Args:
+      credentials: The credentials used with the API.
+      sheet_id: Add the scripts to this sheet.
+
+    Returns:
+      The AppScript Project ID.
+    """
 
     print('Installing scripts into Sheets ... ', end='', flush=True)
 
@@ -284,7 +307,7 @@ def create_appscript(credentials, sheet_id):
 
     response = service.projects().updateContent(body=request, scriptId=response['scriptId']).execute()
 
-    print('Done. AppScript Project URL: https://script.google.com/d/{0}/edit'.format(response['scriptId']))
+    print(f'Done. AppScript Project URL: https://script.google.com/d/{response["scriptId"]}/edit')
 
     return response['scriptId']
     

@@ -16,7 +16,7 @@ import pickle
 from google_auth_oauthlib.flow import InstalledAppFlow
 
 # Read client's ID and secret
-client_id = input('Desktop Client Id: ')
+client_id = input('Desktop Client ID: ')
 client_secret = input('Desktop Client Secret: ')
 
 # Get credentials from console flow

@@ -2,7 +2,7 @@
 
 <img src="https://github.com/google/product_video_ads/blob/main/logo.png" alt="PVA Logo" width="300"/>
 
-Product Video Ads is an open-source solution to build videos at scale, by reading
+Product Video Ads is an open-source solution that builds videos at scale, by reading
 product data from Google Sheets or Google Merchant Center and generating videos
 with product information (name, image, price) automatically. These videos are 
 automatically uploaded to Youtube or Drive, and can be configured to Google Ads campaigns.
@@ -11,7 +11,7 @@ The integrated installer will setup the project on Google Cloud so
 you are up and running right away.
 
 ## Requirements
-You will need a **new** Google Cloud project and a user with atleast **Editor (or Owner) role** to do the install.
+You will need a **new** Google Cloud project and a user with at least **Editor (or Owner) role** to do the install.
 
 Also ensure that '**Google Apps Script API**' is **ENABLED** for this user. You can enable it at: https://script.google.com/home/usersettings
 
@@ -67,7 +67,7 @@ Instructions are as follows.
 	./install.sh
 	```
 1. Follow the on-screen instructions to complete the install.
-1. **STOP**: Before you click on the AppEngine URL, add the URL to the authorized URIs section in the **Web OAuth Client Id** as follows:
+1. **STOP**: Before you click on the AppEngine URL, add the URL to the authorized URIs section in the **Web OAuth Client ID** as follows:
 	1. Go to ['APIs and Services' > 'Credentials'](https://console.cloud.google.com/apis/credentials/)
 	1. Click on the name of your client under 'OAuth 2.0 Client IDs'
 	1. Add the URI to `Authorized redirect URIs` and `Authorized Javascript Origins`
@@ -76,9 +76,9 @@ Instructions are as follows.
 1. **Installation is complete!** Click on the AppEngine URL to run your app.
 	- **IMP**: Ensure cookies and pop-ups are allowed. Ref: [Allow pop-ups in Chrome](https://support.google.com/chrome/answer/95472?co=GENIE.Platform%3DDesktop&hl=en)
 
-*Optional:* Check that your SpreadSheet has access to GMC as follows:
+*Optional:* Check that your Spreadsheet has access to Google Merchant Center as follows:
 1. [Optional] Navigate to _Tools_ > _Script Editor_ > _Settings (gear icon)_
 	1. Update the GCP Project ID
-	1. Test the GMC connection by
-		1. Add an ID on "Prices" tab in the format `<GMC id>:<product id>` 
+	1. Test the Google Merchant Center connection by
+		1. Add an ID on "Prices" tab in the format `<Google Merchant Center id>:<product id>` 
 		1. Click _Merchant Center_ > _Run Now_

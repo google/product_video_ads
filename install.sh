@@ -82,11 +82,10 @@ ${BLUE}$APP_URL/${NC}
 1. Go to 'APIs & Services' > Credentials (https://console.cloud.google.com/apis/credentials).
 2. Click your Web Client under 'OAuth 2.0 Client IDs'.
 3. Add the URI to '${BOLD}Authorized JavaScript origins${NORMAL}' and '${BOLD}Authorized redirect URIs${NORMAL}'.
+4. Click 'Save'.
 "
 
 echo -e "$INSTRUCTIONS"
-read -p "Press ENTER to continue"
-
 echo "Your application was installed successfully! To login go to:"
 echo -e "\n${BLUE}$APP_URL/${NC}\n"
 echo -e "Sheet Id: $SPREADSHEET_ID"
