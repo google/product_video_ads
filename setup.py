@@ -15,6 +15,7 @@
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google_auth_oauthlib.flow import InstalledAppFlow
+from google.oauth2.credentials import Credentials
 from pathlib import Path
 
 # @see https://developers.google.com/identity/protocols/oauth2/scopes
@@ -91,7 +92,7 @@ def main(args):
             file.write("DRIVE_ID={}\n".format(drive_id))
 
 
-def create_drive(credentials: google.oauth2.credentials.Credentials, drive_dir: str) -> str:
+def create_drive(credentials: Credentials, drive_dir: str) -> str:
     """Creates the folder setup on Google Drive.
 
     Args:
@@ -156,7 +157,7 @@ def create_drive(credentials: google.oauth2.credentials.Credentials, drive_dir: 
     return drive_id
 
 
-def create_sheet(credentials: google.oauth2.credentials.Credentials, drive_id: str) -> str:
+def create_sheet(credentials: Credentials, drive_id: str) -> str:
     """Creates a new Google SpreadSheet.
 
     Creates all internal sheets, namedranges, with limited formatting.
@@ -271,7 +272,7 @@ def create_sheet(credentials: google.oauth2.credentials.Credentials, drive_id: s
     return sheet_id
 
 
-def create_appscript(credentials: google.oauth2.credentials.Credentials, sheet_id: str) -> str:
+def create_appscript(credentials: Credentials, sheet_id: str) -> str:
     """Create the Merchant Center scripts as an AppScript Project and assign it a Sheet.
 
     Args:
