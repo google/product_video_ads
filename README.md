@@ -38,8 +38,8 @@ Instructions are as follows.
 		- Enter an ‘App Name’ and a ‘User Support Email’.
 		- Skip the optional fields and Save.
 		- Go to [‘Apis & Services’ > ‘OAuth consent screen’](https://console.cloud.google.com/apis/credentials/consent) and set the following:
-			- Publishing Status: **In production**
-			- User **Type: External**
+			- Publishing Status: **Testing**
+			- User **Type: Internal**
 		- *Consent screen configuraiton is now complete.* Go to ['APIs and Services' > 'Credentials' > 'Create Credentials' > 'OAuth Client Id'](https://console.cloud.google.com/apis/credentials/oauthclient) to continue configuring the client.
 1. Configure your **OAuth Client Id for Web** as follows:
 	- Application Type: `Web Application`
