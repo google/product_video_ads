@@ -18,15 +18,6 @@ PROJECT_NAME=video-generator:latest
 
 echo 'About to install Video Generator on Kubernetes Engine...'
 
-echo -n 'Type the spreadsheet ID: '
-read -r SPREADSHEET_ID
-export SPREADSHEET_ID=$SPREADSHEET_ID
-
-echo -n 'Type the cloud project name: '
-read -r CLOUD_PROJECT_NAME
-
-gcloud config set project "$CLOUD_PROJECT_NAME"
-
 # Enable APIs
 echo 'Enabling APIs...'
 gcloud services enable drive.googleapis.com
@@ -45,17 +36,17 @@ gcloud container clusters create video-generator-cluster \
 --scopes=https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/youtube.upload,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/devstorage.read_write
 
 gcloud container clusters get-credentials --zone us-west1-a video-generator-cluster
-
 sleep 5
 
-PROJECT_ID=$(gcloud config list --format 'value(core.project)' 2>/dev/null | tr ":" "/")
-IMAGE_NAME=gcr.io/${PROJECT_ID}/${PROJECT_NAME}
+IMAGE_NAME=gcr.io/${GOOGLE_CLOUD_PROJECT}/${PROJECT_NAME}
+export IMAGE_NAME
 
 if ! test -f "token"; then
   python3 authenticator.py
 fi
 
 # Image is not there yet
+# ENV vars needed: IMAGE_NAME, SPREADSHEET_ID
 docker build -t video-generator .
 docker tag $PROJECT_NAME "$IMAGE_NAME"
 docker push "$IMAGE_NAME"
@@ -63,7 +54,7 @@ docker push "$IMAGE_NAME"
 # Install application to cluster
 echo 'Apply application to cluster...'
 
-export IMAGE_NAME=$IMAGE_NAME
+# ENV vars needed: IMAGE_NAME, SPREADSHEET_ID
 envsubst < video-generator.yaml | kubectl apply -f -
 
 echo 'Deploying video-generator to cluster...'

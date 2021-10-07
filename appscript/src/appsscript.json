@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "ShoppingContent",
+        "version": "v2.1",
+        "serviceId": "content"
+      }
+    ]
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8"
+}

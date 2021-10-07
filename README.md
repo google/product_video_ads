@@ -1,47 +1,84 @@
 # Product Video Ads
 
-Product Video Ads is a solution to build video Ads at scale, by reading data
-from a feed (e.g. Merchant Center feed, Spreadsheet, etc) and rendering videos
-with price, product name and images variations, automatically uploading
-them to Youtube, and configuring Google Ads campaigns.
+<img src="https://github.com/google/product_video_ads/blob/main/logo.png" alt="PVA Logo" width="300"/>
 
-The solution is intended to run on top of Google Cloud's infrastructure, so
-that you don't have to worry abount setting up too many different pieces in
-order to get it up and running.
+Product Video Ads is an open-source solution that builds videos at scale, by reading
+product data from Google Sheets or Google Merchant Center and generating videos
+with product information (name, image, price) automatically. These videos are 
+automatically uploaded to Youtube or Drive, and can be configured to Google Ads campaigns.
 
-## Pre-requisites
+The integrated installer will setup the project on Google Cloud so
+you are up and running right away.
 
-Please ensure that you have the following in place within your GCP Project before running the installation:
+## Requirements
+You will need a **new** Google Cloud project and a user with at least **Editor (or Owner) role** to do the install.
 
-* Configure an OAuth Consent Screen
-	* Go to _Apis & Services_ > _OAuth consent screen_ and set the following:
-		* `Publishing Status: In production`
-		* `User Type: External`
-* Create an OAuth Client ID as a Web Application
-	* Add the AppEngine URL to `Authorized redirect URIs` and `Authorized Javascript Origins` in the Client ID. Your URL is 
-	`PROJECT_ID.REGION_ID.r.appspot.com` ([Reference](https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed)) 
-	* Once you finish deployment make sure the provided url matches the one you entered here
-	* Copy the Client ID and Client Secret (we will need this later)
-* Create an API key and copy the key
-* Create an OAuth Client ID as a Desktop app
-	* Copy the Client ID and Client Secret (we will need this later)
-* Request access to the templates - [Config sheet](https://docs.google.com/spreadsheets/d/1JAGj6lpR1Ghz943fzBF3SMEuxxMn8aiY77GVNKdP_9Q/edit?resourcekey=0-ht2AXur6faTs_Jt6vUJgaQ#gid=6031590) and [Drive folder](https://drive.google.com/drive/u/0/folders/1fG2pUo5obYJDkZmyoxhjVc_h9-WuW5Xr)
-	* [Optional] Create a copy of both in your Google Drive
-* Ensure that `App Engine Creator` role is added to the user profile
+Also ensure that '**Google Apps Script API**' is **ENABLED** for this user. You can enable it at: https://script.google.com/home/usersettings
 
-## Installation
+*This user will be the owner of the newly generated Sheet and Drive folders. You can share these with other users after the installation is complete.*
 
-1. Clone this repository into your GCP project by running
-	`git clone https://github.com/google/product_video_ads.git`
-2. Once cloned succesfully, run `install.sh`
-3. The script will install the frontend first, enter the **Web** OAuth Client ID and secret when prompted
-	* Follow the on-screen instructions to continue the installation
-4. When prompted for Spreadsheet ID, 
-	* Navigate to the UI link from the previous step (ensure cookies and pop-ups are allowed)
-	* Generate a new spreadsheet ID using the web interface, or use the id of a copy of the Config template
-	* Ensure that the Service Account has access to spreadsheet and Drive folder
-	* [Optional] Navigate to _Tools_ > _Script Editor_ > _Settings (gear icon)_
-		* Update the GCP Project ID
-		* Test the GMC connection by
-			* Add an ID on "Prices" tab in the format `<GMC id>:<product id>` 
-			* Click _Merchant Center_ > _Run Now_
+## How to install
+Installation is in 2 parts:
+
+1. Setup the Authorization keys from the GCP UI
+2. Run the installer
+
+### Setup the Authorization Keys
+You will need to create the following keys from the [GCP dashboard](https://console.cloud.google.com/):
+1. An **OAuth Client Id for Web**
+1. An **OAuth Client Id for Desktop**
+1. An **API Key**
+
+Instructions are as follows.
+
+#### 1.Create an OAuth Client ID for a 'Web Application'
+1. Go to ['APIs and Services' > 'Credentials'](https://console.cloud.google.com/apis/credentials/)
+1. Click ['Create Credentials' > 'OAuth Client Id'](https://console.cloud.google.com/apis/credentials/oauthclient)
+	- If you are asked to configure the '**OAuth Consent Screen**' follow the steps below. Otherwise continue with Step 3.
+		- Enter an ‘App Name’ and a ‘User Support Email’.
+		- Skip the optional fields and Save.
+		- Go to [‘Apis & Services’ > ‘OAuth consent screen’](https://console.cloud.google.com/apis/credentials/consent) and set the following:
+			- Publishing Status: **Testing**
+			- User **Type: Internal**
+		- *Consent screen configuraiton is now complete.* Go to ['APIs and Services' > 'Credentials' > 'Create Credentials' > 'OAuth Client Id'](https://console.cloud.google.com/apis/credentials/oauthclient) to continue configuring the client.
+1. Configure your **OAuth Client Id for Web** as follows:
+	- Application Type: `Web Application`
+	- Name: `Web Client 1` *(or anything you prefer)*
+	- Click 'Save'
+
+#### 2.Create an OAuth Client ID for a 'Desktop app'
+1. Go to ['APIs and Services' > 'Credentials'](https://console.cloud.google.com/apis/credentials/)
+1. Click ['Create Credentials' > 'OAuth Client Id'](https://console.cloud.google.com/apis/credentials/oauthclient) and configure as follows:
+	- Application Type: `Desktop app`
+	- Name: `Desktop Client 1` *(or anything you prefer)*
+1. Click 'Create'
+
+#### 3.Create an API key
+1. Go to ['APIs and Services' > 'Credentials'](https://console.cloud.google.com/apis/credentials/)
+1. Click 'Create Credentials' > 'API Key'
+1. Click 'Close'	
+
+### Run the Installation Script
+1. Open your project's [Cloud shell](https://console.cloud.google.com/?cloudshell=true).
+1. Run the following:
+	```bash
+	git clone https://github.com/google/product_video_ads.git
+	cd product_video_ads
+	./install.sh
+	```
+1. Follow the on-screen instructions to complete the install.
+1. **STOP**: Before you click on the AppEngine URL, add the URL to the authorized URIs section in the **Web OAuth Client ID** as follows:
+	1. Go to ['APIs and Services' > 'Credentials'](https://console.cloud.google.com/apis/credentials/)
+	1. Click on the name of your client under 'OAuth 2.0 Client IDs'
+	1. Add the URI to `Authorized redirect URIs` and `Authorized Javascript Origins`
+		- Your URL will be like this: `PROJECT_ID.REGION_ID.r.appspot.com` ([Ref](https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed)).
+	1. Click 'Save'
+1. **Installation is complete!** Click on the AppEngine URL to run your app.
+	- **IMP**: Ensure cookies and pop-ups are allowed. Ref: [Allow pop-ups in Chrome](https://support.google.com/chrome/answer/95472?co=GENIE.Platform%3DDesktop&hl=en)
+
+*Optional:* Check that your Spreadsheet has access to Google Merchant Center as follows:
+1. [Optional] Navigate to _Tools_ > _Script Editor_ > _Settings (gear icon)_
+	1. Update the GCP Project ID
+	1. Test the Google Merchant Center connection by
+		1. Add an ID on "Prices" tab in the format `<Google Merchant Center id>:<product id>` 
+		1. Click _Merchant Center_ > _Run Now_
