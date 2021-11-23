@@ -33,7 +33,7 @@ gcloud container clusters create video-generator-cluster \
 --zone us-west1-a \
 --machine-type=e2-standard-2 \
 --no-enable-autoupgrade \
---scopes=https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/youtube.upload,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/devstorage.read_write
+--scopes=https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/youtube,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/devstorage.read_write
 
 gcloud container clusters get-credentials --zone us-west1-a video-generator-cluster
 sleep 5

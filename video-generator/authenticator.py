@@ -30,7 +30,7 @@ credentials = InstalledAppFlow.from_client_config({
     }
 }, scopes=[
     'https://www.googleapis.com/auth/spreadsheets',
-    'https://www.googleapis.com/auth/youtube.upload',
+    'https://www.googleapis.com/auth/youtube',
     'https://www.googleapis.com/auth/drive',
     'https://www.googleapis.com/auth/devstorage.read_write'
 ]).run_console()
