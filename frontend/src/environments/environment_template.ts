@@ -26,7 +26,7 @@ export const environment = {
   api_key: '',
   
   discovery_docs: ["https://sheets.googleapis.com/$discovery/rest?version=v4", "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest", "https://www.googleapis.com/discovery/v1/apis/storage/v1/rest"],
-  scopes: "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/youtube https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/devstorage.read_only",
+  scopes: "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/devstorage.read_only",
   drive_file_prefix: 'https://drive.google.com/u/0/uc?export=download&id=',
   youtube_prefix: 'https://www.youtube.com/embed/',
 
