@@ -119,7 +119,19 @@ def create_drive(credentials: Credentials, drive_dir: str) -> str:
         'parents': [drive_id],
         'mimeType': 'application/vnd.google-apps.folder'
     }
-    service.files().create(body=file_metadata).execute()
+
+    base_videos = service.files().create(body=file_metadata, fields='id').execute()
+    base_videos_id = base_videos.get('id')
+
+    file_metadata = {
+        'name': 'base_example.mp4',
+        'parents': [base_videos_id]
+    }
+
+    media = MediaFileUpload(drive_dir + '/base_example.mp4',
+                            mimetype='video/mp4', resumable=True)
+    
+    service.files().create(body=file_metadata, media_body=media).execute()
 
     file_metadata = {
         'name': 'fonts',
