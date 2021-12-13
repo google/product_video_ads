@@ -233,10 +233,11 @@ def create_sheet(credentials: Credentials, drive_id: str) -> str:
             _add_sheet_request(1, 'Configuration'),
             _add_sheet_request(2, 'Prices'),
             _add_sheet_request(3, 'Static'),
-            _add_sheet_request(4, 'Bases', hidden=True),
-            _add_sheet_request(5, 'OfferTypes', hidden=True),
-            _add_sheet_request(6, 'Campaigns', hidden=True),
-            _add_sheet_request(7, 'Generator', hidden=True),
+            _add_sheet_request(4, 'Ads'),
+            _add_sheet_request(5, 'Bases', hidden=True),
+            _add_sheet_request(6, 'OfferTypes', hidden=True),
+            _add_sheet_request(7, 'Campaigns', hidden=True),
+            _add_sheet_request(8, 'Generator', hidden=True),
             _paste_data_request(1, row=5, col=1, data=f"DriveConfigFolder, {drive_id}"),
             _paste_data_request(1, row=6, col=1, data="Interval In Minutes, {0}".format(
                 CONFIGS['time_interval'])),
@@ -249,12 +250,41 @@ def create_sheet(credentials: Credentials, drive_id: str) -> str:
             _named_range_request("Output", 1, row=3, row_end=6, col=4, col_end=7),
             _paste_data_request(
                 2, row=0, col=None, data="Id, OfferGroup, OfferType, Position, Title, Image, Price"),
-            _paste_data_request(3, row=0, col=None, data="Id, Text, Image"),
-            _paste_data_request(4, row=0, col=None, data="Title, File, Products"),
-            _paste_data_request(5, row=0, col=None,
-                       data="Title, Base, Configs, Parent"),
             _paste_data_request(
-                6, row=0, col=None, data="Date, AdsMetadata, VideoMetadata, Status, GeneratedVideo"),
+                2, row=1, col=0, data="1"),
+            _paste_data_request(
+                2, row=1, col=4, data="Your Product Name"),
+            _paste_data_request(
+                2, row=1, col=5, data="https://raw.githubusercontent.com/google/product_video_ads/main/logo.png"),
+            _paste_data_request(
+                2, row=1, col=6, data="R$ 2.899"),
+            _paste_data_request(3, row=0, col=None, data="Id, Text, Image"),
+            _paste_data_request(
+                3, row=1, col=0, data="1, This is static and does not change!"),
+            _paste_data_request(
+                3, row=2, col=0, data="2, red bar, https://raw.githubusercontent.com/google/product_video_ads/main/bar.png"),
+            _paste_data_request(
+                4, row=2, col=1, data="Account ID"),
+            _paste_data_request(
+                4, row=3, col=1, data="Campaign Name"),
+            _paste_data_request(
+                4, row=4, col=1, data="Ad Group Type"),
+            _paste_data_request(
+                4, row=5, col=1, data="URL"),
+            _paste_data_request(
+                4, row=6, col=1, data="Call to Action"),
+            _paste_data_request(
+                4, row=7, col=1, data="Target Location"),
+            _paste_data_request(
+                4, row=8, col=1, data="Audience Name"),
+            _paste_data_request(5, row=0, col=None, data="Title, File, Products"),
+            _paste_data_request(5, row=0, col=0, data='Base Example, base_example.mp4, [{"start_time":3.1,"end_time":"7"}]'),
+            _paste_data_request(6, row=0, col=None,
+                       data="Title, Base, Configs, Parent"),
+            _paste_data_request(6, row=0, col=None,
+                       data='MyTest, Base Example, [{"key":"1","type":"product","field":"Title","x":925,"y":108,"start_time":0,"end_time":0,"font":"Ubuntu-Bold.ttf","color":"#ff0000","size":96,"width":20,"height":20,"align":"center","angle":0,"keep_ratio":false,"conditions":[]},{"key":"1","type":"product","field":"Price","x":948,"y":814,"start_time":0,"end_time":0,"font":"Ubuntu-Bold.ttf","color":"#ffed00","size":168,"width":20,"height":20,"align":"center","angle":0,"keep_ratio":false,"conditions":[]},{"key":"1","type":"product","field":"Image","x":684,"y":274,"start_time":0,"end_time":0,"font":"","color":"","size":0,"width":480,"height":480,"align":"left","angle":0,"keep_ratio":true,"conditions":[]}]'),
+            _paste_data_request(
+                7, row=0, col=None, data="Date, AdsMetadata, VideoMetadata, Status, GeneratedVideo"),
             {
                 'deleteSheet': {
                     'sheetId': 0,  # Sheet 1
