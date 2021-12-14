@@ -32,8 +32,8 @@ export const environment = {
 
   sheet_id: 'sheet_id',
 
-  template_drive_folder: '1fG2pUo5obYJDkZmyoxhjVc_h9-WuW5Xr',
-  template_sheet_id: '1JAGj6lpR1Ghz943fzBF3SMEuxxMn8aiY77GVNKdP_9Q',
+  template_drive_folder: '1vIVGT9sgF6mc-3vDoXfhOyOu57LaNXCsXJ5UYw0VECE',
+  template_sheet_id: '1UyUFgNbLNrAA0UDucdIxZlX9Jt07Bap2',
 
   configuration: {
     campaign_range: 'Campaigns!A2:E',

@@ -41,14 +41,7 @@ read -r SPREADSHEET_ID
 
 if [ -z "$SPREADSHEET_ID" ]
 then
-  echo "Setting up Google Sheets and Drive ... "
-  echo -e "Ensure that '${BOLD}Google Apps Script API${NORMAL}' is ${BOLD}ENABLED${NORMAL} for this user. You can enable it at: https://script.google.com/corp/home/usersettings"
-  read -p "Press ENTER when ready"
-
-  set -o allexport
-  pip3 install --upgrade google-auth-oauthlib google-api-python-client oauth2client
-  python3 setup.py --env-out='/tmp/pva.env' && source /tmp/pva.env
-  set +o allexport
+  echo "After the deploy, click Generate new Sheet ID "
 else
   export SPREADSHEET_ID
 fi
