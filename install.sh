@@ -41,9 +41,10 @@ read -r SPREADSHEET_ID
 
 if [ -z "$SPREADSHEET_ID" ]
 then
-  echo "After the deploy, click Generate new Sheet ID, creating dummy configuration..."
+  echo "After the deploy, click Generate new Sheet ID, using template configuration..."
   SPREADSHEET_ID=1vIVGT9sgF6mc-3vDoXfhOyOu57LaNXCsXJ5UYw0VECE
   export SPREADSHEET_ID
+  echo -e "Template spreadsheet_id: $SPREADSHEET_ID"
 else
   export SPREADSHEET_ID
 fi
