@@ -22,11 +22,21 @@ gcloud app create --region=us-central || true
 
 echo 'Installing Web Frontend on App Engine...'
 
-echo -n 'Enter the Web Client Id: '
-read FRONTEND_CLIENT_ID
+if [ -z "$1" ] 
+then
+    echo -n 'Enter the Web Client Id: '
+    read FRONTEND_CLIENT_ID
+else
+    export $1
+fi
 
-echo -n 'Enter the API Key: '
-read FRONTEND_API_KEY
+if [ -z "$2" ]
+then
+    echo -n 'Enter the API Key: '
+    read FRONTEND_API_KEY
+else
+    export $2
+fi
 
 npm install --legacy-peer-deps
 npm run build --configuration=production
