@@ -10,3 +10,4 @@ steps:
   env:
     - 'FRONTEND_CLIENT_ID=${_FRONTEND_CLIENT_ID}'
     - 'FRONTEND_API_KEY=${_FRONTEND_API_KEY}'
+timeout: 3600s
