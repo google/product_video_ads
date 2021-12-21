@@ -1,14 +1,11 @@
 steps:
 - name: python:3.7-buster
-  entrypoint: pip3
-  args: ["install", "--upgrade", "google-auth-oauthlib", "google-api-python-client", "oauth2client"]
-
-- name: 'gcr.io/cloud-builders/gcloud'
-  entrypoint: 'bash'
+  entrypoint: bash
   args:
   - '-c'
   - |
     ./cloud_build.sh
+
   env:
     - 'FRONTEND_CLIENT_ID=${_FRONTEND_CLIENT_ID}'
     - 'FRONTEND_API_KEY=${_FRONTEND_API_KEY}'
