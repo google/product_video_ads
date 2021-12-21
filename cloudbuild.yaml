@@ -1,6 +1,5 @@
 steps:
-- name: 'build'
-  images: ['ubuntu, gcr.io/cloud-builders/gcloud']
+- name: 'ubuntu'
   args: ['./cloud_build.sh']
   env:
     - 'FRONTEND_CLIENT_ID=${_FRONTEND_CLIENT_ID}'
