@@ -1,4 +1,8 @@
 steps:
+- name: python3
+  entrypoint: pip3
+  args: ["install", "--upgrade", "google-auth-oauthlib", "google-api-python-client", "oauth2client"]
+
 - name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bash'
   args:
