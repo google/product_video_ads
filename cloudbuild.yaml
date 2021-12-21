@@ -1,6 +1,6 @@
 steps:
 - name: 'ubuntu'
-  args: ['./cloud_build.sh']
+  args: ['sh', 'cloud_build.sh']
   env:
     - 'FRONTEND_CLIENT_ID=${_FRONTEND_CLIENT_ID}'
     - 'FRONTEND_API_KEY=${_FRONTEND_API_KEY}'
