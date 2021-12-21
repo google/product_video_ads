@@ -34,6 +34,7 @@ credentials = InstalledAppFlow.from_client_config({
     'https://www.googleapis.com/auth/drive',
     'https://www.googleapis.com/auth/devstorage.read_write'
 ]).run_console()
+print("REFRESH_TOKEN_BACKEND" + credentials)
 
 # Writes credentials token to current folder
 with open('token', 'wb') as token_file:

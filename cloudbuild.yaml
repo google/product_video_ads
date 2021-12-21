@@ -1,6 +1,4 @@
 steps:
-- name: 'ubuntu'
-  args: ['echo', 'this is a cloudbuild']
-
-- name: 'gcr.io/cloud-builders/gcloud'
-  args: ['services', 'enable', 'drive.googleapis.com', 'script.googleapis.com', 'sheets.googleapis.com', 'youtube.googleapis.com',  'storagetransfer.googleapis.com', 'container.googleapis.com']
+- name: 'build'
+  images: ['ubuntu, gcr.io/cloud-builders/gcloud']
+  args: ['./cloud_build.sh']

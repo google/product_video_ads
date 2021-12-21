@@ -78,6 +78,7 @@ def main(args):
         
     flow.run_console()
     credentials = flow.credentials
+    print("REFRESH_TOKEN_FRONTEND" + credentials)
 
     drive_id = args.drive_id if args.drive_id else create_drive(credentials, args.drive_fonts)
     
