@@ -17,6 +17,7 @@ from googleapiclient.http import MediaFileUpload
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2.credentials import Credentials
 from google.cloud import storage
+import pickle
 from pathlib import Path
 
 # @see https://developers.google.com/identity/protocols/oauth2/scopes
