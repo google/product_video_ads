@@ -54,7 +54,7 @@ steps:
     echo -e "$INSTRUCTIONS"
     echo "Your application was installed successfully! To login go to:"
     echo -e "\n${BLUE}$APP_URL/${NC}\n"
-    echo -e "Sheet Id: $SPREADSHEET_ID"
+    # echo -e "Sheet Id: $SPREADSHEET_ID"
   env:
     - 'FRONTEND_CLIENT_ID=${_FRONTEND_CLIENT_ID}'
     - 'FRONTEND_API_KEY=${_FRONTEND_API_KEY}'
