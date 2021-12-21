@@ -43,7 +43,7 @@ export IMAGE_NAME
 
 if [ "$1" ]
 then
-  gsutil cp gs://pva-cloud-build-tokens/token_backend token
+  gsutil cp gs://$1 token
 fi
 
 if ! test -f "token"; then
