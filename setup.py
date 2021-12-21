@@ -67,8 +67,8 @@ def main(args):
             splited_args = args.build.split(".")
             storage_client = storage.Client()
             bucket = storage_client.get_bucket(splited_args[0])
-            blob = bucket.blob(splited_args[1])
-            credentials = pickle.loads(blob)
+            result = bucket.blob(splited_args[1]).download_as_string()
+            credentials = pickle.loads(result)
         else:
             client_id = input('Desktop Client ID: ')
             client_secret = input('Client Secret: ')
