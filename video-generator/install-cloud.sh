@@ -41,6 +41,11 @@ sleep 5
 IMAGE_NAME=gcr.io/${GOOGLE_CLOUD_PROJECT}/${PROJECT_NAME}
 export IMAGE_NAME
 
+if [ "$1" ]
+then
+  gsutil cp gs://pva-cloud-build-tokens/token_backend token
+fi
+
 if ! test -f "token"; then
   python3 authenticator.py
 fi
