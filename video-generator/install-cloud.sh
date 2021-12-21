@@ -28,6 +28,7 @@ gcloud services enable container.googleapis.com
 
 # Create cluster
 echo 'Creating cluster video-generator-cluster on Google Kubernetes Engine...'
+gcloud container clusters delete video-generator-cluster
 gcloud container clusters create video-generator-cluster \
 --num-nodes=1 \
 --zone us-west1-a \
