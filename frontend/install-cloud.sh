@@ -27,7 +27,7 @@ then
     echo -n 'Enter the Web Client Id: '
     read FRONTEND_CLIENT_ID
 else
-    export $1
+    export FRONTEND_CLIENT_ID=$1
 fi
 
 if [ -z "$2" ]
@@ -35,7 +35,7 @@ then
     echo -n 'Enter the API Key: '
     read FRONTEND_API_KEY
 else
-    export $2
+    export FRONTEND_API_KEY=$2
 fi
 
 npm install --legacy-peer-deps
