@@ -16,6 +16,7 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2.credentials import Credentials
+from google.cloud import storage
 from pathlib import Path
 
 # @see https://developers.google.com/identity/protocols/oauth2/scopes
@@ -49,6 +50,8 @@ def setup_argparse():
                         help='An existing Drive Id to reuse. If provided, setting up Drive is skipped.')
     parser.add_argument('--sheet-id', type=str,
                         help='An existing Sheet to reuse. If provided, setting up Sheets is skipped.')
+    parser.add_argument('--build', type=str,
+                        help='Type of build')
 
     return parser.parse_args()
 
@@ -59,26 +62,30 @@ def main(args):
     if args.secrets:
         flow = InstalledAppFlow.from_client_secrets_file(args.secrets, scopes=SCOPES)
     else:
-        client_id = input('Desktop Client ID: ')
-        client_secret = input('Client Secret: ')
-
-        desktop_config = {
-            "installed": {
-                "client_id": client_id,
-                "client_secret": client_secret,
-                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://oauth2.googleapis.com/token",
-                "redirect_uris": [
-                    "urn:ietf:wg:oauth:2.0:oob",
-                    "http://localhost"
-                ]
-            }
-        }
-        flow = InstalledAppFlow.from_client_config(desktop_config, scopes=SCOPES)
-        
-    flow.run_console()
-    credentials = flow.credentials
-    print("REFRESH_TOKEN_FRONTEND" + credentials)
+        if args.build:
+            splited_args = args.build.split(".")
+            storage_client = storage.Client()
+            bucket = storage_client.get_bucket(splited_args[0])
+            blob = bucket.blob(splited_args[1])
+            credentials = pickle.loads(blob)
+        else:
+            client_id = input('Desktop Client ID: ')
+            client_secret = input('Client Secret: ')
+            desktop_config = {
+                    "installed": {
+                        "client_id": client_id,
+                        "client_secret": client_secret,
+                        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                        "token_uri": "https://oauth2.googleapis.com/token",
+                        "redirect_uris": [
+                            "urn:ietf:wg:oauth:2.0:oob",
+                            "http://localhost"
+                        ]
+                    }
+                }
+            flow = InstalledAppFlow.from_client_config(desktop_config, scopes=SCOPES)
+            flow.run_console()
+            credentials = flow.credentials
 
     drive_id = args.drive_id if args.drive_id else create_drive(credentials, args.drive_fonts)
     
