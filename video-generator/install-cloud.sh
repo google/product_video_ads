@@ -29,7 +29,7 @@ gcloud services enable container.googleapis.com
 # Create cluster
 echo 'Creating cluster video-generator-cluster on Google Kubernetes Engine...'
 if [ "$(gcloud container clusters list | grep video-generator-cluster)" ]; then
-  gcloud container clusters delete video-generator-cluster --zone us-west1-a
+  gcloud container clusters delete video-generator-cluster --zone us-west1-a -y
 fi
 
 gcloud container clusters create video-generator-cluster \
