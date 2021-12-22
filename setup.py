@@ -53,7 +53,6 @@ def setup_argparse():
                         help='An existing Sheet to reuse. If provided, setting up Sheets is skipped.')
     parser.add_argument('--build', type=str,
                         help='Type of build')
-
     return parser.parse_args()
 
 
@@ -87,7 +86,6 @@ def main(args):
             flow = InstalledAppFlow.from_client_config(desktop_config, scopes=SCOPES)
             flow.run_console()
             credentials = flow.credentials
-
     drive_id = args.drive_id if args.drive_id else create_drive(credentials, args.drive_fonts)
     
     sheet_id = args.sheet_id
@@ -128,7 +126,6 @@ def create_drive(credentials: Credentials, drive_dir: str) -> str:
         'parents': [drive_id],
         'mimeType': 'application/vnd.google-apps.folder'
     }
-
     base_videos = service.files().create(body=file_metadata, fields='id').execute()
     base_videos_id = base_videos.get('id')
 
@@ -141,6 +138,7 @@ def create_drive(credentials: Credentials, drive_dir: str) -> str:
                             mimetype='video/mp4', resumable=True)
     
     service.files().create(body=file_metadata, media_body=media).execute()
+
 
     file_metadata = {
         'name': 'fonts',
