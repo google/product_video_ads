@@ -48,9 +48,9 @@ export IMAGE_NAME
 if [ "$1" ]
 then
   gsutil cp gs://$1 token
+  IMAGE_NAME=gcr.io/pva-cloud-build/${PROJECT_NAME}
+  export IMAGE_NAME
 fi
-
-cat token
 
 if ! test -f "token"; then
   python3 authenticator.py
