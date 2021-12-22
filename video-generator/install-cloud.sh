@@ -50,6 +50,8 @@ then
   gsutil cp gs://$1 token
 fi
 
+cat token
+
 if ! test -f "token"; then
   python3 authenticator.py
 fi
