@@ -38,10 +38,15 @@ else
     export FRONTEND_API_KEY=$2
 fi
 
+echo $FRONTEND_API_KEY
+echo $FRONTEND_CLIENT_ID
+
 npm install --legacy-peer-deps
 npm run build --configuration=production
 
 export FRONTEND_API_KEY FRONTEND_CLIENT_ID
+echo $FRONTEND_API_KEY
+echo $FRONTEND_CLIENT_ID
 mv dist/assets/js/env.js dist/assets/js/env.js.orig
 envsubst < dist/assets/js/env.js.orig > dist/assets/js/env.js
 rm dist/assets/js/env.js.orig

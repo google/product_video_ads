@@ -28,9 +28,6 @@ set +o allexport
 
 echo $SPREADSHEET_ID
 
-echo $FRONTEND_API_KEY
-echo $FRONTEND_CLIENT_ID
-
 cd frontend
 sh install-cloud.sh $FRONTEND_CLIENT_ID $FRONTEND_API_KEY
 cd ..
