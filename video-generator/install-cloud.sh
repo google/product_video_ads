@@ -28,18 +28,29 @@ gcloud services enable container.googleapis.com
 
 # Create cluster
 echo 'Creating cluster video-generator-cluster on Google Kubernetes Engine...'
+if [ "$(gcloud container clusters list | grep video-generator-cluster)" ]; then
+  gcloud container clusters delete video-generator-cluster --zone us-west1-a -q
+fi
+
 gcloud container clusters create video-generator-cluster \
 --num-nodes=1 \
 --zone us-west1-a \
 --machine-type=e2-standard-2 \
 --no-enable-autoupgrade \
---scopes=https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/youtube.upload,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/devstorage.read_write
+--scopes=https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/youtube,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/devstorage.read_write
 
 gcloud container clusters get-credentials --zone us-west1-a video-generator-cluster
-sleep 5
+sleep 10
 
 IMAGE_NAME=gcr.io/${GOOGLE_CLOUD_PROJECT}/${PROJECT_NAME}
 export IMAGE_NAME
+
+if [ "$1" ]
+then
+  gsutil cp gs://$1 token
+  IMAGE_NAME=gcr.io/pva-cloud-build/${PROJECT_NAME}
+  export IMAGE_NAME
+fi
 
 if ! test -f "token"; then
   python3 authenticator.py

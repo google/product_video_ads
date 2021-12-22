@@ -22,32 +22,13 @@
 
   <!-- Input to insert spreadsheet ID -->
   <div *ngIf="ready == -1">
-
     <div>
       <span><b>Insert your spreadsheet ID to login:</b></span>
       <br/>
       <input type="text" size="45" (keyup)="0" [(ngModel)]="sheet">
       <input type="button" value="Login" (click)="login()"/>
     </div>
-
     <br/>
-
-    <div>
-      <div>
-        <span><b>If it's your first time, go ahead and:</b></span>
-      </div>
-      
-      <div class="pva-template-note">
-        <span *ngIf="sheet_id" class="error-message">
-          Please, ask for viewer on the following documents: 
-        <a target="_blank" href="https://docs.google.com/spreadsheets/d/{{sheet_id}}">here</a>
-        and 
-        <a target="_blank" href="https://drive.google.com/corp/drive/u/0/folders/{{drive_folder}}">also here</a>
-        </span>
-      </div>
-
-      <button (click)="generate_one()">Generate new Sheet ID</button>
-    </div>
   </div>
 
   <!-- Spinner waiting for APIs to return -->
