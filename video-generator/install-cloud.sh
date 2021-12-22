@@ -40,7 +40,7 @@ gcloud container clusters create video-generator-cluster \
 --scopes=https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/youtube,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/devstorage.read_write
 
 gcloud container clusters get-credentials --zone us-west1-a video-generator-cluster
-sleep 5
+sleep 10
 
 IMAGE_NAME=gcr.io/${GOOGLE_CLOUD_PROJECT}/${PROJECT_NAME}
 export IMAGE_NAME
