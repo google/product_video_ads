@@ -1,6 +1,13 @@
 steps:
-- name: 'ubuntu'
-  args: ['echo', 'this is a cloudbuild']
-
-- name: 'gcr.io/cloud-builders/gcloud'
-  args: ['services', 'enable', 'drive.googleapis.com', 'script.googleapis.com', 'sheets.googleapis.com', 'youtube.googleapis.com',  'storagetransfer.googleapis.com', 'container.googleapis.com']
+- name: python:3.7-buster
+  entrypoint: bash
+  args:
+  - '-c'
+  - |
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && apt-get update -y && apt-get install google-cloud-sdk -y
+    ./cloud_build.sh
+  timeout: 3600s
+  env:
+    - 'FRONTEND_CLIENT_ID=${_FRONTEND_CLIENT_ID}'
+    - 'FRONTEND_API_KEY=${_FRONTEND_API_KEY}'
+timeout: 3600s
