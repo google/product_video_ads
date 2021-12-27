@@ -67,6 +67,8 @@ docker push "$IMAGE_NAME"
 # Install application to cluster
 echo 'Apply application to cluster...'
 
+echo -e "Sheet Id inside container shoud be: $SPREADSHEET_ID"
+
 # ENV vars needed: IMAGE_NAME, SPREADSHEET_ID
 envsubst < video-generator.yaml | kubectl apply -f -
 

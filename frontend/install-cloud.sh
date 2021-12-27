@@ -46,6 +46,6 @@ mv dist/assets/js/env.js dist/assets/js/env.js.orig
 envsubst < dist/assets/js/env.js.orig > dist/assets/js/env.js
 rm dist/assets/js/env.js.orig
 
-gcloud app deploy -q
+gcloud app deploy -q -v v1
 
 rm -rf dist node_modules package-lock.json
