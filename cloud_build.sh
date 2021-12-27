@@ -32,6 +32,8 @@ cd frontend
 sh install-cloud.sh $FRONTEND_CLIENT_ID $FRONTEND_API_KEY
 cd ..
 
+echo $SPREADSHEET_ID
+
 cd video-generator
 sh install-cloud.sh "pva-cloud-build-tokens/token_backend"
 cd ..
