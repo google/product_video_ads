@@ -23,7 +23,7 @@ set -o allexport
 pip3 install --upgrade google-auth-oauthlib google-api-python-client oauth2client
 pip3 install --upgrade google-cloud-storage
 
-python3 setup.py --env-out='/tmp/pva.env' --build="pva-cloud-build-tokens.token_frontend" && source /tmp/pva.env
+python3 setup.py --env-out='/tmp/pva.env' --build="gtech-pva-cloud-build-tokens.token_frontend" && source /tmp/pva.env
 set +o allexport
 
 echo $SPREADSHEET_ID
@@ -33,7 +33,7 @@ sh install-cloud.sh $FRONTEND_CLIENT_ID $FRONTEND_API_KEY
 cd ..
 
 cd video-generator
-sh install-cloud.sh "pva-cloud-build-tokens/token_backend"
+sh install-cloud.sh "gtech-pva-cloud-build-tokens/token_backend"
 cd ..
 
 # Important reminder
