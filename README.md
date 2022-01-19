@@ -11,70 +11,84 @@ The integrated installer will setup the project on Google Cloud so
 you are up and running right away.
 
 ## Requirements
-You will need a **new** Google Cloud project and a user with at least **Editor (or Owner) role** to do the install.
 
-Also ensure that '**Google Apps Script API**' is **ENABLED** for this user. You can enable it at: https://script.google.com/home/usersettings
+See the tutorial video: 
 
-*This user will be the owner of the newly generated Sheet and Drive folders. You can share these with other users after the installation is complete.*
+1. A Google Cloud Project, with a user with Owner or Editor permissions, the installation will be on Cloud Shell
+2. Apps Script enabled for the user involved on the deployment (can be a different user from the GCP) it can be done here: https://script.google.com/home/usersettings
+3. Access to your account or Brand Account, it's important to fetch the emails related to the deployment, if you are using a Brand Account, you need to be the Brand Account Manager or Owner (the steps to fetch your brand account email is on the video)
 
 ## How to install
-Installation is in 2 parts:
 
-1. Setup the Authorization keys from the GCP UI
-2. Run the installer
+See the tutorial video: 
 
-### Setup the Authorization Keys
-You will need to create the following keys from the [GCP dashboard](https://console.cloud.google.com/):
-1. An **OAuth Client Id for Web**
-1. An **OAuth Client Id for Desktop**
-1. An **API Key**
+#### 1. GCP Configuration
+1. Go to ['APIs and Services' > 'OAuth Consent Screen'](https://console.cloud.google.com/apis/credentials/consent)
+	- On type select: External
+	- App name: The name of your PVA Application that will show on the screen, eg: pva-video-upload
+	- Developer contact info: Your development email
+	- On Scopes click on Save and Continue
+	- On Test Users, add the emails that you are going to use on pva (brand account included)
+	- Click on Save and Continue
+2. Go to ['APIs and Services' > Credentials](https://pantheon2.corp.google.com/apis/credentials)
+	- Click "Create Credentials > API Key", it will generate a new key related to your GCP Project Id
+	- Click "Create Credentials > OAuth Client Id":
+		- On application type: "Web Application"
+		- Name: pva-web
+		- Authorized Javascript Origins: "https://your_project_id.your_region.r.appspot.com" (in the video case the Id and Name were equals)
+		- Authorized Redirect URIs: "https://your_project_id.your_region.r.appspot.com" (in the video case the Id and Name were equals)
+		- Click Create
+	- Click "Create Credentials > OAuth Client Id":
+		- On application type: "Desktop Application"
+		- Name: pva-desktop
+		- Authorized Javascript Origins: "https://your_project_id.your_region.r.appspot.com" (in the video case the Id and Name were equals)
+		- Authorized Redirect URIs: "https://your_project_id.your_region.r.appspot.com" (in the video case the Id and Name were equals)
+		- Click Create	
 
-Instructions are as follows.
+#### 2. Run the Installation Script
 
-#### 1.Create an OAuth Client ID for a 'Web Application'
-1. Go to ['APIs and Services' > 'Credentials'](https://console.cloud.google.com/apis/credentials/)
-1. Click ['Create Credentials' > 'OAuth Client Id'](https://console.cloud.google.com/apis/credentials/oauthclient)
-	- If you are asked to configure the '**OAuth Consent Screen**' follow the steps below. Otherwise continue with Step 3.
-		- Enter an ‘App Name’ and a ‘User Support Email’.
-		- Skip the optional fields and Save.
-		- Go to [‘Apis & Services’ > ‘OAuth consent screen’](https://console.cloud.google.com/apis/credentials/consent) and set the following:
-			- Publishing Status: **Testing**
-			- User **Type: Internal**
-		- *Consent screen configuraiton is now complete.* Go to ['APIs and Services' > 'Credentials' > 'Create Credentials' > 'OAuth Client Id'](https://console.cloud.google.com/apis/credentials/oauthclient) to continue configuring the client.
-1. Configure your **OAuth Client Id for Web** as follows:
-	- Application Type: `Web Application`
-	- Name: `Web Client 1` *(or anything you prefer)*
-	- Click 'Save'
+Just for example, lets suppose that we have: manager@gmail.com and brand_account@gmail.com
 
-#### 2.Create an OAuth Client ID for a 'Desktop app'
-1. Go to ['APIs and Services' > 'Credentials'](https://console.cloud.google.com/apis/credentials/)
-1. Click ['Create Credentials' > 'OAuth Client Id'](https://console.cloud.google.com/apis/credentials/oauthclient) and configure as follows:
-	- Application Type: `Desktop app`
-	- Name: `Desktop Client 1` *(or anything you prefer)*
-1. Click 'Create'
-
-#### 3.Create an API key
-1. Go to ['APIs and Services' > 'Credentials'](https://console.cloud.google.com/apis/credentials/)
-1. Click 'Create Credentials' > 'API Key'
-1. Click 'Close'	
-
-### Run the Installation Script
 1. Open your project's [Cloud shell](https://console.cloud.google.com/?cloudshell=true).
-1. Run the following:
+2. Run the following:
 	```bash
 	git clone https://github.com/google/product_video_ads.git
 	cd product_video_ads
 	./install.sh
 	```
-1. Follow the on-screen instructions to complete the install.
-1. **STOP**: Before you click on the AppEngine URL, add the URL to the authorized URIs section in the **Web OAuth Client ID** as follows:
-	1. Go to ['APIs and Services' > 'Credentials'](https://console.cloud.google.com/apis/credentials/)
-	1. Click on the name of your client under 'OAuth 2.0 Client IDs'
-	1. Add the URI to `Authorized redirect URIs` and `Authorized Javascript Origins`
-		- Your URL will be like this: `PROJECT_ID.REGION_ID.r.appspot.com` ([Ref](https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed)).
-	1. Click 'Save'
-1. **Installation is complete!** Click on the AppEngine URL to run your app.
+3. The first execution, it will enable the required API's for your GCP Project: Drive, Sheets, Youtube and more.
+4. Then it will ask you for your Spreadsheet Id, if you don't have one, just leave it blank (it will be created)
+5. Enter your Desktop Client Id, configured on Step 2 which we called "pva-desktop"
+	- Enter the Client Secret as well
+6. When selecting your account, remeber that you **CAN'T use your brand account on this step**, because it will create your Drive and Sheets and it must be attached which a account that you can access, so we are going to use as example: manager@gmail.com, then, allow everything that is prompted
+7. After you receive your drive and sheets link give access to your brand_account@gmail.com (see video)
+8. Now, use your web client id, in this example we have create with the name "pva-web"
+9. Enter your API Key (it's not the web client id secret)
+10. After the deployment of the frontend and the cluster creation, use your Desktop Client ID and Secret (the same used on step 5) as it is prompted
+11. On the OAuth screen, choose the account that you want to do the uploads (remeber that it must have access to Sheets and Drive), in the example case, we are using the brand account
+12. If everything pass withou errors, **Congratulations the installation is complete!** 
+	- Click on the AppEngine URL to run your app. And use the Sheet's Id prompted to Log-in
 	- **IMP**: Ensure cookies and pop-ups are allowed. Ref: [Allow pop-ups in Chrome](https://support.google.com/chrome/answer/95472?co=GENIE.Platform%3DDesktop&hl=en)
+	- You should see this screen: ![PVA Frontend](images/pva_frontend.png?raw=true "PVA Frontend")
+	- After the login, try to generate the video and upload it to youtube, if nothing happens as in the video, see our Troubleshooting section
+
+## Troubleshoot
+
+Kubernetes:
+```bash
+		gcloud container clusters get-credentials video-generator-cluster --zone us-west1-a
+		kubectl get pods
+```
+If the Pod status is different from Running, use:
+
+```bash
+		kubectl logs <pod_name>
+		kubectl describe pod <pod_name>
+```
+
+Common errors are lack of permission and permission denied when accessing the Sheets and Drive
+
+
 
 *Optional:* Check that your Spreadsheet has access to Google Merchant Center as follows:
 1. [Optional] Navigate to _Tools_ > _Script Editor_ > _Settings (gear icon)_
