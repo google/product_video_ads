@@ -86,7 +86,11 @@ If the Pod status is different from Running, use:
 		kubectl describe pod <pod_name>
 ```
 
-Common errors are lack of permission and permission denied when accessing the Sheets and Drive
+Common errors are lack of permission and permission denied when accessing the Sheets and Drive, if you encounter more errors and have solved them, feel free to contribute.
+
+## Contribute
+
+PVA is a open-source project, so you can help us create a better application! Every push will trigger a CI/CD application which we will verify it's integrity, after that, if everything is fine, we are going to merge your pull request :)
 
 
 
