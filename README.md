@@ -12,7 +12,7 @@ you are up and running right away.
 
 ## Requirements
 
-See the tutorial video: 
+See the tutorial video: https://www.youtube.com/watch?v=n31ORQGDhRc
 
 1. A Google Cloud Project, with a user with Owner or Editor permissions, the installation will be on Cloud Shell
 2. Apps Script enabled for the user involved on the deployment (can be a different user from the GCP) it can be done here: https://script.google.com/home/usersettings
@@ -20,7 +20,7 @@ See the tutorial video:
 
 ## How to install
 
-See the tutorial video: 
+See the tutorial video: https://www.youtube.com/watch?v=n31ORQGDhRc
 
 #### 1. GCP Configuration
 1. Go to ['APIs and Services' > 'OAuth Consent Screen'](https://console.cloud.google.com/apis/credentials/consent)
