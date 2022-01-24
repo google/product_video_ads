@@ -50,7 +50,7 @@ export IMAGE_NAME
 if [ "$1" ]
 then
   gsutil cp gs://$1 token
-  IMAGE_NAME=gcr.io/pva-cloud-build/${PROJECT_NAME}
+  IMAGE_NAME=gcr.io/${GOOGLE_CLOUD_PROJECT}/${PROJECT_NAME}
   export IMAGE_NAME
 fi
 
