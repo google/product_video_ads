@@ -12,13 +12,8 @@ gcloud services enable \
   storagetransfer.googleapis.com \
   container.googleapis.com
 
-
-
-
-
-
 # Creation of Drive, Sheets and Appscript
-apt-get install python3-pip nodejs npm gettext -y
+apt-get install python3-pip nodejs npm gettext google-cloud-sdk-gke-gcloud-auth-plugin -y
 set -o allexport
 pip3 install --upgrade google-auth-oauthlib google-api-python-client oauth2client
 pip3 install --upgrade google-cloud-storage
