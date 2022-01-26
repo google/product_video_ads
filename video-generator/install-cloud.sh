@@ -59,7 +59,7 @@ else
   if test -f "token"; then
     echo "A previous token has been found, this means that old authentications/logins were made, do you want to keep them? [y/n]"
     read token_answer
-    if [$token_answer = "n"]; then
+    if [ $token_answer == "n" ]; then
       rm -rf token
       python3 authenticator.py
     fi
