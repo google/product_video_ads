@@ -26,6 +26,9 @@ gcloud services enable youtube.googleapis.com
 gcloud services enable storagetransfer.googleapis.com
 gcloud services enable container.googleapis.com
 
+# Install required plugin
+sudo apt-get install google-cloud-sdk-gke-gcloud-auth-plugin
+
 
 # Delete cluster
 if [ "$(gcloud container clusters list | grep video-generator-cluster)" ]; then
@@ -41,22 +44,33 @@ gcloud container clusters create video-generator-cluster \
 --no-enable-autoupgrade \
 --scopes=https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/youtube,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/devstorage.read_write
 
+
 gcloud container clusters get-credentials --zone us-west1-a video-generator-cluster
 sleep 10
 
 IMAGE_NAME=gcr.io/${GOOGLE_CLOUD_PROJECT}/${PROJECT_NAME}
 export IMAGE_NAME
 
-if [ "$1" ]
-then
+if [ "$1" ]; then
   gsutil cp gs://$1 token
   IMAGE_NAME=gcr.io/${GOOGLE_CLOUD_PROJECT}/${PROJECT_NAME}
   export IMAGE_NAME
+else
+  if test -f "token"; then
+    echo "A previous token has been found, this means that old authentications/logins were made, do you want to keep them? [y/n]"
+    read token_answer
+    if [$token_answer = "n"]; then
+      rm -rf token
+      python3 authenticator.py
+    fi
+  else
+    python3 authenticator.py
+  fi
 fi
 
-if ! test -f "token"; then
-  python3 authenticator.py
-fi
+
+
+
 
 # Image is not there yet
 # ENV vars needed: IMAGE_NAME, SPREADSHEET_ID
