@@ -82,8 +82,9 @@ docker push "$IMAGE_NAME"
 echo 'Apply application to cluster...'
 
 echo -e "Sheet Id inside container shoud be: $SPREADSHEET_ID"
+echo -e "Google Cloud Storage bucket Name inside container shoud be: $GCS_BUCKET_NAME"
 
-# ENV vars needed: IMAGE_NAME, SPREADSHEET_ID
+# ENV vars needed: IMAGE_NAME, SPREADSHEET_ID, GCS_BUCKET_NAME
 envsubst < video-generator.yaml | kubectl apply -f -
 
 echo 'Deploying video-generator to cluster...'

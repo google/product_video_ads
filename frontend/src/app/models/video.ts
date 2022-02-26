@@ -16,6 +16,7 @@
 
 import { AdsMetadata } from './ads_metadata'
 import { VideoMetadata } from './video_metadata'
+import { environment } from 'environments/environment';
 
 export class Video {
 
@@ -24,26 +25,50 @@ export class Video {
         public ads_metadata : AdsMetadata,
         public video_metadata : VideoMetadata,
         public status : string,
-        public generated_video : string = ''
+        public generated_video : string = '',
+        public cloud_preview: boolean = false
         ) {}
         
     public static from_video_array(video_array : Array<any>) : Video {
+        let generated_video: string = ''
+        let cloud_preview = false
+
+        if (video_array && video_array[4]) {
+            generated_video = video_array[4]
+            if (generated_video.includes(environment.gsutil_uri_prefix)) {
+                cloud_preview = true
+                generated_video = generated_video.replace(
+                    environment.gsutil_uri_prefix, environment.gcs_url_prefix)
+            } else {
+                generated_video = environment.drive_file_prefix + generated_video
+            }
+        }
+        
         return new Video(
             video_array[0],
             AdsMetadata.from_string_object(video_array[1]),
             VideoMetadata.from_string_object(video_array[2]),
             video_array[3],
-            video_array[4]
+            generated_video,
+            cloud_preview
         )
     }
             
     public static to_video_array(video : Video) : Array<any> {
+        let generated_video = video.generated_video
+        if (video.cloud_preview) {
+            generated_video = generated_video.replace(
+                environment.gcs_url_prefix, environment.gsutil_uri_prefix)
+        } else {
+            generated_video = generated_video.split(environment.drive_file_prefix)[1]
+        }
+
         return [
             video.id,
             AdsMetadata.to_string_object(video.ads_metadata),
             VideoMetadata.to_string_object(video.video_metadata),
             video.status,
-            video.generated_video
+            generated_video
         ]
     }
 }

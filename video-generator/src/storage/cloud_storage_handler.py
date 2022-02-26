@@ -25,7 +25,7 @@ API_SCOPES = [
 class CloudStorageHandler():
     logger = log.getLogger()
 
-    def __init__(self, project: str = None, credentials=None):
+    def __init__(self, project: str = None, credentials=None, gcs_bucket_name=None):
         if credentials is None:
             # Obtains Service Account from environment just to access storage
             # It comes from GCP or GOOGLE_APPLICATION_CREDENTIALS env variable file
@@ -33,6 +33,7 @@ class CloudStorageHandler():
 
         self.storage_client = storage.Client(
             project=project, credentials=credentials)
+        self.gcs_bucket_name = gcs_bucket_name
 
     def download_string(self, bucket_name, object_name):
         return self.storage_client.get_bucket(bucket_name).blob(object_name).download_as_string()
@@ -41,3 +42,14 @@ class CloudStorageHandler():
         self.logger.debug(
             'Downloading from bucket %s file %s and saving to %s' % (bucket_name, object_name, destination_path))
         self.storage_client.get_bucket(bucket_name).blob(object_name).download_to_filename(destination_path)
+
+    def upload_to_preview(self, output_file_path):
+        if not self.gcs_bucket_name:
+            raise ValueError('Cannot upload to preview to gcs due to gcs_bucket_name=None.')
+
+        title = output_file_path.split('/')[-1]
+        bucket = self.storage_client.bucket(self.gcs_bucket_name)
+        blob = bucket.blob(title)
+        blob.upload_from_filename(output_file_path)
+        self.logger.info('Uploaded preview video %s to gcs bucket %s', title, self.gcs_bucket_name)
+        return f"gs://{self.gcs_bucket_name}/{title}"
