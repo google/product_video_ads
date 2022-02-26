@@ -69,7 +69,7 @@
         <ng-container matColumnDef="download">
           <mat-header-cell *matHeaderCellDef> Download </mat-header-cell>
           <mat-cell *matCellDef="let element">
-            <a [href]="drive_url + element.generated_video" *ngIf="element.generated_video && element.status == 'Done'">
+            <a [href]="element.generated_video" *ngIf="element.generated_video && element.status == 'Done'">
               <mat-icon aria-hidden="false" aria-label="download icon">download</mat-icon>
             </a>
           </mat-cell>
