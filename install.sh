@@ -53,6 +53,17 @@ else
   export SPREADSHEET_ID
 fi
 
+echo -n "Enter Google Cloud Storage bucket name to store generated assets in Google Cloud Storage instead of Google Drive (Leave blank to default to Google Drive Storage): "
+read -r GCS_BUCKET_NAME
+
+if [ -z "$GCS_BUCKET_NAME" ]
+then
+  export GCS_BUCKET_NAME=""
+else 
+  export GCS_BUCKET_NAME
+fi
+
+
 cd frontend
 sh install-cloud.sh
 cd ../
@@ -89,3 +100,4 @@ echo -e "$INSTRUCTIONS"
 echo "Your application was installed successfully! To login go to:"
 echo -e "\n${BLUE}$APP_URL/${NC}\n"
 echo -e "Sheet Id: $SPREADSHEET_ID"
+echo -e "Google Cloud Storage bucket name: $GCS_BUCKET_NAME"

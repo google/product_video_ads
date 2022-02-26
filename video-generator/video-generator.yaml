@@ -35,3 +35,5 @@ spec:
         env:
         - name: SPREADSHEET_ID
           value: $SPREADSHEET_ID
+        - name: GCS_BUCKET_NAME
+          value: $GCS_BUCKET_NAME

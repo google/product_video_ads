@@ -29,6 +29,8 @@ export const environment = {
   scopes: "https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/devstorage.read_only",
   drive_file_prefix: 'https://drive.google.com/u/0/uc?export=download&id=',
   youtube_prefix: 'https://www.youtube.com/embed/',
+  gsutil_uri_prefix: 'gs://',
+  gcs_url_prefix: 'https://storage.cloud.google.com/',
 
   sheet_id: 'sheet_id',
 

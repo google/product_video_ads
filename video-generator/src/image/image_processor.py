@@ -25,10 +25,11 @@ logger = log.getLogger()
 
 class ImageProcessor():
 
-  def __init__(self, storage, generator, cloud_storage):
+  def __init__(self, storage, generator, cloud_storage, cloud_preview=False):
     self.storage = storage
     self.generator = generator
     self.cloud_storage = cloud_storage
+    self.cloud_preview = cloud_preview
 
   def process_task(self, row, config, preview_only=False):
 
@@ -40,7 +41,10 @@ class ImageProcessor():
       output_image = self.generate_single_image(row, config)
 
       # Uploads image to storage and retrieve the ID
-      output_id = self.storage.upload_to_preview(output_image)
+      if self.cloud_preview:
+        output_id = self.cloud_storage.upload_to_preview(output_image)
+      else:
+        output_id = self.storage.upload_to_preview(output_image)
 
       # Finally, deletes local file since it's not needed anymore
       self.storage.delete_file(output_image)
