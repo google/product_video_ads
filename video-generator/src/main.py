@@ -38,10 +38,15 @@ logger = log.getLogger()
 def main():
     # Read environment parameters
     spreadsheet_id = os.environ.get('SPREADSHEET_ID')
+    gcs_bucket_name = os.environ.get('GCS_BUCKET_NAME')
+    cloud_preview = False
 
     if spreadsheet_id is None:
         print('Please set environment variable SPREADSHEET_ID.')
         exit(1)
+    if gcs_bucket_name:
+        cloud_preview = True
+        print(f"Saving image and video preview to Google Cloud Storage bucket named: {gcs_bucket_name}.")
 
     # Tries to retrieve token from storage each 5 minutes
     while True:
@@ -58,10 +63,10 @@ def main():
     # Dependencies
     configuration = Configuration(spreadsheet_id, credentials)
     storage = StorageHandler(configuration.get_drive_folder(), credentials)
-    cloud_storage = CloudStorageHandler(credentials)
+    cloud_storage = CloudStorageHandler(gcs_bucket_name=gcs_bucket_name)
     video_processor = VideoProcessor(
-        storage, VideoGenerator(), Uploader(credentials), cloud_storage)
-    image_processor = ImageProcessor(storage, ImageGenerator(), cloud_storage)
+        storage, VideoGenerator(), Uploader(credentials), cloud_storage, cloud_preview)
+    image_processor = ImageProcessor(storage, ImageGenerator(), cloud_storage, cloud_preview)
 
     # Handler acts as facade
     handler = EventHandler(configuration, video_processor, image_processor)

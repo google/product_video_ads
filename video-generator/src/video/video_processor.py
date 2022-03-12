@@ -26,11 +26,12 @@ logger = log.getLogger()
 class VideoProcessor():
     OUTPUT_VIDEO_FORMAT = '.mp4'
 
-    def __init__(self, storage, generator, uploader, cloud_storage):
+    def __init__(self, storage, generator, uploader, cloud_storage, cloud_preview=False):
         self.storage = storage
         self.generator = generator
         self.uploader = uploader
         self.cloud_storage = cloud_storage
+        self.cloud_preview = cloud_preview
 
     def process_task(self, row, config, preview_only=False):
 
@@ -43,7 +44,10 @@ class VideoProcessor():
 
             if preview_only:
                 # Uploads video to storage and retrieve the ID
-                video_id = self.storage.upload_to_preview(output_video)
+                if self.cloud_preview:
+                    video_id = self.cloud_storage.upload_to_preview(output_video)
+                else:
+                    video_id = self.storage.upload_to_preview(output_video)
             else:
                 # Uploads video to YouTube and retrieve the ID
                 video_id = self.uploader.upload_video(
