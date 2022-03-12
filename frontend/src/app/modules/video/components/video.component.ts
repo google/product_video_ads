@@ -344,7 +344,7 @@ export class VideoComponent implements OnInit {
         url = this.sanitizer.bypassSecurityTrustResourceUrl(this.yt_url + video.generated_video)
         type = 'youtube'
       } else {
-        url = this.drive_url + video.generated_video
+        url = video.generated_video
         type = 'drive'
       }     
 
