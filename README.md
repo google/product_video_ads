@@ -20,7 +20,7 @@ you are up and running right away.
 
 ![PVA Demo](images/pva_demo.gif?raw=true "PVA Demo")
 
-3 - Then, you can upload your to youtube and it can be used as a Ad, after you update your video on PVA, it update the add automatically. This is one example of a video generated with PVA:
+3 - Then, you can upload your video to youtube and it can be used as a Google Ad, after you update your video on PVA, it update the Ad automatically. This is one example of a video ad generated with PVA:
 
 [![Carrefour Brasil - PVA Video](images/pva_carrefour_example.png?raw=true)](https://www.youtube.com/watch?v=xk8hqo1lZbk&t)
 ## Requirements
