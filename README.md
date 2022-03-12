@@ -20,7 +20,7 @@ So, after you have selected a base_video you just need to configurate your offer
 
 Then, you can upload your to youtube and it can be used as a Ad, after you update your video on PVA, it update the add automatically. This is one example of a video generated with PVA:
 
-[![Carrefour Brasil - PVA Video](https://img.youtube.com/vi/xk8hqo1lZbk&t/0.jpg)](https://www.youtube.com/watch?v=xk8hqo1lZbk&t)
+[![Carrefour Brasil - PVA Video](images/pva_carrefour_example.png?raw=true)](https://www.youtube.com/watch?v=xk8hqo1lZbk&t)
 ## Requirements
 
 See the tutorial video: https://www.youtube.com/watch?v=n31ORQGDhRc
