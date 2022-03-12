@@ -12,13 +12,15 @@ you are up and running right away.
 
 ## How does it work?
 
-PVA works with a base_video, which is a template for the offers video. The average market video consists of a introduction, offers and closing. As described in the image below: 
+1 - PVA works with a base_video, which is a template for the offers video. The average market video consists of a introduction, offers and closing. As described in the image below: 
+
 ![PVA Example](images/pva_example.png?raw=true "PVA Example")
 
-So, after you have selected a base_video you just need to configurate your offers inside PVA, using your feed (it can be Merchant Center's) as in the example below:
+2 - So, after you have selected a base_video you just need to configurate your offers inside PVA, using your feed (it can be Merchant Center's) as in the example below:
+
 ![PVA Demo](images/pva_demo.gif?raw=true "PVA Demo")
 
-Then, you can upload your to youtube and it can be used as a Ad, after you update your video on PVA, it update the add automatically. This is one example of a video generated with PVA:
+3 - Then, you can upload your to youtube and it can be used as a Ad, after you update your video on PVA, it update the add automatically. This is one example of a video generated with PVA:
 
 [![Carrefour Brasil - PVA Video](images/pva_carrefour_example.png?raw=true)](https://www.youtube.com/watch?v=xk8hqo1lZbk&t)
 ## Requirements
