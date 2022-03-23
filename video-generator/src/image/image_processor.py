@@ -41,7 +41,9 @@ class ImageProcessor():
       output_image = self.generate_single_image(row, config)
 
       # Uploads image to storage and retrieve the ID
-      if self.cloud_preview:
+      if self._should_upload_to_directory(config):
+        output_id = self.cloud_storage.upload_to_directory(output_image, config)
+      elif self.cloud_preview:
         output_id = self.cloud_storage.upload_to_preview(output_image)
       else:
         output_id = self.storage.upload_to_preview(output_image)
@@ -83,3 +85,6 @@ class ImageProcessor():
 
   def _generate_image_name(self, input_image_file):
     return datetime.now().strftime('%Y%m%d%H%M%S') + '.' + input_image_file.split('.')[-1]
+
+  def _should_upload_to_directory(self, config): 
+    return bool(config.get('custom_dir'))

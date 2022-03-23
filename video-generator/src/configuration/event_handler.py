@@ -70,6 +70,7 @@ class EventHandler:
 
         config = {
             'name': metadata.get('name', 'Unnamed'),
+            'custom_dir': metadata.get('custom_dir', ''),
             'description': metadata.get('description', ''),
             'visibility': metadata.get('visibility', ''),
             'base_file': base_file_name,

@@ -60,6 +60,7 @@ export class VideoComponent implements OnInit {
   products : Product[]
   mode : string
   youtube : boolean
+  custom_dir : boolean
 
   // Video configuration from screen (bulk)
   product_groups : Map<string, Product[]>
@@ -72,6 +73,7 @@ export class VideoComponent implements OnInit {
   selected_products: Array<string>
   video_metadata : any
   ads_metadata : any
+  custom_dir_name : String
   
   constructor(private facade : VideoFacade, public sanitizer: DomSanitizer, public dialog: MatDialog, private _snackBar: MatSnackBar) {
       this.bases$ = this.facade.bases$
@@ -95,6 +97,10 @@ export class VideoComponent implements OnInit {
       return base && base.file.endsWith('mp4')
     }
     
+    is_base_image(base : Base) {
+      return base && !this.is_base_video(base)
+    }
+
     choose_base(base : Base) {
       this.base = base
 
@@ -119,26 +125,28 @@ export class VideoComponent implements OnInit {
       this._snackBar.open('Loading products from ' + key, 'OK', { duration: 4000 })
     }
 
-    select_single_video_mode(youtube? : boolean) {
+    select_single_video_mode(youtube? : boolean, custom_dir? : boolean) {
 
       this.selected_offer_types = new Array(this.base.products.length)
       this.selected_products = new Array(this.base.products.length)
 
       this.mode = 'single'
-      this.youtube = youtube != undefined
+      this.youtube = youtube != undefined && youtube
+      this.custom_dir = custom_dir != undefined && custom_dir
 
       if (this.youtube)
         this.prepare_video_ads_metadata()
     }
 
-    select_bulk_video_mode(youtube? : boolean) {
+    select_bulk_video_mode(youtube? : boolean, custom_dir? : boolean) {
 
       // Load avaiable products groups and their validations already
       this.product_groups = this.facade.get_available_groups_for_base(this.products)
       this.product_groups_validations = this.facade.validate_groups(this.product_groups, this.base.products.length)
 
       this.mode = 'bulk'
-      this.youtube = youtube != undefined
+      this.youtube = youtube != undefined && youtube
+      this.custom_dir = custom_dir != undefined && custom_dir
 
       if (this.youtube)
         this.prepare_video_ads_metadata()
@@ -149,6 +157,16 @@ export class VideoComponent implements OnInit {
     }
 
     is_all_filled() {
+      if (this.custom_dir && !this.custom_dir_name) {
+        // Make sure directory name is filled if we are using custom directory feature
+        return false
+      }
+
+      if (this.mode == 'bulk') {
+        // Skip remaining checks if we are creating in bulk
+        return true
+      }
+
       return !this.selected_offer_types.includes(undefined) && !this.selected_products.includes(undefined)
     }
 
@@ -156,6 +174,7 @@ export class VideoComponent implements OnInit {
 
       // Create a single video
       video_metadata.name = video_metadata.name || 'Preview'
+      video_metadata.custom_dir = this.custom_dir_name
 
       this.add_video(
         this.facade.generate_final_configs(selected_offer_types, this.base, selected_products, this.products),
@@ -224,7 +243,8 @@ export class VideoComponent implements OnInit {
             target_location: metadata.target_location,
             audience_name: metadata.audience_name,
             ad_group_name: metadata.ad_group_name,
-            ad_name: metadata.ad_name
+            ad_name: metadata.ad_name,
+            custom_dir: this.custom_dir_name
           })
         }
       }
@@ -251,6 +271,7 @@ export class VideoComponent implements OnInit {
       this.video_metadata = {}
       this.ads_metadata = {}
       this.base = undefined
+      this.custom_dir_name = undefined
       this.products = undefined
       this.product_sheet = undefined
       this.mode = ''
@@ -265,6 +286,7 @@ export class VideoComponent implements OnInit {
           this.base.title,
           this.product_sheet,
           final_configs,
+          video_metadata.custom_dir,
           video_metadata.description,
           video_metadata.visibility
         ),
