@@ -53,3 +53,38 @@ class CloudStorageHandler():
         blob.upload_from_filename(output_file_path)
         self.logger.info('Uploaded preview video %s to gcs bucket %s', title, self.gcs_bucket_name)
         return f"gs://{self.gcs_bucket_name}/{title}"
+
+    def sanitize_string(self, string):
+        # Only allow letters, numbers, dash, underscore, and slash
+        return ''.join(char for char in string if (char.isalnum() or char == '-' or char == '_' or char == '/'))
+
+    def create_bucket_if_not_exists(self, bucket_name):
+        if not storage.Bucket(self.storage_client, bucket_name).exists():
+            bucket = self.storage_client.bucket(bucket_name)
+            bucket.storage_class = "STANDARD"
+            return self.storage_client.create_bucket(bucket, location="us")
+        else:
+            return self.storage_client.bucket(bucket_name)
+
+    def upload_to_directory(self, output_file_path, config):
+        directory = self.sanitize_string(config.get('custom_dir')).strip('/')
+
+        # Nested directories needed to be added as prefixes to object names in gcs 
+        bucket_name = directory.split('/')[0].lower()
+        if not bucket_name:
+            raise ValueError('Bucket name cannot be empty when calling upload_to_directory.')
+
+        object_prefix = directory[len(bucket_name):]
+        if object_prefix:
+            object_prefix = object_prefix.strip('/') + '/'
+
+        bucket = self.create_bucket_if_not_exists(bucket_name)
+
+        name = self.sanitize_string(config.get('name', ''))
+        id = output_file_path.split('/')[-1]
+        object_name = f"{object_prefix}{name}_{id}"
+
+        blob = bucket.blob(object_name)
+        blob.upload_from_filename(output_file_path)
+        self.logger.info('Uploaded object: %s to bucket: %s', object_name, bucket_name)
+        return f"gs://{bucket_name}/{object_name}"
