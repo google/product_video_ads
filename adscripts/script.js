@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/3h3g5f237rt7dgvtrh/edit'
+var SPREADSHEET_URL = 'INSERT_YOUR_SHEETS_URL_HERE'
 var SHEET_NAME = 'Campaigns'
 var SLEEP_TIME_SECONDS = 60
 var ACCOUNTS_LIMIT = 50
@@ -120,6 +120,7 @@ function processAccount() {
     
     // Find all account IDs
     var accountIds = Util.findAccountIds(sheet)
+    
 
     // Start processing line matching account ID
     for (var row = 0; row < accountIds.length; row++) {
@@ -474,26 +475,21 @@ var Util = {
       
         // Already existing adGroup
         if (adGroup) {
-          
           adGroup.enable()
           adGroup.isEnabled()
-          
           Logger.log('AdGroup %s already exists with type %s', adGroup.getName(), adGroup.getAdGroupType())
-          
         } else {
-          
-          	// New adGroup
+          Logger.log('AdGroupName: %s, AdGroupType %s, campaignName %s', adGroupName, AdGroupType, campaignName)
         	var videoCampaign = AdsApp.videoCampaigns()
               .withCondition('Name = "' + campaignName + '"')
               .get()
-              .next()
-        
-            adGroup =  videoCampaign.newVideoAdGroupBuilder()
-                  .withName(adGroupName)
-                  .withAdGroupType(AdGroupType)
-                  .build()
-                  .getResult()
-          
+              .next();
+          Logger.log('videoCampaign %s', videoCampaign.getName())
+          adGroup =  videoCampaign.newVideoAdGroupBuilder()
+              .withName(adGroupName)
+              .withAdGroupType(AdGroupType)
+              .build()
+              .getResult();         
           	Logger.log('AdGroup %s created with type %s', adGroup.getName(), adGroup.getAdGroupType())
         }
         
@@ -559,20 +555,27 @@ var Util = {
       }
       
       switch(adGroup.getAdGroupType()) {
-          
         case 'VIDEO_TRUE_VIEW_IN_STREAM':
+          videoAd = adGroup.newVideoAd()
+            .inStreamAdBuilder()
+            .withAdName(adName)
+            .withDisplayUrl(url)
+            .withFinalUrl(url)
+            .withCallToAction(callToAction)
+            .withVideo(video)
+            .build()
+            .getResult();
+          break
         case 'VIDEO_NON_SKIPPABLE_IN_STREAM':
          videoAd = adGroup.newVideoAd()
-           .inStreamAdBuilder()
+           .nonSkippableAdBuilder()
            .withAdName(adName)
            .withDisplayUrl(url)
            .withFinalUrl(url)
-           .withCallToAction(callToAction)
            .withVideo(video)
            .build()
-           .getResult()
+           .getResult();
           break
-          
         case 'VIDEO_TRUE_VIEW_IN_DISPLAY':
           videoAd = adGroup.newVideoAd()
             .videoDiscoveryAdBuilder()
@@ -580,12 +583,25 @@ var Util = {
             .withDescription1('Description 1')
             .withDescription2('Description 2')
             .withHeadline('Headline')
+            .withDestinationPage("WATCH")
           	.withThumbnail('DEFAULT')
             .withVideo(video)
           	.build()
           	.getResult()
+          if(!videoAd){
+            var errors = videoAd = adGroup.newVideoAd()
+            .videoDiscoveryAdBuilder()
+            .withAdName(adName)
+            .withDescription1('Description 1')
+            .withDescription2('Description 2')
+            .withHeadline('Headline')
+            .withDestinationPage("WATCH")
+          	.withThumbnail('DEFAULT')
+            .withVideo(video)
+          	.build().getErrors();
+            Logger.log(errors);
+          }
           break
-          
         case 'VIDEO_BUMPER':
           videoAd = adGroup.newVideoAd()
             .bumperAdBuilder()
@@ -695,4 +711,3 @@ var Util = {
           .build();
     }
 }
-
