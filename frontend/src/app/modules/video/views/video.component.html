@@ -148,25 +148,38 @@
     
     <h3>What do you want to do?</h3>
 
-    <div class="added_item" [ngClass]="{'selected_box': mode == 'single' && !youtube}" (click)="select_single_video_mode()">
+    <div class="added_item" [ngClass]="{'selected_box': mode == 'single' && !youtube && !custom_dir}" (click)="select_single_video_mode()">
       <mat-icon aria-hidden="false" aria-label="video_label icon" title="video_label">video_label</mat-icon>
       <p>Create <b>one</b><br/>single asset <b>(Preview)</b></p>
     </div>
 
-    <div class="added_item" [ngClass]="{'selected_box': mode == 'bulk' && !youtube}" (click)="select_bulk_video_mode()">
+    <div class="added_item" [ngClass]="{'selected_box': mode == 'bulk' && !youtube && !custom_dir}" (click)="select_bulk_video_mode()">
       <mat-icon aria-hidden="false" aria-label="video_library icon" title="video_library">video_library</mat-icon>
       <p>Create <b>multiple</b><br/>assets in bulk <b>(Preview)</b></p>
     </div>
 
     <span *ngIf="is_base_video(base)">
-      <div class="added_item" [ngClass]="{'selected_box': mode == 'single' && youtube}" (click)="select_single_video_mode(true)">
+      <div class="added_item" [ngClass]="{'selected_box': mode == 'single' && youtube && !custom_dir}" (click)="select_single_video_mode(true)">
         <mat-icon aria-hidden="false" aria-label="video_label icon" title="video_label">ondemand_video</mat-icon>
         <p>Create <b>one</b><br/>single asset <b>(YouTube)</b></p>
       </div>
 
-      <div class="added_item" [ngClass]="{'selected_box': mode == 'bulk' && youtube}" (click)="select_bulk_video_mode(true)">
+      <div class="added_item" [ngClass]="{'selected_box': mode == 'bulk' && youtube && !custom_dir}" (click)="select_bulk_video_mode(true)">
         <mat-icon aria-hidden="false" aria-label="video_library icon" title="video_library">video_settings</mat-icon>
         <p>Create <b>multiple</b><br/>assets in bulk <b>(YouTube)</b></p>
+      </div>
+    </span>
+
+    <!-- Allow for images to be stored in custom directory -->
+    <span *ngIf="is_base_image(base)">
+      <div class="added_item" [ngClass]="{'selected_box': mode == 'single' && !youtube && custom_dir}" (click)="select_single_video_mode(false, true)">
+        <mat-icon aria-hidden="false" aria-label="panorama icon" title="video_label">panorama</mat-icon>
+        <p>Create <b>one</b><br/>image <b>(Cloud Storage)</b></p>
+      </div>
+  
+      <div class="added_item" [ngClass]="{'selected_box': mode == 'bulk' && !youtube && custom_dir}" (click)="select_bulk_video_mode(false, true)">
+        <mat-icon aria-hidden="false" aria-label="collections icon" title="video_library">collections</mat-icon>
+        <p>Create <b>multiple</b><br/>images <b>(Cloud Storage)</b></p>
       </div>
     </span>
   </div>
@@ -280,6 +293,19 @@
 
     </div>
 
+    <div *ngIf="custom_dir" class="ads-fields">
+      <!-- Name -->
+      <mat-form-field class="example-full-width">
+        <mat-label>Name</mat-label>
+        <input [(ngModel)]="video_metadata.name" placeholder="Name" matInput>
+      </mat-form-field>
+      <!-- Custom output dir -->
+      <mat-form-field class="example-full-width">
+        <mat-label>Storage Bucket</mat-label>
+        <input [(ngModel)]="custom_dir_name" placeholder="Name of storage bucket" matInput>
+      </mat-form-field>
+    </div>
+    
     <br/><br/>
 
     <button mat-stroked-button [disabled]="!is_all_filled()" (click)="add_single_video(selected_products, selected_offer_types, video_metadata)">Create Asset</button>
@@ -391,9 +417,17 @@
 
           <div>{{selected_groups.size}} selected</div>
 
+          <div *ngIf="custom_dir" class="ads-fields">
+            <!-- Custom output dir -->
+            <mat-form-field class="example-full-width">
+              <mat-label>Storage Bucket</mat-label>
+              <input [(ngModel)]="custom_dir_name" placeholder="Name of storage bucket" matInput>
+            </mat-form-field>
+          </div>
+
         <br/><br/>
 
-        <button mat-stroked-button (click)="review_create_bulk()">Review Bulk</button>
+        <button mat-stroked-button [disabled]="!is_all_filled()" (click)="review_create_bulk()">Review Bulk</button>
 
         <br/><br/>
 
