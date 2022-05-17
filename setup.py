@@ -15,10 +15,13 @@
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google_auth_oauthlib.flow import InstalledAppFlow
+from oauthlib.oauth2.rfc6749.errors import InvalidGrantError
 from google.oauth2.credentials import Credentials
 from google.cloud import storage
 import pickle
 from pathlib import Path
+from urllib import parse
+import sys
 
 # @see https://developers.google.com/identity/protocols/oauth2/scopes
 SCOPES = [
@@ -35,6 +38,7 @@ CONFIGS = {
     'lang': 'en',
 }
 
+_REDIRECT_URI = 'http://localhost:8080'
 
 def setup_argparse():
     import argparse
@@ -55,6 +59,39 @@ def setup_argparse():
                         help='Type of build')
     return parser.parse_args()
 
+class ClientConfigBuilder(object):
+    """Helper class used to build a client config dict used in the OAuth 2.0 flow.
+    """
+    _DEFAULT_AUTH_URI = 'https://accounts.google.com/o/oauth2/auth'
+    _DEFAULT_TOKEN_URI = 'https://accounts.google.com/o/oauth2/token'
+    CLIENT_TYPE_WEB = 'web'
+    CLIENT_TYPE_INSTALLED_APP = 'installed'
+
+    def __init__(self, client_type=None, client_id=None, client_secret=None,
+                 auth_uri=_DEFAULT_AUTH_URI, token_uri=_DEFAULT_TOKEN_URI):
+        self.client_type = client_type
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.auth_uri = auth_uri
+        self.token_uri = token_uri
+
+    def Build(self):
+        """Builds a client config dictionary used in the OAuth 2.0 flow."""
+        if all((self.client_type, self.client_id, self.client_secret,
+                self.auth_uri, self.token_uri)):
+            client_config = {
+                self.client_type: {
+                    'client_id': self.client_id,
+                    'client_secret': self.client_secret,
+                    'auth_uri': self.auth_uri,
+                    'token_uri': self.token_uri
+                }
+            }
+        else:
+            raise ValueError('Required field is missing.')
+
+        return client_config
+
 
 def main(args):
 
@@ -71,23 +108,32 @@ def main(args):
         else:
             client_id = input('Desktop Client ID: ')
             client_secret = input('Client Secret: ')
-            desktop_config = {
-                    "installed": {
-                        "client_id": client_id,
-                        "client_secret": client_secret,
-                        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                        "token_uri": "https://oauth2.googleapis.com/token",
-                        "redirect_uris": [
-                            "urn:ietf:wg:oauth:2.0:oob",
-                            "http://localhost"
-                        ]
-                    }
-                }
-            flow = InstalledAppFlow.from_client_config(desktop_config, scopes=SCOPES)
-            flow.run_console()
+            client_config = ClientConfigBuilder(
+            client_type=ClientConfigBuilder.CLIENT_TYPE_WEB, client_id=client_id,
+            client_secret=client_secret)
+            flow = InstalledAppFlow.from_client_config(
+                client_config.Build(), scopes=SCOPES)
+            # Note that from_client_config will not produce a flow with the
+            # redirect_uris (if any) set in the client_config. This must be set
+            # separately.
+            flow.redirect_uri = _REDIRECT_URI
+
+            auth_url, _ = flow.authorization_url(prompt='consent')
+
+            print('Log into the Google Account you use to access your Ads account '
+                  'and go to the following URL: \n%s\n' % auth_url)
+            print('After approving the token copy and paste the full URL.')
+            url = input('URL: ').strip()
+            code = parse.parse_qs(parse.urlparse(url).query)['code'][0]
+
+            try:
+                flow.fetch_token(code=code)
+            except InvalidGrantError as ex:
+                print('Authentication has failed: %s' % ex)
+                sys.exit(1)
             credentials = flow.credentials
     drive_id = args.drive_id if args.drive_id else create_drive(credentials, args.drive_fonts)
-    
+
     sheet_id = args.sheet_id
     if not sheet_id:
         sheet_id = create_sheet(credentials, drive_id)
@@ -136,7 +182,7 @@ def create_drive(credentials: Credentials, drive_dir: str) -> str:
 
     media = MediaFileUpload(drive_dir + '/base_example.mp4',
                             mimetype='video/mp4', resumable=True)
-    
+
     service.files().create(body=file_metadata, media_body=media).execute()
 
 
@@ -361,7 +407,7 @@ def create_appscript(credentials: Credentials, sheet_id: str) -> str:
     print(f'Done. AppScript Project URL: https://script.google.com/d/{response["scriptId"]}/edit')
 
     return response['scriptId']
-    
+
 
 if __name__ == '__main__':
     args = setup_argparse()
