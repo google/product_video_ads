@@ -37,7 +37,7 @@ See the tutorial video: https://www.youtube.com/watch?v=n31ORQGDhRc
 
 #### 1. GCP Configuration
 1. Go to ['APIs and Services' > 'OAuth Consent Screen'](https://console.cloud.google.com/apis/credentials/consent)
-	- On type select: External
+	- On type select: External (if using brand account), otherwise, use Internal
 	- App name: The name of your PVA Application that will show on the screen, eg: pva-video-upload
 	- Developer contact info: Your development email
 	- On Scopes click on Save and Continue

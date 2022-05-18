@@ -34,18 +34,6 @@ SCOPES = ['https://www.googleapis.com/auth/content',
 # generated for an installed application will always have this value.
 _REDIRECT_URI = 'http://localhost:8080'
 
-#parser = argparse.ArgumentParser(description='Generates a refresh token with '
-                                             #'the provided credentials.')
-#parser.add_argument('--client_id',
-                    #help='Client Id retrieved from the Developer\'s Console.')
-#parser.add_argument('--client_secret',
-                    #help='Client Secret retrieved from the Developer\'s '
-                    #     'Console.')
-#parser.add_argument('--additional_scopes', default=None,
-                    #help='Additional scopes to apply when generating the '
-                     #    'refresh token. Each scope should be separated by a comma.')
-
-
 class ClientConfigBuilder(object):
     """Helper class used to build a client config dict used in the OAuth 2.0 flow.
     """
