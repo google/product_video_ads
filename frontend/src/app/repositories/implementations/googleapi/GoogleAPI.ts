@@ -40,7 +40,8 @@ export class GoogleAPI {
           apiKey: environment.api_key,
           clientId: environment.client_id,
           discoveryDocs: environment.discovery_docs,
-          scope: environment.scopes
+          scope: environment.scopes,
+          pluginName: `PLUGIN`
         }).then(() => {
           
           // Gets logged in email
