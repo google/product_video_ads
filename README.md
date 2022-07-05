@@ -25,7 +25,7 @@ you are up and running right away.
 [![Carrefour Brasil - PVA Video](images/pva_carrefour_example.png?raw=true)](https://www.youtube.com/watch?v=xk8hqo1lZbk&t)
 ## Requirements
 
-See the tutorial video: https://www.youtube.com/watch?v=n31ORQGDhRc
+See the tutorial video (deprecated): https://www.youtube.com/watch?v=n31ORQGDhRc
 
 1. A Google Cloud Project, with a user with Owner or Editor permissions, the installation will be on Cloud Shell
 2. Apps Script enabled for the user involved on the deployment (can be a different user from the GCP) it can be done here: https://script.google.com/home/usersettings
@@ -33,7 +33,7 @@ See the tutorial video: https://www.youtube.com/watch?v=n31ORQGDhRc
 
 ## How to install
 
-See the tutorial video: https://www.youtube.com/watch?v=n31ORQGDhRc
+See the tutorial video (deprecated): https://www.youtube.com/watch?v=n31ORQGDhRc
 
 #### 1. GCP Configuration
 1. Go to ['APIs and Services' > 'OAuth Consent Screen'](https://console.cloud.google.com/apis/credentials/consent)
@@ -69,21 +69,36 @@ Just for example, lets suppose that we have: manager@gmail.com and brand_account
 	cd product_video_ads
 	./install.sh
 	```
-3. The first execution, it will enable the required API's for your GCP Project: Drive, Sheets, Youtube and more.
-4. Then it will ask you for your Spreadsheet Id, if you don't have one, just leave it blank (it will be created)
-5. Enter your Desktop Client Id, configured on Step 2 which we called "pva-desktop"
-	- Enter the Client Secret as well
-6. When selecting your account, remeber that you **CAN'T use your brand account on this step**, because it will create your Drive and Sheets and it must be attached which a account that you can access, so we are going to use as example: manager@gmail.com, then, allow everything that is prompted
-7. After you receive your drive and sheets link give access to your brand_account@gmail.com (see video)
-8. Now, use your web client id, in this example we have create with the name "pva-web"
-9. Enter your API Key (it's not the web client id secret)
-10. After the deployment of the frontend and the cluster creation, use your Desktop Client ID and Secret (the same used on step 5) as it is prompted
-11. On the OAuth screen, choose the account that you want to do the uploads (remeber that it must have access to Sheets and Drive), in the example case, we are using the brand account
+3. The first execution, it will enable the required API's for your GCP Project: Drive, Sheets, Youtube and more. So, click in Authorize.
+4. Then it will ask you for your Spreadsheet Id, if you don't have one, just leave it blank (it will be created).
+5. Ensure that Google Apps Script API is ENABLED for the deployment user in https://script.google.com/corp/home/usersettings, then press enter.
+6. [Desktop Credentials] Enter your Desktop Client Id and Client Secret, configured on Step 2 which we called "pva-desktop"
+7. Click on the URL, when selecting your account, remeber that you **CAN'T use your brand account on this step**, because it will create your Drive and Sheets and it must be attached which a account that you can access, so we are going to use as example: manager@gmail.com, then, allow everything that is prompted
+	- After selecting your account, you will see a ERR_CONNECTION_REFUSED, but this is correct, copy the full localhost url (it will look like: "http://localhost:8080/?state=...") and paste it on the terminal.
+8. If everything is configured correctly, you will see your Drive and Sheets being created.
+9. You will be prompted to use GCS if you want, if not, just leave it blank. 
+10. [Web Credentials] Now, enter your web client id, in this example we have create with the name "pva-web", if you are using a brand account give access to drive and sheets on this account, like brand_account@gmail.com.
+11. Enter your API Key (it's not the web client id secret)
+10. Now the frontend will be deployed on app engine and GKE will be created (this will take some time)
+11. [Desktop Credentials] Use your Desktop Client ID and Secret (the same used on step 6) as it is prompted, on the OAuth screen, choose the account that you want to do the upload (remeber that it must have access to Sheets and Drive), in the example case, we are using the brand account
+	- After selecting your account, you will see a ERR_CONNECTION_REFUSED, but this is correct, copy the full localhost url (it will look like: "http://localhost:8080/?state=...") and paste it on the terminal.
 12. If everything pass withou errors, **Congratulations the installation is complete!** 
 	- Click on the AppEngine URL to run your app. And use the Sheet's Id prompted to Log-in
 	- **IMP**: Ensure cookies and pop-ups are allowed. Ref: [Allow pop-ups in Chrome](https://support.google.com/chrome/answer/95472?co=GENIE.Platform%3DDesktop&hl=en)
 	- You should see this screen: ![PVA Frontend](images/pva_frontend.png?raw=true "PVA Frontend")
 	- After the login, try to generate the video and upload it to youtube, if nothing happens as in the video, see our Troubleshooting section
+
+#### 3. Test
+
+1. After your login, go to Generate > Select Base Example > Price
+![PVA Video Config](images/pva_video_config_0.png?raw=true "PVA Video Config")
+2. Now, to test the Youtube Upload, click Create One (Youtube)
+![PVA Video Config](images/pva_video_config_1.png?raw=true "PVA Video Config")
+3. To test, only select Offer Type: My Test and Product: Your Product Name, the other fields leave it blank
+4. Click in Create Asset
+![PVA Video Config](images/pva_video_config_2.png?raw=true "PVA Video Config")
+5. On Generator Logs, you can click in Update to see PVA processing on GKE. And in Assets, you can see your video status.
+![PVA Video Config](images/pva_video_status.png?raw=true "PVA Video Config")
 
 ## Troubleshoot
 
