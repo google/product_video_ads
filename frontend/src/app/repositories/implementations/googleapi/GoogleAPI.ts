@@ -23,48 +23,51 @@ export class GoogleAPI {
   FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder'
 
   private gapi : any
+  private token_client : any
   public sheet_id : string
-  
   load(on_login : Function) {
-    
-    // Callback called when GAPI loaded
-    window['googleSDKLoaded'] = () => {
-      
-      const gapi = window['gapi']
-      
-      gapi.load('client:auth2', () => {
-        
-        this.gapi = gapi
-        
-        gapi.client.init({
-          apiKey: environment.api_key,
-          clientId: environment.client_id,
-          discoveryDocs: environment.discovery_docs,
-          scope: environment.scopes
-        }).then(() => {
-          
-          // Gets logged in email
-          //console.log(gapi.auth2.getAuthInstance().currentUser.get())
+         
+    const gapi = window['gapi']
+    const google = window['google']
 
-          // Listen for sign-in state changes
-          gapi.auth2.getAuthInstance().isSignedIn.listen(on_login)
-          
-          // If it's already logged in
-          if (this.gapi.auth2.getAuthInstance().isSignedIn.get())
-            on_login()
-          else
-            this.gapi.auth2.getAuthInstance().signIn()
-        })
+    gapi.load('client', async () => {
+
+      this.gapi = gapi
+
+      // Starts the Google Apis
+      await gapi.client.init({
+        apiKey: environment.api_key,
+        discoveryDocs: environment.discovery_docs,
       })
-    }
-    
-    (function(d, s, id){
-      var js, fjs = d.getElementsByTagName(s)[0];
-      if (d.getElementById(id)) {return;}
-      js = d.createElement(s); js.id = id;
-      js.src = "https://apis.google.com/js/api.js?onload=googleSDKLoaded";
-      fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'google-jssdk'));
+
+      // Initiates the token access process through GSI
+      this.token_client = await google.accounts.oauth2.initTokenClient({
+        client_id: environment.client_id,
+        scope: environment.scopes,
+        prompt: ''
+      })
+
+      // The access token is missing, invalid, or expired, prompt for user consent to obtain one.
+      await new Promise((resolve, reject) => {
+        try {
+          // Settle this promise in the response callback for requestAccessToken()
+          this.token_client.callback = (response) => {
+            if (response.error)
+              reject(response);
+            
+            // GIS has automatically updated gapi.client with the newly issued access token.
+            resolve(response);
+          };
+          // Requests the access token
+          this.token_client.requestAccessToken();
+        } catch (err) {
+          console.error(`Error during the signin`, err)
+        }
+      });
+
+      // Proceeds to the login
+      on_login()
+    })
   }
   
   /*** Spreadsheet ***/
