@@ -46,7 +46,7 @@ then
   read -p "Press ENTER when ready"
 
   set -o allexport
-  pip3 install --upgrade google-auth-oauthlib google-api-python-client oauth2client
+  pip3 install --upgrade google-auth-oauthlib google-api-python-client oauth2client google-cloud-storage
   python3 setup.py --env-out='/tmp/pva.env' && source /tmp/pva.env
   set +o allexport
 else

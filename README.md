@@ -91,13 +91,21 @@ Just for example, lets suppose that we have: manager@gmail.com and brand_account
 #### 3. Test
 
 1. After your login, go to Generate > Select Base Example > Price
+
 ![PVA Video Config](images/pva_video_config_0.png?raw=true "PVA Video Config")
+
 2. Now, to test the Youtube Upload, click Create One (Youtube)
+
 ![PVA Video Config](images/pva_video_config_1.png?raw=true "PVA Video Config")
+
 3. To test, only select Offer Type: My Test and Product: Your Product Name, the other fields leave it blank
+
 4. Click in Create Asset
+
 ![PVA Video Config](images/pva_video_config_2.png?raw=true "PVA Video Config")
+
 5. On Generator Logs, you can click in Update to see PVA processing on GKE. And in Assets, you can see your video status.
+
 ![PVA Video Config](images/pva_video_status.png?raw=true "PVA Video Config")
 
 ## Troubleshoot
