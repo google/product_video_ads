@@ -78,6 +78,15 @@ docker build -t video-generator .
 docker tag $PROJECT_NAME "$IMAGE_NAME"
 docker push "$IMAGE_NAME"
 
+#Give GKE service account right to pull image from private gcr.
+#Context: On first docker push, the private docker repository is created and Compute Engine service account (used by Kubernetes instances)
+#doesn't have read permissions for some reason. This resulted in "ErrorImagePull" and video-generator pod being unable to start.
+#Service accounts are described by several lines, hence the grep/grep/sed combo
+export COMPUTE_ENGINE_SERVICE_ACCOUNT_EMAIL=$(gcloud iam service-accounts list | grep -a1 Compute | grep EMAIL | sed 's/EMAIL: //')
+#Note: there's also 'us.artifacts...' one but I assume the main one is the one to go
+export GCR_GCS_BUCKET=$(gsutil ls | grep /artifacts.)
+gsutil iam ch serviceAccount:$COMPUTE_ENGINE_SERVICE_ACCOUNT_EMAIL:roles/storage.objectViewer $GCR_GCS_BUCKET
+
 # Install application to cluster
 echo 'Apply application to cluster...'
 
