@@ -4,3 +4,4 @@ node_modules
 *.tar
 */**/token
 appscript/script.js
+pva.conf

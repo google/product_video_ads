@@ -18,7 +18,7 @@ set -e
 echo 'Enabling some needed APIs...'
 gcloud services enable drive.googleapis.com
 gcloud services enable sheets.googleapis.com
-gcloud app create --region=us-central || true
+gcloud app create --region=${GCP_REGION} || true
 
 echo 'Installing Web Frontend on App Engine...'
 
