@@ -1,0 +1,5 @@
+export SPREADSHEET_ID=
+export GCS_BUCKET_NAME=
+export GCP_REGION=europe-west1
+export GCP_ZONE=europe-west1-a
+export GCR_URL=gcr.io

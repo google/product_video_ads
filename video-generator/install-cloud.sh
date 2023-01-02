@@ -32,28 +32,28 @@ sudo apt-get install google-cloud-sdk-gke-gcloud-auth-plugin
 
 # Delete cluster
 if [ "$(gcloud container clusters list | grep video-generator-cluster)" ]; then
-  gcloud container clusters delete video-generator-cluster --zone us-west1-a -q
+  gcloud container clusters delete video-generator-cluster --zone ${GCP_ZONE} -q
 fi
 
 # Create cluster
 echo 'Creating cluster video-generator-cluster on Google Kubernetes Engine...'
 gcloud container clusters create video-generator-cluster \
 --num-nodes=1 \
---zone us-west1-a \
+--zone ${GCP_ZONE} \
 --machine-type=e2-standard-2 \
 --no-enable-autoupgrade \
 --scopes=https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/youtube,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/devstorage.read_write
 
 
-gcloud container clusters get-credentials --zone us-west1-a video-generator-cluster
+gcloud container clusters get-credentials --zone ${GCP_ZONE} video-generator-cluster
 sleep 10
 
-IMAGE_NAME=gcr.io/${GOOGLE_CLOUD_PROJECT}/${PROJECT_NAME}
+IMAGE_NAME=${GCR_URL}/${GOOGLE_CLOUD_PROJECT}/${PROJECT_NAME}
 export IMAGE_NAME
 
 if [ "$1" ]; then
   gsutil cp gs://$1 token
-  IMAGE_NAME=gcr.io/${GOOGLE_CLOUD_PROJECT}/${PROJECT_NAME}
+  IMAGE_NAME=${GCR_URL}/${GOOGLE_CLOUD_PROJECT}/${PROJECT_NAME}
   export IMAGE_NAME
 else
   if test -f "token"; then
@@ -68,15 +68,20 @@ else
   fi
 fi
 
-
-
-
-
 # Image is not there yet
 # ENV vars needed: IMAGE_NAME, SPREADSHEET_ID
 docker build -t video-generator .
 docker tag $PROJECT_NAME "$IMAGE_NAME"
 docker push "$IMAGE_NAME"
+
+#Give GKE service account right to pull image from private gcr.
+#Context: On first docker push, the private docker repository is created and Compute Engine service account (used by Kubernetes instances)
+#doesn't have read permissions for some reason. This resulted in "ErrorImagePull" and video-generator pod being unable to start.
+#Service accounts are described by several lines, hence the grep/grep/sed combo
+export COMPUTE_ENGINE_SERVICE_ACCOUNT_EMAIL=$(gcloud iam service-accounts list | grep -a1 Compute | grep EMAIL | sed 's/EMAIL: //')
+#Note: there's also 'us.artifacts...' one but I assume the main one is the one to go
+export GCR_GCS_BUCKET=$(gsutil ls | grep /artifacts.)
+gsutil iam ch serviceAccount:$COMPUTE_ENGINE_SERVICE_ACCOUNT_EMAIL:roles/storage.objectViewer $GCR_GCS_BUCKET
 
 # Install application to cluster
 echo 'Apply application to cluster...'
