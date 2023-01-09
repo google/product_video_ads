@@ -99,9 +99,11 @@ selectRegionAndZone() {
 }
 
 selectGcrRegistry(){
-    echo -n "Select base GCP Container Registry URL [${GCR_URL:=gcr.io}] : "
+    PREVIOUS_GCR=${GCR_URL:=gcr.io}
+    echo -n "Select base GCP Container Registry URL [${GCR_URL:=${PREVIOUS_GCR}}] : "
     read -r GCR_URL
-    export GCR_URL=${GCR_URL:=gcr.io}
+    export GCR_URL=${GCR_URL:=${PREVIOUS_GCR}}
+    echo "Will use GCR registry under ${GCR_URL}"
 }
 
 printReminderAndConfig(){
