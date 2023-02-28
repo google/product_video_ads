@@ -19,6 +19,7 @@ import time
 
 import log
 from auth import authentication
+from google.auth.transport.requests import Request
 # Handle "events" from configuration
 from configuration.event_handler import EventHandler as EventHandler
 from configuration.spreadsheet_configuration import SpreadsheetConfiguration as Configuration
@@ -52,6 +53,9 @@ def main():
     while True:
         credentials = authentication.get_credentials_from_local_file()
         if credentials is not None:
+            if credentials.expired and credentials.refresh_token:
+                logger.info("Refreshing credentials")
+                credentials.refresh(Request())
             break
 
         logger.info('Sleeping for 5 minutes before trying again...')
