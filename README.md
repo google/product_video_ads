@@ -43,7 +43,7 @@ See the tutorial video (deprecated): https://www.youtube.com/watch?v=n31ORQGDhRc
 	- On Scopes click on Save and Continue
 	- On Test Users, add the emails that you are going to use on pva (brand account included)
 	- Click on Save and Continue
-2. Go to ['APIs and Services' > Credentials](https://pantheon2.corp.google.com/apis/credentials)
+2. Go to ['APIs and Services' > Credentials](https://console.cloud.google.com/apis/credentials)
 	- Click "Create Credentials > API Key", it will generate a new key related to your GCP Project Id
 	- Click "Create Credentials > OAuth Client Id":
 		- On application type: "Web Application"
@@ -51,13 +51,8 @@ See the tutorial video (deprecated): https://www.youtube.com/watch?v=n31ORQGDhRc
 		- Authorized Javascript Origins: "https://your_project_id.your_region.r.appspot.com" (in the video case the Id and Name were equals)
 		- Authorized Redirect URIs: "https://your_project_id.your_region.r.appspot.com" (in the video case the Id and Name were equals)
 		- Click Create
-	- Click "Create Credentials > OAuth Client Id":
-		- On application type: "Desktop Application"
-		- Name: pva-desktop
-		- Authorized Javascript Origins: "https://your_project_id.your_region.r.appspot.com" (in the video case the Id and Name were equals)
-		- Authorized Redirect URIs: "https://your_project_id.your_region.r.appspot.com" (in the video case the Id and Name were equals)
-		- Click Create	
-
+   
+   
 #### 2. Run the Installation Script
 
 Just for example, lets suppose that we have: manager@gmail.com and brand_account@gmail.com
