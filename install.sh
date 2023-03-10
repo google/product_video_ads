@@ -120,6 +120,7 @@ selectServiceAccountName(){
 printReminderAndConfig(){
     # Important reminder
     APP_URL=$(gcloud app browse --no-launch-browser)
+    PVA_SERVICE_ACCOUNT=$(gcloud iam service-accounts list | grep -a1 $PVA_SERVICE_ACCOUNT_NAME  | grep EMAIL | sed 's/EMAIL: //')
     INSTRUCTIONS="
     ${RED}
     #############################################################################
@@ -149,7 +150,8 @@ printReminderAndConfig(){
     echo -e "Google Cloud Storage bucket name: $GCS_BUCKET_NAME"
     echo -e "GCP Region and Zone chosen: $GCP_REGION / $GCP_ZONE"
     echo -e "GCR repository used: $GCR_URL"
-    echo -e "GCP service account name: $PVA_SERVICE_ACCOUNT_NAME"
+    echo -e "GCP service account: $PVA_SERVICE_ACCOUNT"
+    echo -e "Share ${BOLD}Drive${NORMAL} and ${BOLD}Sheet${NORMAL} are shared as ${BOLD}EDITOR${NORMAL} with ${BOLD}$PVA_SERVICE_ACCOUNT${NC}"
 }
 
 installFrontend(){
@@ -174,7 +176,7 @@ main() {
     selectServiceAccountName
     selectGcrRegistry
     saveConfig
-    # installFrontend
+    installFrontend
     installBackend
     printReminderAndConfig
 }
