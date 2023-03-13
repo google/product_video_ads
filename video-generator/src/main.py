@@ -19,6 +19,7 @@ import time
 
 import log
 from auth import authentication
+from google.auth.transport.requests import Request
 # Handle "events" from configuration
 from configuration.event_handler import EventHandler as EventHandler
 from configuration.spreadsheet_configuration import SpreadsheetConfiguration as Configuration
