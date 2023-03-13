@@ -28,7 +28,7 @@ echo 'Creating Service account and granting it required permissions'
 export COMPUTE_ENGINE_SERVICE_ACCOUNT_EMAIL=$(gcloud iam service-accounts list | grep -a1 Compute | grep EMAIL | sed 's/EMAIL: //')
 gcloud iam service-accounts create $PVA_SERVICE_ACCOUNT_NAME --display-name $PVA_SERVICE_ACCOUNT_NAME
 export PVA_SERVICE_ACCOUNT=$(gcloud iam service-accounts list | grep -a1 $PVA_SERVICE_ACCOUNT_NAME  | grep EMAIL | sed 's/EMAIL: //')
-echo gcloud iam service-accounts add-iam-policy-binding $PVA_SERVICE_ACCOUNT --member=serviceAccount:$COMPUTE_ENGINE_SERVICE_ACCOUNT_EMAIL --role=roles/iam.serviceAccountTokenCreator
+gcloud iam service-accounts add-iam-policy-binding $PVA_SERVICE_ACCOUNT --member=serviceAccount:$COMPUTE_ENGINE_SERVICE_ACCOUNT_EMAIL --role=roles/iam.serviceAccountTokenCreator
 
 # Delete cluster
 if [ "$(gcloud container clusters list | grep video-generator-cluster)" ]; then

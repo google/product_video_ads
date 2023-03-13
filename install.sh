@@ -151,7 +151,7 @@ printReminderAndConfig(){
     echo -e "GCP Region and Zone chosen: $GCP_REGION / $GCP_ZONE"
     echo -e "GCR repository used: $GCR_URL"
     echo -e "GCP service account: $PVA_SERVICE_ACCOUNT"
-    echo -e "Share ${BOLD}Drive${NORMAL} and ${BOLD}Sheet${NORMAL} are shared as ${BOLD}EDITOR${NORMAL} with ${BOLD}$PVA_SERVICE_ACCOUNT${NC}"
+    echo -e "Please ensure that ${BOLD}Drive${NORMAL} and ${BOLD}Sheet${NORMAL} are shared as ${BOLD}EDITOR${NORMAL} with ${BOLD}$PVA_SERVICE_ACCOUNT${NC}"
 }
 
 installFrontend(){
