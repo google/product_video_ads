@@ -35,7 +35,7 @@ if [ "$(gcloud container clusters list | grep video-generator-cluster)" ]; then
   gcloud container clusters delete video-generator-cluster --zone ${GCP_ZONE} -q
 fi
 
-# # Create cluster
+# Create cluster
 echo 'Creating cluster video-generator-cluster on Google Kubernetes Engine...'
 gcloud container clusters create video-generator-cluster \
 --num-nodes=1 \
@@ -58,14 +58,13 @@ docker build -t video-generator .
 docker tag $PROJECT_NAME "$IMAGE_NAME"
 docker push "$IMAGE_NAME"
 
-#Give GKE service account right to pull image from private gcr.
-#Context: On first docker push, the private docker repository is created and Compute Engine service account (used by Kubernetes instances)
-#doesn't have read permissions for some reason. This resulted in "ErrorImagePull" and video-generator pod being unable to start.
-#Note: there's also 'us.artifacts...' and 'eu.artifacts...' but I assume the main one is the one to go. Leave only one of 3 below lines uncommented
-# export GCR_GCS_BUCKET=$(gsutil ls | grep /artifacts.)
-export GCR_GCS_BUCKET=$(gsutil ls | grep /eu.artifacts.)
-# export GCR_GCS_BUCKET=$(gsutil ls | grep /us.artifacts.)
-gsutil iam ch serviceAccount:$COMPUTE_ENGINE_SERVICE_ACCOUNT_EMAIL:roles/storage.objectViewer $GCR_GCS_BUCKET
+# Give GKE service account right to pull image from private gcr.
+# Context: On first docker push, the private docker repository is created and Compute Engine service account (used by Kubernetes instances)
+# doesn't have read permissions for some reason. This resulted in "ErrorImagePull" and video-generator pod being unable to start.
+# Enabling all 3 potential locations just to be sure. We could have parsed GCR_URL but why complicate matters?
+gsutil iam ch serviceAccount:$COMPUTE_ENGINE_SERVICE_ACCOUNT_EMAIL:roles/storage.objectViewer $(gsutil ls | grep /artifacts.)
+gsutil iam ch serviceAccount:$COMPUTE_ENGINE_SERVICE_ACCOUNT_EMAIL:roles/storage.objectViewer $(gsutil ls | grep /eu.artifacts.)
+gsutil iam ch serviceAccount:$COMPUTE_ENGINE_SERVICE_ACCOUNT_EMAIL:roles/storage.objectViewer $(gsutil ls | grep /us.artifacts.)
 
 # Install application to cluster
 echo 'Apply application to cluster...'
