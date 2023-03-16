@@ -18,22 +18,16 @@ you are up and running right away.
 
 2 - So, after you have selected a base_video you just need to configurate your offers inside PVA, using your feed (it can be Merchant Center's) as in the example below:
 
-![PVA Demo](images/pva_demo.gif?raw=true "PVA Demo")
+[![PVA Demo](https://img.youtube.com/vi/53YZQUNVE5E/0.jpg)](https://www.youtube.com/watch?v=53YZQUNVE5E)
 
 3 - Then, you can upload your video to youtube and it can be used as a Google Ad, after you update your video on PVA, it update the Ad automatically. This is one example of a video ad generated with PVA:
 
 [![Carrefour Brasil - PVA Video](images/pva_carrefour_example.png?raw=true)](https://www.youtube.com/watch?v=xk8hqo1lZbk&t)
 ## Requirements
 
-See the tutorial video (deprecated): https://www.youtube.com/watch?v=n31ORQGDhRc
-
 1. A Google Cloud Project, with a user with Owner or Editor permissions, the installation will be on Cloud Shell
 2. Apps Script enabled for the user involved on the deployment (can be a different user from the GCP) it can be done here: https://script.google.com/home/usersettings
 3. Access to your account or Brand Account, it's important to fetch the emails related to the deployment, if you are using a Brand Account, you need to be the Brand Account Manager or Owner (the steps to fetch your brand account email is on the video)
-
-## How to install
-
-See the tutorial video (deprecated): https://www.youtube.com/watch?v=n31ORQGDhRc
 
 #### 1. GCP Configuration
 1. Go to ['APIs and Services' > 'OAuth Consent Screen'](https://console.cloud.google.com/apis/credentials/consent)
