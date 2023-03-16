@@ -37,6 +37,7 @@ saveConfig(){
     echo "export GCP_REGION=${GCP_REGION}" >> $CONFIG_FILE
     echo "export GCP_ZONE=${GCP_ZONE}" >> $CONFIG_FILE
     echo "export GCR_URL=${GCR_URL}" >> $CONFIG_FILE
+    echo "export PVA_SERVICE_ACCOUNT_NAME=${PVA_SERVICE_ACCOUNT_NAME}" >> $CONFIG_FILE
 }
 
 readConfig(){
@@ -53,7 +54,9 @@ enableApis(){
         sheets.googleapis.com \
         youtube.googleapis.com \
         storagetransfer.googleapis.com \
-        container.googleapis.com
+        container.googleapis.com \
+        iamcredentials.googleapis.com \
+        cloudresourcemanager.googleapis.com
 }
 
 selectSpreadsheet(){
@@ -106,9 +109,18 @@ selectGcrRegistry(){
     echo "Will use GCR registry under ${GCR_URL}"
 }
 
+selectServiceAccountName(){
+    PREVIOUS_SERVICE_ACCOUNT_NAME=${PVA_SERVICE_ACCOUNT_NAME:=}
+    echo -n "Select PVA service account name [${PVA_SERVICE_ACCOUNT_NAME:=${PREVIOUS_SERVICE_ACCOUNT_NAME}}] : "
+    read -r PVA_SERVICE_ACCOUNT_NAME
+    export PVA_SERVICE_ACCOUNT_NAME=${PVA_SERVICE_ACCOUNT_NAME:=${PREVIOUS_SERVICE_ACCOUNT_NAME}}
+    echo "Video generator will use service account name $PVA_SERVICE_ACCOUNT_NAME"
+}
+
 printReminderAndConfig(){
     # Important reminder
     APP_URL=$(gcloud app browse --no-launch-browser)
+    PVA_SERVICE_ACCOUNT=$(gcloud iam service-accounts list | grep -a1 $PVA_SERVICE_ACCOUNT_NAME  | grep EMAIL | sed 's/EMAIL: //')
     INSTRUCTIONS="
     ${RED}
     #############################################################################
@@ -138,6 +150,8 @@ printReminderAndConfig(){
     echo -e "Google Cloud Storage bucket name: $GCS_BUCKET_NAME"
     echo -e "GCP Region and Zone chosen: $GCP_REGION / $GCP_ZONE"
     echo -e "GCR repository used: $GCR_URL"
+    echo -e "GCP service account: $PVA_SERVICE_ACCOUNT"
+    echo -e "Please ensure that ${BOLD}Drive${NORMAL} and ${BOLD}Sheet${NORMAL} are shared as ${BOLD}EDITOR${NORMAL} with ${BOLD}$PVA_SERVICE_ACCOUNT${NC}"
 }
 
 installFrontend(){
@@ -159,6 +173,7 @@ main() {
     selectSpreadsheet
     selectStorage
     selectRegionAndZone
+    selectServiceAccountName
     selectGcrRegistry
     saveConfig
     installFrontend

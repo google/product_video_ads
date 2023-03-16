@@ -43,7 +43,7 @@ See the tutorial video (deprecated): https://www.youtube.com/watch?v=n31ORQGDhRc
 	- On Scopes click on Save and Continue
 	- On Test Users, add the emails that you are going to use on pva (brand account included)
 	- Click on Save and Continue
-2. Go to ['APIs and Services' > Credentials](https://pantheon2.corp.google.com/apis/credentials)
+2. Go to ['APIs and Services' > Credentials](https://console.cloud.google.com/apis/credentials)
 	- Click "Create Credentials > API Key", it will generate a new key related to your GCP Project Id
 	- Click "Create Credentials > OAuth Client Id":
 		- On application type: "Web Application"
@@ -51,13 +51,8 @@ See the tutorial video (deprecated): https://www.youtube.com/watch?v=n31ORQGDhRc
 		- Authorized Javascript Origins: "https://your_project_id.your_region.r.appspot.com" (in the video case the Id and Name were equals)
 		- Authorized Redirect URIs: "https://your_project_id.your_region.r.appspot.com" (in the video case the Id and Name were equals)
 		- Click Create
-	- Click "Create Credentials > OAuth Client Id":
-		- On application type: "Desktop Application"
-		- Name: pva-desktop
-		- Authorized Javascript Origins: "https://your_project_id.your_region.r.appspot.com" (in the video case the Id and Name were equals)
-		- Authorized Redirect URIs: "https://your_project_id.your_region.r.appspot.com" (in the video case the Id and Name were equals)
-		- Click Create	
-
+   
+   
 #### 2. Run the Installation Script
 
 Just for example, lets suppose that we have: manager@gmail.com and brand_account@gmail.com
@@ -83,9 +78,8 @@ Just for example, lets suppose that we have: manager@gmail.com and brand_account
 10. [Web Credentials] Now, enter your web client id, in this example we have create with the name "pva-web", if you are using a brand account give access to drive and sheets on this account, like brand_account@gmail.com.
 11. Enter your API Key (it's not the web client id secret)
 10. Now the frontend will be deployed on app engine and GKE will be created (this will take some time)
-11. [Desktop Credentials] Use your Desktop Client ID and Secret (the same used on step 6) as it is prompted, on the OAuth screen, choose the account that you want to do the upload (remeber that it must have access to Sheets and Drive), in the example case, we are using the brand account
-	- After selecting your account, you will see a ERR_CONNECTION_REFUSED, but this is correct, copy the full localhost url (it will look like: "http://localhost:8080/?state=...") and paste it on the terminal.
-12. If everything pass withou errors, **Congratulations the installation is complete!** 
+11. Service account email will be displayed, use it to share Spreadsheet and Drive Folder with service user.
+11. If everything pass withou errors, **Congratulations the installation is complete!** 
 	- Click on the AppEngine URL to run your app. And use the Sheet's Id prompted to Log-in
 	- **IMP**: Ensure cookies and pop-ups are allowed. Ref: [Allow pop-ups in Chrome](https://support.google.com/chrome/answer/95472?co=GENIE.Platform%3DDesktop&hl=en)
 	- You should see this screen: ![PVA Frontend](images/pva_frontend.png?raw=true "PVA Frontend")
