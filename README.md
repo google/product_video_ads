@@ -18,7 +18,7 @@ you are up and running right away.
 
 2 - So, after you have selected a base_video you just need to configurate your offers inside PVA, using your feed (it can be Merchant Center's) as in the example below:
 
-[![PVA Demo](https://img.youtube.com/vi/53YZQUNVE5E/0.jpg)](https://www.youtube.com/watch?v=53YZQUNVE5E)
+[![PVA Demo](https://img.youtube.com/vi/nTVo8WQ99h4/0.jpg)](https://www.youtube.com/watch?v=nTVo8WQ99h4)
 
 3 - Then, you can upload your video to youtube and it can be used as a Google Ad, after you update your video on PVA, it update the Ad automatically. This is one example of a video ad generated with PVA:
 
