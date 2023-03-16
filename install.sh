@@ -26,7 +26,7 @@ CONFIG_FILE=pva.conf
 
 printInitialPrompt(){
     echo -e "${BOLD}Welcome to the Product Video Ads Installer${NORMAL}"
-    echo -e "Keep your OAuth 2.0 Keys (Web & Desktop) and API Key at hand."
+    echo -e "Keep your Web Client ID and API Key at hand."
     read -p "Press ENTER when ready"
 }
 
@@ -38,6 +38,8 @@ saveConfig(){
     echo "export GCP_ZONE=${GCP_ZONE}" >> $CONFIG_FILE
     echo "export GCR_URL=${GCR_URL}" >> $CONFIG_FILE
     echo "export PVA_SERVICE_ACCOUNT_NAME=${PVA_SERVICE_ACCOUNT_NAME}" >> $CONFIG_FILE
+    echo "export FRONTEND_CLIENT_ID=${FRONTEND_CLIENT_ID}" >> $CONFIG_FILE
+    echo "export FRONTEND_API_KEY=${FRONTEND_API_KEY}" >> $CONFIG_FILE
 }
 
 readConfig(){
@@ -98,7 +100,7 @@ selectRegionAndZone() {
     read -r GCP_ZONE
     export GCP_ZONE=${GCP_ZONE:=${PREVIOUS_ZONE}}
     export GCP_REGION=${GCP_ZONE%-*}
-    echo "Selected deployment region ${GCP_REGION}, zone ${GCP_ZONE}"
+    # echo "Selected deployment region ${GCP_REGION}, zone ${GCP_ZONE}"
 }
 
 selectGcrRegistry(){
@@ -106,7 +108,7 @@ selectGcrRegistry(){
     echo -n "Select base GCP Container Registry URL [${GCR_URL:=${PREVIOUS_GCR}}] : "
     read -r GCR_URL
     export GCR_URL=${GCR_URL:=${PREVIOUS_GCR}}
-    echo "Will use GCR registry under ${GCR_URL}"
+    # echo "Will use GCR registry under ${GCR_URL}"
 }
 
 selectServiceAccountName(){
@@ -114,7 +116,23 @@ selectServiceAccountName(){
     echo -n "Select PVA service account name [${PVA_SERVICE_ACCOUNT_NAME:=${PREVIOUS_SERVICE_ACCOUNT_NAME}}] : "
     read -r PVA_SERVICE_ACCOUNT_NAME
     export PVA_SERVICE_ACCOUNT_NAME=${PVA_SERVICE_ACCOUNT_NAME:=${PREVIOUS_SERVICE_ACCOUNT_NAME}}
-    echo "Video generator will use service account name $PVA_SERVICE_ACCOUNT_NAME"
+    # echo "Video generator will use service account name $PVA_SERVICE_ACCOUNT_NAME"
+}
+
+selectWebClientId(){
+    PREVIOUS_FRONTEND_CLIENT_ID=${FRONTEND_CLIENT_ID:=}
+    echo -n "Enter Web Client ID [${FRONTEND_CLIENT_ID:=${PREVIOUS_FRONTEND_CLIENT_ID}}] : "
+    read -r FRONTEND_CLIENT_ID
+    export FRONTEND_CLIENT_ID=${FRONTEND_CLIENT_ID:=${PREVIOUS_FRONTEND_CLIENT_ID}}
+    # echo "Frontend will use Web Client ID $FRONTEND_CLIENT_ID"
+}
+
+selectFrontendApiKey(){
+    PREVIOUS_FRONTEND_API_KEY=${FRONTEND_API_KEY:=}
+    echo -n "Enter Web API key [${FRONTEND_API_KEY:=${PREVIOUS_FRONTEND_API_KEY}}] : "
+    read -r FRONTEND_API_KEY
+    export FRONTEND_API_KEY=${FRONTEND_API_KEY:=${PREVIOUS_FRONTEND_API_KEY}}
+    # echo "Frontend will use Web API key $FRONTEND_API_KEY"
 }
 
 printReminderAndConfig(){
@@ -151,6 +169,8 @@ printReminderAndConfig(){
     echo -e "GCP Region and Zone chosen: $GCP_REGION / $GCP_ZONE"
     echo -e "GCR repository used: $GCR_URL"
     echo -e "GCP service account: $PVA_SERVICE_ACCOUNT"
+    echo -e "Frontend will use Web Client ID $FRONTEND_CLIENT_ID"
+    echo -e "Frontend will use Web API key $FRONTEND_API_KEY"
     echo -e "Please ensure that ${BOLD}Drive${NORMAL} and ${BOLD}Sheet${NORMAL} are shared as ${BOLD}EDITOR${NORMAL} with ${BOLD}$PVA_SERVICE_ACCOUNT${NC}"
 }
 
@@ -175,9 +195,11 @@ main() {
     selectRegionAndZone
     selectServiceAccountName
     selectGcrRegistry
+    selectWebClientId
+    selectFrontendApiKey
     saveConfig
-    installFrontend
-    installBackend
+    # installFrontend
+    # installBackend
     printReminderAndConfig
 }
 

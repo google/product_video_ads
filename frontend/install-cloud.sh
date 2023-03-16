@@ -15,33 +15,14 @@
 # limitations under the License.
 set -e
 
-echo 'Enabling some needed APIs...'
-gcloud services enable drive.googleapis.com
-gcloud services enable sheets.googleapis.com
+echo "Ensuring that Compute Engine Application is created"
 gcloud app create --region=${GCP_REGION} || true
 
 echo 'Installing Web Frontend on App Engine...'
 
-if [ -z "$1" ] 
-then
-    echo -n 'Enter the Web Client Id: '
-    read FRONTEND_CLIENT_ID
-else
-    export FRONTEND_CLIENT_ID=$1
-fi
-
-if [ -z "$2" ]
-then
-    echo -n 'Enter the API Key: '
-    read FRONTEND_API_KEY
-else
-    export FRONTEND_API_KEY=$2
-fi
-
 npm install --legacy-peer-deps
 npm run build --configuration=production
 
-export FRONTEND_API_KEY FRONTEND_CLIENT_ID
 mv dist/assets/js/env.js dist/assets/js/env.js.orig
 envsubst < dist/assets/js/env.js.orig > dist/assets/js/env.js
 rm dist/assets/js/env.js.orig
