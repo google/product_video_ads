@@ -18,7 +18,8 @@ limitations under the License.
 function onOpen() {
 
   SpreadsheetApp.getUi().createMenu('Merchant Center')
-    .addItem('Run Now', 'main')
+    .addItem('Fetch Product Feed', 'getProductsFromMerchantCenter')
+    .addItem('Translate Product IDs', 'translateMcIds')
     .addToUi()
 }
 
@@ -37,7 +38,7 @@ var Log = {
   }
 }
 
-function main() {
+function translateMcIds() {
 
   Log.init()
 

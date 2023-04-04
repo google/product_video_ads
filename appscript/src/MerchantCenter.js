@@ -13,9 +13,91 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+let DEBUG = false;
+let FILTER_MC_FEED = true;
+const deep_value = (o, p) => p.split('.').reduce((a, v) => a[v], o);
+
+function getProductsFromMerchantCenter() {
+  FILTER_MC_FEED = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Configuration").getRange(11, 3).getValue();
+  DEBUG = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Configuration").getRange(12, 3).getValue();
+  let merchantCenterId = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Configuration").getRange(10, 3).getValue();
+  let feedSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Feed');
+  clearData(feedSheet);
+  retrieveMerchantCenterFeed(merchantCenterId,
+    productsToSheetAppender(feedSheet));
+}
+
+function productsToSheetAppender(feedSheet) {
+  const selectedFields = feedSheet.getDataRange().getValues()[0];
+  return products => {
+    let productData = products
+      .filter(includeProduct)
+      .map(product => productToSheetRow(product, selectedFields));
+    feedSheet.getRange(feedSheet.getDataRange().getLastRow() + 1, 1, productData.length, productData[0].length).setValues(productData);
+  }
+}
+
+function clearData(sheet) {
+  let headerValues = sheet.getDataRange().getValues()[0];
+  sheet.getDataRange().clearContent();
+  sheet.appendRow(headerValues);
+  SpreadsheetApp.flush();
+}
+
+function productToSheetRow(product, selectedFields) {
+  try {
+    let sheetRow = selectedFields.map(name => deep_value(product, name));
+    sheetRow.push(extractPvaId(product));
+    if (DEBUG) {
+      sheetRow.push(JSON.stringify(product));
+    }
+    return sheetRow;
+  } catch (e) {
+    console.log(e);
+    return new Array(selectedFields.length + DEBUG ? 1 : 0);
+  }
+}
+
+function includeProduct(product) {
+  if (FILTER_MC_FEED) {
+    return product.customAttributes && product.customAttributes.some(a => a.name == "pva id");
+  } else {
+    return true;
+  }
+}
+
+function extractPvaId(product) {
+  if (product.customAttributes) {
+    let pvaIdObj = product.customAttributes.find(a => a.name == "pva id");
+    if (pvaIdObj) {
+      return pvaIdObj.value;
+    }
+  }
+  return "";
+}
+
+function retrieveMerchantCenterFeed(merchantId, callbackFn) {
+  let pageToken;
+  let pageNum = 1;
+  const maxResults = 250;//max 250
+  do {
+    const products = ShoppingContent.Products.list(merchantId, {
+      pageToken: pageToken,
+      maxResults: maxResults
+    });
+    console.log('Page ' + pageNum);
+    if (products.resources) {
+      callbackFn(products.resources);
+    } else {
+      console.log('No more products in account ' + merchantId);
+    }
+    pageToken = products.nextPageToken;
+    pageNum++;
+  } while (pageToken);
+}
+
 
 function retrieveProductsInformation(productIds, contentLanguage, targetCountry) {
-
   // Put product ID as key for easy lookup
   var products = {}
   var requestEntries = []
