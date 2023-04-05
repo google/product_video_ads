@@ -198,8 +198,8 @@ main() {
     selectWebClientId
     selectFrontendApiKey
     saveConfig
-    # installFrontend
-    # installBackend
+    installFrontend
+    installBackend
     printReminderAndConfig
 }
 
