@@ -95,11 +95,18 @@ selectStorage(){
 }
 
 selectRegionAndZone() {
+    
+    PREVIOUS_REGION=${GCP_REGION:=us-central}
     PREVIOUS_ZONE=${GCP_ZONE:=us-central1-a}
-    echo -n "Select GCP zone do to deploy into? [${GCP_ZONE:=${PREVIOUS_ZONE}}] : "
+    gcloud app regions list | grep REGION:
+    echo -n "Select GCP region that you want to deploy into? [${GCP_REGION:=${PREVIOUS_REGION}}] : "
+    read -r GCP_REGION
+    export GCP_REGION=${GCP_REGION:=${PREVIOUS_REGION}}
+    gcloud compute zones list | grep ${GCP_REGION} | grep NAME
+    echo -n "Select GCP zone that you want to deploy into? [${GCP_ZONE:=${PREVIOUS_ZONE}}] : "
     read -r GCP_ZONE
     export GCP_ZONE=${GCP_ZONE:=${PREVIOUS_ZONE}}
-    export GCP_REGION=${GCP_ZONE%-*}
+    
     # echo "Selected deployment region ${GCP_REGION}, zone ${GCP_ZONE}"
 }
 
