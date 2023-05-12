@@ -3,6 +3,5 @@ export GCS_BUCKET_NAME=
 export GCP_REGION=europe-west1
 export GCP_ZONE=europe-west1-b
 export GCR_URL=gcr.io
-export PVA_SERVICE_ACCOUNT_NAME=pva-service
 export FRONTEND_CLIENT_ID=
 export FRONTEND_API_KEY=

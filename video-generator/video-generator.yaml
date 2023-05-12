@@ -37,5 +37,3 @@ spec:
           value: $SPREADSHEET_ID
         - name: GCS_BUCKET_NAME
           value: $GCS_BUCKET_NAME
-        - name: PVA_SERVICE_ACCOUNT
-          value: $PVA_SERVICE_ACCOUNT
