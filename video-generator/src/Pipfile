@@ -15,6 +15,7 @@ pytest = "*"
 more_itertools = "*"
 pytest-mock = "*"
 requests = "*"
+google-cloud-secret-manager = "*"
 
 [requires]
 python_version = "3"

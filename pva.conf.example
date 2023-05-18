@@ -5,3 +5,5 @@ export GCP_ZONE=europe-west1-b
 export GCR_URL=gcr.io
 export FRONTEND_CLIENT_ID=
 export FRONTEND_API_KEY=
+export DESKTOP_CLIENT_ID=
+export DESKTOP_CLIENT_SECRET=

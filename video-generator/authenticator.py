@@ -23,6 +23,7 @@ import pickle
 from urllib import parse
 from google_auth_oauthlib.flow import InstalledAppFlow
 from oauthlib.oauth2.rfc6749.errors import InvalidGrantError
+from google.cloud import secretmanager
 
 SCOPES = ['https://www.googleapis.com/auth/content',
         'https://www.googleapis.com/auth/spreadsheets',
@@ -33,6 +34,8 @@ SCOPES = ['https://www.googleapis.com/auth/content',
 # The redirect URI set for the given Client ID. The redirect URI for Client ID
 # generated for an installed application will always have this value.
 _REDIRECT_URI = 'http://localhost:8080'
+
+SECRET_ID = "video_generator_auth_token"
 
 class ClientConfigBuilder(object):
     """Helper class used to build a client config dict used in the OAuth 2.0 flow.
@@ -68,7 +71,7 @@ class ClientConfigBuilder(object):
         return client_config
 
 
-def main(client_id, client_secret, scopes):
+def main(project_id, client_id, client_secret, scopes):
     """Retrieve and display the access and refresh token."""
     client_config = ClientConfigBuilder(
         client_type=ClientConfigBuilder.CLIENT_TYPE_WEB, client_id=client_id,
@@ -95,16 +98,40 @@ def main(client_id, client_secret, scopes):
         print('Authentication has failed: %s' % ex)
         sys.exit(1)
 
-    print('Access token: %s' % flow.credentials.token)
-    print('Refresh token: %s' % flow.credentials.refresh_token)
-    with open('token', 'wb') as token_file:
-        token_file.write(pickle.dumps(flow.credentials))
+    token = flow.credentials
+
+    client = secretmanager.SecretManagerServiceClient()
+
+    try:
+        secret_name = f"projects/{project_id}/secrets/{SECRET_ID}"
+        secret = client.get_secret(   
+            request={
+                "name": secret_name
+            }
+        )
+    except:
+        secret = client.create_secret(
+            request={
+                "parent": f"projects/{project_id}",
+                "secret_id": SECRET_ID,
+                "secret": {"replication": {"automatic": {}}},
+            }
+        )
+    secret_name = secret.name
+    
+    #Add the secret version.
+    secret_name = f"projects/{project_id}/secrets/{SECRET_ID}"
+    version = client.add_secret_version(
+        request={"parent": secret_name, "payload": {"data": pickle.dumps(token)}}
+    )
+    print(f'Created secret version {version.name}')
+
 
 if __name__ == '__main__':
-    #args = parser.parse_args()
     configured_scopes = SCOPES
-    client_id = input('Desktop Client ID: ')
-    client_secret = input('Desktop Client Secret: ')
+    project_id = sys.argv[1]
+    client_id = sys.argv[2]
+    client_secret = sys.argv[3]
     if not (client_id and client_secret):
         raise AttributeError('No client_id or client_secret specified.')
-    main(client_id, client_secret, configured_scopes)
+    main(project_id, client_id, client_secret, configured_scopes)

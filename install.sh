@@ -16,17 +16,16 @@
 
 # INSTRUCTIONS: This script should be run inside the Cloud Shell of your GCP.
 set -e
-RED='\033[1;91m'
-BLUE='\033[1;34m'
-NC='\033[0m' # No Color
-BOLD=$(tput bold)
-NORMAL=$(tput sgr0)
+export RED='\033[1;91m'
+export BLUE='\033[1;34m'
+export NC='\033[0m' # No Color
+export BOLD=$(tput bold)
+export NORMAL=$(tput sgr0)
 
 CONFIG_FILE=pva.conf
 
 printInitialPrompt(){
     echo -e "${BOLD}Welcome to the Product Video Ads Installer${NORMAL}"
-    echo -e "Keep your Web Client ID and API Key at hand."
     read -p "Press ENTER when ready"
 }
 
@@ -39,6 +38,8 @@ saveConfig(){
     echo "export GCR_URL=${GCR_URL}" >> $CONFIG_FILE
     echo "export FRONTEND_CLIENT_ID=${FRONTEND_CLIENT_ID}" >> $CONFIG_FILE
     echo "export FRONTEND_API_KEY=${FRONTEND_API_KEY}" >> $CONFIG_FILE
+    echo "export DESKTOP_CLIENT_ID=${DESKTOP_CLIENT_ID}" >> $CONFIG_FILE
+    echo "export DESKTOP_CLIENT_SECRET=${DESKTOP_CLIENT_SECRET}" >> $CONFIG_FILE
 }
 
 readConfig(){
@@ -120,7 +121,6 @@ selectWebClientId(){
     echo -n "Enter Web Client ID [${FRONTEND_CLIENT_ID:=${PREVIOUS_FRONTEND_CLIENT_ID}}] : "
     read -r FRONTEND_CLIENT_ID
     export FRONTEND_CLIENT_ID=${FRONTEND_CLIENT_ID:=${PREVIOUS_FRONTEND_CLIENT_ID}}
-    # echo "Frontend will use Web Client ID $FRONTEND_CLIENT_ID"
 }
 
 selectFrontendApiKey(){
@@ -128,7 +128,21 @@ selectFrontendApiKey(){
     echo -n "Enter Web API key [${FRONTEND_API_KEY:=${PREVIOUS_FRONTEND_API_KEY}}] : "
     read -r FRONTEND_API_KEY
     export FRONTEND_API_KEY=${FRONTEND_API_KEY:=${PREVIOUS_FRONTEND_API_KEY}}
-    # echo "Frontend will use Web API key $FRONTEND_API_KEY"
+}
+
+
+selectDesktopClientId(){
+    PREVIOUS_DESKTOP_CLIENT_ID=${DESKTOP_CLIENT_ID:=}
+    echo -n "Enter Desktop Client ID [${DESKTOP_CLIENT_ID:=${PREVIOUS_DESKTOP_CLIENT_ID}}] : "
+    read -r DESKTOP_CLIENT_ID
+    export DESKTOP_CLIENT_ID=${DESKTOP_CLIENT_ID:=${PREVIOUS_DESKTOP_CLIENT_ID}}
+}
+
+selectDesktopSecret(){
+    PREVIOUS_DESKTOP_CLIENT_SECRET=${DESKTOP_CLIENT_SECRET:=}
+    echo -n "Enter Desktop Client Secret [${DESKTOP_CLIENT_SECRET:=${PREVIOUS_DESKTOP_CLIENT_SECRET}}] : "
+    read -r DESKTOP_CLIENT_SECRET
+    export DESKTOP_CLIENT_SECRET=${DESKTOP_CLIENT_SECRET:=${PREVIOUS_DESKTOP_CLIENT_SECRET}}
 }
 
 printReminderAndConfig(){
@@ -165,6 +179,8 @@ printReminderAndConfig(){
     echo -e "GCR repository used: $GCR_URL"
     echo -e "Frontend will use Web Client ID $FRONTEND_CLIENT_ID"
     echo -e "Frontend will use Web API key $FRONTEND_API_KEY"
+    echo -e "Video Generator will use Desktop Client ID $DESKTOP_CLIENT_ID"
+    echo -e "Video Generator will use Desktop Client Secret $DESKTOP_CLIENT_SECRET"
 }
 
 installFrontend(){
@@ -189,6 +205,8 @@ main() {
     selectGcrRegistry
     selectWebClientId
     selectFrontendApiKey
+    selectDesktopClientId
+    selectDesktopSecret
     saveConfig
     installFrontend
     installBackend

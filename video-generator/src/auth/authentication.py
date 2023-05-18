@@ -15,12 +15,17 @@
 import log
 import os
 import pickle
+from google.cloud import secretmanager
+from google.auth.transport.requests import Request
+
+SECRET_ID = "video_generator_auth_token"
+
+def get_credentials_from_secret_manager(gcp_project_number):
+    client = secretmanager.SecretManagerServiceClient()
+    version_name = f"projects/{gcp_project_number}/secrets/{SECRET_ID}/versions/latest"
+    response = client.access_secret_version(request={"name": version_name})
+    credentials = pickle.loads(response.payload.data)
+    credentials.refresh(Request())
+    return credentials
 
 
-def get_credentials_from_local_file():
-    if not os.path.exists('token'):
-        log.getLogger().error('Token file not found')
-        return None
-
-    with open('token', 'rb') as token_file:
-        return pickle.loads(token_file.read())
