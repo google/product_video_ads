@@ -56,6 +56,7 @@ enableApis(){
         sheets.googleapis.com \
         youtube.googleapis.com \
         storagetransfer.googleapis.com \
+        secretmanager.googleapis.com \
         container.googleapis.com
 }
 
