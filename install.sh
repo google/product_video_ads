@@ -127,7 +127,7 @@ selectWebClientId(){
 
 selectFrontendApiKey(){
     PREVIOUS_FRONTEND_API_KEY=${FRONTEND_API_KEY:=}
-    echo -n "Enter Web API key [${FRONTEND_API_KEY:=${PREVIOUS_FRONTEND_API_KEY}}] : "
+    echo -n "Enter API key [${FRONTEND_API_KEY:=${PREVIOUS_FRONTEND_API_KEY}}] : "
     read -r FRONTEND_API_KEY
     export FRONTEND_API_KEY=${FRONTEND_API_KEY:=${PREVIOUS_FRONTEND_API_KEY}}
 }
@@ -201,14 +201,14 @@ main() {
     readConfig
     printInitialPrompt
     enableApis
+    selectDesktopClientId
+    selectDesktopSecret
     selectSpreadsheet
     selectStorage
     selectRegionAndZone
     selectGcrRegistry
     selectWebClientId
     selectFrontendApiKey
-    selectDesktopClientId
-    selectDesktopSecret
     saveConfig
     installFrontend
     installBackend
