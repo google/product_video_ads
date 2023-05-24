@@ -22,6 +22,7 @@ import pickle
 from pathlib import Path
 from urllib import parse
 import sys
+import os
 
 # @see https://developers.google.com/identity/protocols/oauth2/scopes
 SCOPES = [
@@ -106,8 +107,8 @@ def main(args):
             result = bucket.blob(splited_args[1]).download_as_string()
             credentials = pickle.loads(result)
         else:
-            client_id = input('Desktop Client ID: ')
-            client_secret = input('Client Secret: ')
+            client_id = os.environ['DESKTOP_CLIENT_ID']
+            client_secret = os.environ['DESKTOP_CLIENT_SECRET']
             client_config = ClientConfigBuilder(
             client_type=ClientConfigBuilder.CLIENT_TYPE_WEB, client_id=client_id,
             client_secret=client_secret)

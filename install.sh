@@ -16,17 +16,16 @@
 
 # INSTRUCTIONS: This script should be run inside the Cloud Shell of your GCP.
 set -e
-RED='\033[1;91m'
-BLUE='\033[1;34m'
-NC='\033[0m' # No Color
-BOLD=$(tput bold)
-NORMAL=$(tput sgr0)
+export RED='\033[1;91m'
+export BLUE='\033[1;34m'
+export NC='\033[0m' # No Color
+export BOLD=$(tput bold)
+export NORMAL=$(tput sgr0)
 
 CONFIG_FILE=pva.conf
 
 printInitialPrompt(){
     echo -e "${BOLD}Welcome to the Product Video Ads Installer${NORMAL}"
-    echo -e "Keep your Web Client ID and API Key at hand."
     read -p "Press ENTER when ready"
 }
 
@@ -37,9 +36,10 @@ saveConfig(){
     echo "export GCP_REGION=${GCP_REGION}" >> $CONFIG_FILE
     echo "export GCP_ZONE=${GCP_ZONE}" >> $CONFIG_FILE
     echo "export GCR_URL=${GCR_URL}" >> $CONFIG_FILE
-    echo "export PVA_SERVICE_ACCOUNT_NAME=${PVA_SERVICE_ACCOUNT_NAME}" >> $CONFIG_FILE
     echo "export FRONTEND_CLIENT_ID=${FRONTEND_CLIENT_ID}" >> $CONFIG_FILE
     echo "export FRONTEND_API_KEY=${FRONTEND_API_KEY}" >> $CONFIG_FILE
+    echo "export DESKTOP_CLIENT_ID=${DESKTOP_CLIENT_ID}" >> $CONFIG_FILE
+    echo "export DESKTOP_CLIENT_SECRET=${DESKTOP_CLIENT_SECRET}" >> $CONFIG_FILE
 }
 
 readConfig(){
@@ -50,15 +50,13 @@ readConfig(){
 
 enableApis(){
     echo "Enabling some needed APIs..."
-    gcloud services enable \
-        drive.googleapis.com \
-        script.googleapis.com \
-        sheets.googleapis.com \
-        youtube.googleapis.com \
-        storagetransfer.googleapis.com \
-        container.googleapis.com \
-        iamcredentials.googleapis.com \
-        cloudresourcemanager.googleapis.com
+    gcloud services enable drive.googleapis.com
+    gcloud services enable script.googleapis.com
+    gcloud services enable sheets.googleapis.com
+    gcloud services enable youtube.googleapis.com
+    gcloud services enable storagetransfer.googleapis.com
+    gcloud services enable container.googleapis.com
+    gcloud services enable secretmanager.googleapis.com
 }
 
 selectSpreadsheet(){
@@ -118,34 +116,38 @@ selectGcrRegistry(){
     # echo "Will use GCR registry under ${GCR_URL}"
 }
 
-selectServiceAccountName(){
-    PREVIOUS_SERVICE_ACCOUNT_NAME=${PVA_SERVICE_ACCOUNT_NAME:=}
-    echo -n "Select PVA service account name [${PVA_SERVICE_ACCOUNT_NAME:=${PREVIOUS_SERVICE_ACCOUNT_NAME}}] : "
-    read -r PVA_SERVICE_ACCOUNT_NAME
-    export PVA_SERVICE_ACCOUNT_NAME=${PVA_SERVICE_ACCOUNT_NAME:=${PREVIOUS_SERVICE_ACCOUNT_NAME}}
-    # echo "Video generator will use service account name $PVA_SERVICE_ACCOUNT_NAME"
-}
-
 selectWebClientId(){
     PREVIOUS_FRONTEND_CLIENT_ID=${FRONTEND_CLIENT_ID:=}
     echo -n "Enter Web Client ID [${FRONTEND_CLIENT_ID:=${PREVIOUS_FRONTEND_CLIENT_ID}}] : "
     read -r FRONTEND_CLIENT_ID
     export FRONTEND_CLIENT_ID=${FRONTEND_CLIENT_ID:=${PREVIOUS_FRONTEND_CLIENT_ID}}
-    # echo "Frontend will use Web Client ID $FRONTEND_CLIENT_ID"
 }
 
 selectFrontendApiKey(){
     PREVIOUS_FRONTEND_API_KEY=${FRONTEND_API_KEY:=}
-    echo -n "Enter Web API key [${FRONTEND_API_KEY:=${PREVIOUS_FRONTEND_API_KEY}}] : "
+    echo -n "Enter API key [${FRONTEND_API_KEY:=${PREVIOUS_FRONTEND_API_KEY}}] : "
     read -r FRONTEND_API_KEY
     export FRONTEND_API_KEY=${FRONTEND_API_KEY:=${PREVIOUS_FRONTEND_API_KEY}}
-    # echo "Frontend will use Web API key $FRONTEND_API_KEY"
+}
+
+
+selectDesktopClientId(){
+    PREVIOUS_DESKTOP_CLIENT_ID=${DESKTOP_CLIENT_ID:=}
+    echo -n "Enter Desktop Client ID [${DESKTOP_CLIENT_ID:=${PREVIOUS_DESKTOP_CLIENT_ID}}] : "
+    read -r DESKTOP_CLIENT_ID
+    export DESKTOP_CLIENT_ID=${DESKTOP_CLIENT_ID:=${PREVIOUS_DESKTOP_CLIENT_ID}}
+}
+
+selectDesktopSecret(){
+    PREVIOUS_DESKTOP_CLIENT_SECRET=${DESKTOP_CLIENT_SECRET:=}
+    echo -n "Enter Desktop Client Secret [${DESKTOP_CLIENT_SECRET:=${PREVIOUS_DESKTOP_CLIENT_SECRET}}] : "
+    read -r DESKTOP_CLIENT_SECRET
+    export DESKTOP_CLIENT_SECRET=${DESKTOP_CLIENT_SECRET:=${PREVIOUS_DESKTOP_CLIENT_SECRET}}
 }
 
 printReminderAndConfig(){
     # Important reminder
     APP_URL=$(gcloud app browse --no-launch-browser)
-    PVA_SERVICE_ACCOUNT=$(gcloud iam service-accounts list | grep -a1 $PVA_SERVICE_ACCOUNT_NAME  | grep EMAIL | sed 's/EMAIL: //')
     INSTRUCTIONS="
     ${RED}
     #############################################################################
@@ -175,10 +177,10 @@ printReminderAndConfig(){
     echo -e "Google Cloud Storage bucket name: $GCS_BUCKET_NAME"
     echo -e "GCP Region and Zone chosen: $GCP_REGION / $GCP_ZONE"
     echo -e "GCR repository used: $GCR_URL"
-    echo -e "GCP service account: $PVA_SERVICE_ACCOUNT"
     echo -e "Frontend will use Web Client ID $FRONTEND_CLIENT_ID"
     echo -e "Frontend will use Web API key $FRONTEND_API_KEY"
-    echo -e "Please ensure that ${BOLD}Drive${NORMAL} and ${BOLD}Sheet${NORMAL} are shared as ${BOLD}EDITOR${NORMAL} with ${BOLD}$PVA_SERVICE_ACCOUNT${NC}"
+    echo -e "Video Generator will use Desktop Client ID $DESKTOP_CLIENT_ID"
+    echo -e "Video Generator will use Desktop Client Secret $DESKTOP_CLIENT_SECRET"
 }
 
 installFrontend(){
@@ -197,10 +199,11 @@ main() {
     readConfig
     printInitialPrompt
     enableApis
+    selectDesktopClientId
+    selectDesktopSecret
     selectSpreadsheet
     selectStorage
     selectRegionAndZone
-    selectServiceAccountName
     selectGcrRegistry
     selectWebClientId
     selectFrontendApiKey

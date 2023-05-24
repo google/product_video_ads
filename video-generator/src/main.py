@@ -40,7 +40,7 @@ def main():
     # Read environment parameters
     spreadsheet_id = os.environ.get('SPREADSHEET_ID')
     gcs_bucket_name = os.environ.get('GCS_BUCKET_NAME')
-    service_account_name = os.environ.get('PVA_SERVICE_ACCOUNT')
+    gcp_project_number = os.environ.get('GCP_PROJECT_NUMBER')
     cloud_preview = False
 
     if spreadsheet_id is None:
@@ -50,9 +50,8 @@ def main():
         cloud_preview = True
         print(f"Saving image and video preview to Google Cloud Storage bucket named: {gcs_bucket_name}.")
 
-    #TODO get creadentials and re-set config in a try-catch loop ?
-    credentials = authentication.get_credentials_for_service_account(service_account_name);
-
+    credentials = authentication.get_credentials_from_secret_manager(gcp_project_number)
+        
     # Starts processing only after token authenticated!
     logger.info('[v2] Started processing...')
 
