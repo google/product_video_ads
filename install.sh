@@ -50,15 +50,13 @@ readConfig(){
 
 enableApis(){
     echo "Enabling some needed APIs..."
-    gcloud services enable \
-        drive.googleapis.com \
-        script.googleapis.com \
-        sheets.googleapis.com \
-        youtube.googleapis.com \
-        storagetransfer.googleapis.com \
-        container.googleapis.com \
-        secretmanager.googleapis.com
-        
+    gcloud services enable drive.googleapis.com
+    gcloud services enable script.googleapis.com
+    gcloud services enable sheets.googleapis.com
+    gcloud services enable youtube.googleapis.com
+    gcloud services enable storagetransfer.googleapis.com
+    gcloud services enable container.googleapis.com
+    gcloud services enable secretmanager.googleapis.com
 }
 
 selectSpreadsheet(){
