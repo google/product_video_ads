@@ -64,22 +64,22 @@ Just for example, lets suppose that we have: manager@gmail.com and brand_account
 	./install.sh
 	```
 3. The first execution, it will enable the required API's for your GCP Project: Drive, Sheets, Youtube and more. So, click Authorize.
-3. Your configuration choices made during the installation process are saved in file __pva.conf__ in case you need to re-run the installation. If you run into any problems, you can edit or delete this file with values of your choice. Example file is provided for reference or as a starting point (if you deploy to EU).
-4. It will ask you for your Spreadsheet Id. If you don't have one, just leave it blank (it will be created).
-5. Ensure that Google Apps Script API is ENABLED for the deployment user in https://script.google.com/corp/home/usersettings, then press enter.
-6. [Desktop Credentials] Enter your Desktop Client Id and Client Secret, configured on Step 2 which we called "pva-desktop"
-7. Click on the URL, when selecting your account, remeber that you **CAN'T use your brand account on this step**, because it will create your Drive and Sheets and it must be attached which a account that you can access, so we are going to use as example: manager@gmail.com, then, allow everything that is prompted
+4. Your configuration choices made during the installation process are saved in file __pva.conf__ in case you need to re-run the installation. If you run into any problems, you can edit or delete this file with values of your choice. Example file is provided for reference or as a starting point (if you deploy to EU).
+5. [Desktop Credentials] Enter your Desktop Client Id and Client Secret, configured on Step 2 which we called "pva-desktop"
+6. It will ask you for your Spreadsheet Id. If you don't have one, just leave it blank (it will be created).
+7. Ensure that Google Apps Script API is ENABLED for the deployment user in https://script.google.com/corp/home/usersettings, then press enter.
+8. Click on the URL, when selecting your account, remeber that you **CAN'T use your brand account on this step**, because it will create your Drive and Sheets and it must be attached which a account that you can access, so we are going to use as example: manager@gmail.com, then, allow everything that is prompted
 	- After selecting your account, you will see a ERR_CONNECTION_REFUSED, but this is correct, copy the full localhost url (it will look like: "http://localhost:8080/?state=...") and paste it on the terminal.
-8. If everything is configured correctly, you will see your Drive and Sheets being created.
-9. You will be prompted to use GCS if you want. If not, just leave it blank - PVA will use Google Drive as storage.
-9. Now, you need to choose GCP Region and Zone you want to use. You can use the default __us-central1-a__, or enter full Zone name (Region will be inferred from that).
-9. Next, in case you want to use Google Container Registry different that the default one (__gcr.io__ which sits in US), enter it to the prompt. Europe uses __eu.gcr.io__ but the default should work for most installations. Leave blank for default.
-10. [Web Credentials] Now, enter your web client id, in this example we have create with the name "pva-web", if you are using a brand account give access to drive and sheets on this account, like brand_account@gmail.com.
-11. Enter your API Key (it's not the web client id secret)
-10. Now the frontend will be deployed on app engine and GKE will be created (this will take some time)
-11. [Desktop Credentials] Use your Desktop Client ID and Secret (the same used on step 6) as it is prompted, on the OAuth screen, choose the account that you want to do the upload (remeber that it must have access to Sheets and Drive), in the example case, we are using the brand account
+9. If everything is configured correctly, you will see your Drive and Sheets being created.
+10. You will be prompted to use GCS if you want. If not, just leave it blank - PVA will use Google Drive as storage.
+11. Now, you need to choose GCP Region and Zone you want to use. You can use the default __us-central1-a__, or enter full Zone name (Region will be inferred from that).
+12. Next, in case you want to use Google Container Registry different that the default one (__gcr.io__ which sits in US), enter it to the prompt. Europe uses __eu.gcr.io__ but the default should work for most installations. Leave blank for default.
+13. [Web Credentials] Now, enter your web client id, in this example we have create with the name "pva-web", if you are using a brand account give access to drive and sheets on this account, like brand_account@gmail.com.
+14. Enter your API Key (it's not the web client id secret)
+15. Now the frontend will be deployed on app engine and GKE will be created (this will take some time)
+16. For the backend part (GKE), if it's the first time, PVA might throw a error for Secret Not Found, but this is correct. PVA requires another authentication to upload to youtube (if necessary), follow the same steps when prompted with a URL:
 	- After selecting your account, you will see a ERR_CONNECTION_REFUSED, but this is correct, copy the full localhost url (it will look like: "http://localhost:8080/?state=...") and paste it on the terminal.
-12. If everything pass withou errors, **Congratulations the installation is complete!** 
+17. If everything pass withou errors, **Congratulations the installation is complete!** 
 	- Click on the AppEngine URL to run your app. And use the Sheet's Id prompted to Log-in
 	- **IMP**: Ensure cookies and pop-ups are allowed. Ref: [Allow pop-ups in Chrome](https://support.google.com/chrome/answer/95472?co=GENIE.Platform%3DDesktop&hl=en)
 	- You should see this screen: ![PVA Frontend](images/pva_frontend.png?raw=true "PVA Frontend")
