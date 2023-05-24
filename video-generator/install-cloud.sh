@@ -83,6 +83,11 @@ gsutil iam ch serviceAccount:$COMPUTE_ENGINE_SERVICE_ACCOUNT_EMAIL:roles/storage
 export GCR_GCS_BUCKET=$(gsutil ls | grep /us.artifacts.)
 gsutil iam ch serviceAccount:$COMPUTE_ENGINE_SERVICE_ACCOUNT_EMAIL:roles/storage.objectViewer $GCR_GCS_BUCKET
 
+#TODO - Change editor role for service account and specify a better role for security reasons
+gcloud projects add-iam-policy-binding $GOOGLE_CLOUD_PROJECT \
+    --member=serviceAccount:$COMPUTE_ENGINE_SERVICE_ACCOUNT_EMAIL \
+    --role=roles/editor
+
 echo 'Building Docker image for video-generator'
 IMAGE_NAME=${GCR_URL}/${GOOGLE_CLOUD_PROJECT}/${PROJECT_NAME}
 export IMAGE_NAME
