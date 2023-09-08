@@ -43,6 +43,7 @@ def main():
     spreadsheet_id = os.environ.get('SPREADSHEET_ID')
     gcs_bucket_name = os.environ.get('GCS_BUCKET_NAME')
     gcp_project_number = os.environ.get('GCP_PROJECT_NUMBER')
+    disable_sheet_logging = os.getenv("DISABLE_SHEET_LOGGING", 'False').lower() in ('true', '1', 't')
     lock_path = os.environ.get('SHEET_LOCK_FILE')
     lock = filelock.FileLock(lock_path)
     cloud_preview = False
@@ -62,7 +63,7 @@ def main():
     logger.info('[v2] Started processing...')
 
     # Dependencies
-    configuration = Configuration(spreadsheet_id, credentials)
+    configuration = Configuration(spreadsheet_id, credentials, not disable_sheet_logging)
     storage = StorageHandler(configuration.get_drive_folder(), credentials)
     cloud_storage = CloudStorageHandler(gcs_bucket_name=gcs_bucket_name)
     video_processor = VideoProcessor(
