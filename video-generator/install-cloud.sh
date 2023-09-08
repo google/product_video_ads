@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+source ../pva.conf
+
 #Service accounts are described by several lines, hence the grep/grep/sed combo
 export COMPUTE_ENGINE_SERVICE_ACCOUNT_EMAIL=$(gcloud iam service-accounts list | grep -a1 Compute | grep EMAIL | sed 's/EMAIL: //')
 PROJECT_NAME=video-generator:latest
@@ -29,11 +31,14 @@ store_token_in_secret_manager(){
 
 create_cluster(){
     gcloud container clusters create video-generator-cluster \
-    --num-nodes=1 \
+    --num-nodes=${VIDEO_GENERATOR_NODES} \
     --zone ${GCP_ZONE} \
     --machine-type=e2-standard-2 \
+    --addons=GcpFilestoreCsiDriver \
     --no-enable-autoupgrade \
     --scopes=https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/youtube,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/devstorage.read_write,https://www.googleapis.com/auth/cloud-platform
+
+    # gcloud container clusters update video-generator-cluster --update-addons=GcpFilestoreCsiDriver=ENABLED --zone ${GCP_ZONE}
 }
 
 echo 'Installing Video Generator on Kubernetes Engine...'
@@ -100,8 +105,9 @@ echo -e "Applying application to cluster..."
 echo -e "Sheet Id inside container shoud be: $SPREADSHEET_ID"
 echo -e "Google Cloud Storage bucket Name inside container shoud be: $GCS_BUCKET_NAME"
 echo -e "GCP Project Number inside container shoud be: $GCP_PROJECT_NUMBER"
+echo -e "Replicas count should be ${VIDEO_GENERATOR_REPLICAS}"
 
-# ENV vars needed: IMAGE_NAME, SPREADSHEET_ID, GCS_BUCKET_NAME, GOOGLE_CLOUD_PROJECT
+# ENV vars needed: IMAGE_NAME, SPREADSHEET_ID, GCS_BUCKET_NAME, GOOGLE_CLOUD_PROJECT, VIDEO_GENERATOR_REPLICAS
 envsubst < video-generator.yaml | kubectl apply -f -
 
 echo 'Done'

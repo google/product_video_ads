@@ -21,7 +21,7 @@ import log
 from auth import authentication
 from google.auth.transport.requests import Request
 # Handle "events" from configuration
-from configuration.event_handler import EventHandler as EventHandler
+from configuration.config_handler import ConfigHandler as ConfigHandler
 from configuration.spreadsheet_configuration import SpreadsheetConfiguration as Configuration
 from image.image_generator import ImageGenerator as ImageGenerator
 # Handles image processing
@@ -32,6 +32,8 @@ from uploader.youtube_upload import YoutubeUploader as Uploader
 from video.video_generator import VideoGenerator as VideoGenerator
 # Handles video processing
 from video.video_processor import VideoProcessor as VideoProcessor
+import random
+import filelock
 
 logger = log.getLogger()
 
@@ -41,6 +43,8 @@ def main():
     spreadsheet_id = os.environ.get('SPREADSHEET_ID')
     gcs_bucket_name = os.environ.get('GCS_BUCKET_NAME')
     gcp_project_number = os.environ.get('GCP_PROJECT_NUMBER')
+    lock_path = os.environ.get('SHEET_LOCK_FILE')
+    lock = filelock.FileLock(lock_path)
     cloud_preview = False
 
     if spreadsheet_id is None:
@@ -48,10 +52,12 @@ def main():
         exit(1)
     if gcs_bucket_name:
         cloud_preview = True
-        print(f"Saving image and video preview to Google Cloud Storage bucket named: {gcs_bucket_name}.")
+        print(
+            f"Saving image and video preview to Google Cloud Storage bucket named: {gcs_bucket_name}.")
 
-    credentials = authentication.get_credentials_from_secret_manager(gcp_project_number)
-        
+    credentials = authentication.get_credentials_from_secret_manager(
+        gcp_project_number)
+
     # Starts processing only after token authenticated!
     logger.info('[v2] Started processing...')
 
@@ -61,26 +67,43 @@ def main():
     cloud_storage = CloudStorageHandler(gcs_bucket_name=gcs_bucket_name)
     video_processor = VideoProcessor(
         storage, VideoGenerator(), Uploader(credentials), cloud_storage, cloud_preview)
-    image_processor = ImageProcessor(storage, ImageGenerator(), cloud_storage, cloud_preview)
-
+    image_processor = ImageProcessor(
+        storage, ImageGenerator(), cloud_storage, cloud_preview)
+    interval = configuration.get_interval_in_minutes()
     # Handler acts as facade
-    handler = EventHandler(configuration, video_processor, image_processor)
+    handler = ConfigHandler(
+        configuration, video_processor, image_processor, lock)
 
     while True:
         try:
             # Sync drive files to local tmp
             storage.update_local_files()
-
-            # Process configuration joining threads
-            handler.handle_configuration()
+            logger.info('Acquiring lock...')
+            lock.acquire()
+            logger.info('Lock Acquired, checking queue')
+            rows_todo = handler.rows_to_be_processed()
+            if(len(rows_todo) > 0):
+                row_to_process = rows_todo[0]
+                (metadata, original_status) = handler.mark_row_in_progress(
+                    row_to_process)
+                lock.release()
+                logger.info(f'Processing row {row_to_process}')
+                # critical section protects config sheet only, generation is long
+                (new_status, result_id) = handler.process_row(
+                    row_to_process, metadata, original_status)
+                logger.info('Re-Acquiring lock to mark processing done')
+                lock.acquire()
+                handler.update_status(row_to_process, new_status, result_id)
+                logger.info(f'Marking row {row_to_process} as {new_status}')
+            else:
+                logger.info(f'Sleeping for {interval} seconds')
+                time.sleep(int(interval))
 
         except Exception as e:
             logger.error(e)
-
-        # Sleep!
-        interval = configuration.get_interval_in_minutes()
-        logger.info('Sleeping for %s minutes', interval)
-        time.sleep(int(interval) * 60)
+        finally:
+            logger.info('Releasing lock')
+            lock.release()
 
 
 if __name__ == '__main__':

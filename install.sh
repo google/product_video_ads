@@ -36,6 +36,8 @@ saveConfig(){
     echo "export GCP_REGION=${GCP_REGION}" >> $CONFIG_FILE
     echo "export GCP_ZONE=${GCP_ZONE}" >> $CONFIG_FILE
     echo "export GCR_URL=${GCR_URL}" >> $CONFIG_FILE
+    echo "export VIDEO_GENERATOR_REPLICAS=${VIDEO_GENERATOR_REPLICAS}" >> $CONFIG_FILE
+    echo "export VIDEO_GENERATOR_NODES=${VIDEO_GENERATOR_NODES}" >> $CONFIG_FILE
     echo "export FRONTEND_CLIENT_ID=${FRONTEND_CLIENT_ID}" >> $CONFIG_FILE
     echo "export FRONTEND_API_KEY=${FRONTEND_API_KEY}" >> $CONFIG_FILE
     echo "export DESKTOP_CLIENT_ID=${DESKTOP_CLIENT_ID}" >> $CONFIG_FILE
@@ -57,6 +59,7 @@ enableApis(){
     gcloud services enable storagetransfer.googleapis.com
     gcloud services enable container.googleapis.com
     gcloud services enable secretmanager.googleapis.com
+    gcloud services enable file.googleapis.com
 }
 
 selectSpreadsheet(){
@@ -93,7 +96,6 @@ selectStorage(){
 }
 
 selectRegionAndZone() {
-    
     PREVIOUS_REGION=${GCP_REGION:=us-central}
     PREVIOUS_ZONE=${GCP_ZONE:=us-central1-a}
     gcloud app regions list | grep REGION:
@@ -114,6 +116,20 @@ selectGcrRegistry(){
     read -r GCR_URL
     export GCR_URL=${GCR_URL:=${PREVIOUS_GCR}}
     # echo "Will use GCR registry under ${GCR_URL}"
+}
+
+selectVideoGeneratorReplicasCount(){
+    PREVIOUS_VIDEO_GENERATOR_REPLICAS=${VIDEO_GENERATOR_REPLICAS:=1}
+    echo -n "How many parallel video generator processes to set up?[${VIDEO_GENERATOR_REPLICAS:=${PREVIOUS_VIDEO_GENERATOR_REPLICAS}}] : "
+    read -r VIDEO_GENERATOR_REPLICAS
+    export VIDEO_GENERATOR_REPLICAS=${VIDEO_GENERATOR_REPLICAS:=${PREVIOUS_VIDEO_GENERATOR_REPLICAS}}
+}
+
+selectVideoGeneratorNodesCount(){
+    PREVIOUS_VIDEO_GENERATOR_NODES=${VIDEO_GENERATOR_NODES:=1}
+    echo -n "How many cluster nodes should video generator use?[${VIDEO_GENERATOR_NODES:=${PREVIOUS_VIDEO_GENERATOR_NODES}}] : "
+    read -r VIDEO_GENERATOR_NODES
+    export VIDEO_GENERATOR_NODES=${VIDEO_GENERATOR_NODES:=${PREVIOUS_VIDEO_GENERATOR_NODES}}
 }
 
 selectWebClientId(){
@@ -181,6 +197,9 @@ printReminderAndConfig(){
     echo -e "Frontend will use Web API key $FRONTEND_API_KEY"
     echo -e "Video Generator will use Desktop Client ID $DESKTOP_CLIENT_ID"
     echo -e "Video Generator will use Desktop Client Secret $DESKTOP_CLIENT_SECRET"
+    echo -e "Video Generator will run ${VIDEO_GENERATOR_REPLICAS} replicas"
+    echo -e "Video Generator will run ${VIDEO_GENERATOR_NODES} cluster nodes"
+    echo -e "Video Generator operation might require increasing quota read & write requests per minute per user!"
 }
 
 installFrontend(){
@@ -198,17 +217,19 @@ installBackend(){
 main() {
     readConfig
     printInitialPrompt
-    enableApis
-    selectDesktopClientId
-    selectDesktopSecret
-    selectSpreadsheet
-    selectStorage
-    selectRegionAndZone
-    selectGcrRegistry
-    selectWebClientId
-    selectFrontendApiKey
-    saveConfig
-    installFrontend
+    # enableApis
+    # selectDesktopClientId
+    # selectDesktopSecret
+    # selectSpreadsheet
+    # selectStorage
+    # selectRegionAndZone
+    # selectGcrRegistry
+    # selectVideoGeneratorNodesCount
+    # selectVideoGeneratorReplicasCount
+    # selectWebClientId
+    # selectFrontendApiKey
+    # saveConfig
+    # installFrontend
     installBackend
     printReminderAndConfig
 }
