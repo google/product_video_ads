@@ -21,8 +21,29 @@ export BLUE='\033[1;34m'
 export NC='\033[0m' # No Color
 export BOLD=$(tput bold)
 export NORMAL=$(tput sgr0)
+export UNSUPERVISED=false
+export SKIP_FRONTEND=false
+export SKIP_BACKEND=false
+while [ $# -gt 0 ]; do
+  case $1 in
+    -u | --unsupervised)
+        echo "Running in UNSUPERVISED mode - using only pva.conf variables"
+        export UNSUPERVISED=true
+    ;;
+    -sf | --skip-frontend)
+        echo "Will NOT run frontend installation"
+        export SKIP_FRONTEND=true
+    ;;
+    -sb | --skip-backend)
+        echo "Will NOT run backend installation"
+        export SKIP_BACKEND=true
+    ;;
+  esac
+  shift
+done
 
 CONFIG_FILE=pva.conf
+
 
 printInitialPrompt(){
     echo -e "${BOLD}Welcome to the Product Video Ads Installer${NORMAL}"
@@ -224,20 +245,26 @@ installBackend(){
 main() {
     readConfig
     printInitialPrompt
-    enableApis
-    selectDesktopClientId
-    selectDesktopSecret
-    selectSpreadsheet
-    selectStorage
-    selectRegionAndZone
-    selectGcrRegistry
-    selectVideoGeneratorNodesCount
-    selectVideoGeneratorReplicasCount
-    selectWebClientId
-    selectFrontendApiKey
-    saveConfig
-    installFrontend
-    installBackend
+    if [ "$UNSUPERVISED" = false ]; then
+        enableApis
+        selectDesktopClientId
+        selectDesktopSecret
+        selectSpreadsheet
+        selectStorage
+        selectRegionAndZone
+        selectGcrRegistry
+        selectVideoGeneratorNodesCount
+        selectVideoGeneratorReplicasCount
+        selectWebClientId
+        selectFrontendApiKey
+        saveConfig
+    fi
+    if [ "$SKIP_FRONTEND" = false ]; then
+        installFrontend
+    fi
+    if [ "$SKIP_BACKEND" = false ]; then
+        installBackend
+    fi
     printReminderAndConfig
 }
 
