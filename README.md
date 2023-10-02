@@ -54,7 +54,7 @@ you are up and running right away.
 
 #### 2. Run the Installation Script
 
-Just for example, lets suppose that we have: manager@gmail.com and brand_account@gmail.com
+Just for example, let's suppose that we have: manager@gmail.com and brand_account@gmail.com
 
 1. Open your project's [Cloud shell](https://console.cloud.google.com/?cloudshell=true).
 2. Run the following:
@@ -68,7 +68,7 @@ Just for example, lets suppose that we have: manager@gmail.com and brand_account
 5. [Desktop Credentials] Enter your Desktop Client Id and Client Secret, configured on Step 2 which we called "pva-desktop"
 6. It will ask you for your Spreadsheet Id. If you don't have one, just leave it blank (it will be created).
 7. Ensure that Google Apps Script API is ENABLED for the deployment user in https://script.google.com/corp/home/usersettings, then press enter.
-8. Click on the URL, when selecting your account, remeber that you **CAN'T use your brand account on this step**, because it will create your Drive and Sheets and it must be attached which a account that you can access, so we are going to use as example: manager@gmail.com, then, allow everything that is prompted
+8. Click on the URL, when selecting your account, remember that you **CAN'T use your brand account on this step**, because it will create your Drive and Sheets and it must be attached which a account that you can access, so we are going to use as example: manager@gmail.com, then, allow everything that is prompted
 	- After selecting your account, you will see a ERR_CONNECTION_REFUSED, but this is correct, copy the full localhost url (it will look like: "http://localhost:8080/?state=...") and paste it on the terminal.
 9. If everything is configured correctly, you will see your Drive and Sheets being created.
 10. You will be prompted to use GCS if you want. If not, just leave it blank - PVA will use Google Drive as storage.
