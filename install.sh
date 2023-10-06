@@ -59,7 +59,7 @@ saveConfig(){
     echo "export GCR_URL=${GCR_URL}" >> $CONFIG_FILE
     echo "export VIDEO_GENERATOR_REPLICAS=${VIDEO_GENERATOR_REPLICAS}" >> $CONFIG_FILE
     echo "export VIDEO_GENERATOR_NODES=${VIDEO_GENERATOR_NODES}" >> $CONFIG_FILE
-    echo "export DISABLE_SHEET_LOGGING=${export DISABLE_SHEET_LOGGING}" >> $CONFIG_FILE
+    echo "export DISABLE_SHEET_LOGGING=${DISABLE_SHEET_LOGGING}" >> $CONFIG_FILE
     echo "export FRONTEND_CLIENT_ID=${FRONTEND_CLIENT_ID}" >> $CONFIG_FILE
     echo "export FRONTEND_API_KEY=${FRONTEND_API_KEY}" >> $CONFIG_FILE
     echo "export DESKTOP_CLIENT_ID=${DESKTOP_CLIENT_ID}" >> $CONFIG_FILE
@@ -143,7 +143,7 @@ selectVideoGeneratorReplicasCount(){
     PREVIOUS_VIDEO_GENERATOR_REPLICAS=${VIDEO_GENERATOR_REPLICAS:=1}
     echo -n "How many parallel video generator processes to set up?[${VIDEO_GENERATOR_REPLICAS:=${PREVIOUS_VIDEO_GENERATOR_REPLICAS}}] : "
     read -r VIDEO_GENERATOR_REPLICAS
-    if [ "VIDEO_GENERATOR_REPLICAS" -gt "1" ]; then
+-   if [[ $VIDEO_GENERATOR_REPLICAS  > 1 ]]; then
         echo "More than one replica selected - Disabling Spreadsheet Logging.."
         export DISABLE_SHEET_LOGGING=TRUE
     else
