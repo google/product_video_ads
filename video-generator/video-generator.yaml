@@ -60,4 +60,4 @@ spec:
         - name: SHEET_LOCK_FILE
           value: "/sheet_lock/lock_file"
         - name: DISABLE_SHEET_LOGGING
-          value: $DISABLE_SHEET_LOGGING
+          value: "$DISABLE_SHEET_LOGGING"
