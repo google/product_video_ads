@@ -33,7 +33,7 @@ create_cluster(){
     gcloud container clusters create video-generator-cluster \
     --num-nodes=${VIDEO_GENERATOR_NODES} \
     --zone ${GCP_ZONE} \
-    --machine-type=e2-standard-2 \
+    --machine-type=${VIDEO_GENERATOR_MACHINE_TYPE} \
     --addons=GcpFilestoreCsiDriver \
     --no-enable-autoupgrade \
     --scopes=https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/youtube,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/devstorage.read_write,https://www.googleapis.com/auth/cloud-platform

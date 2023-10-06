@@ -59,6 +59,7 @@ saveConfig(){
     echo "export GCR_URL=${GCR_URL}" >> $CONFIG_FILE
     echo "export VIDEO_GENERATOR_REPLICAS=${VIDEO_GENERATOR_REPLICAS}" >> $CONFIG_FILE
     echo "export VIDEO_GENERATOR_NODES=${VIDEO_GENERATOR_NODES}" >> $CONFIG_FILE
+    echo "export VIDEO_GENERATOR_MACHINE_TYPE=${VIDEO_GENERATOR_MACHINE_TYPE}" >> $CONFIG_FILE
     echo "export DISABLE_SHEET_LOGGING=${DISABLE_SHEET_LOGGING}" >> $CONFIG_FILE
     echo "export FRONTEND_CLIENT_ID=${FRONTEND_CLIENT_ID}" >> $CONFIG_FILE
     echo "export FRONTEND_API_KEY=${FRONTEND_API_KEY}" >> $CONFIG_FILE
@@ -150,6 +151,13 @@ selectVideoGeneratorReplicasCount(){
         export DISABLE_SHEET_LOGGING=FALSE
     fi
     export VIDEO_GENERATOR_REPLICAS=${VIDEO_GENERATOR_REPLICAS:=${PREVIOUS_VIDEO_GENERATOR_REPLICAS}}
+}
+
+selectVideoGeneratorMachineType(){
+    PREVIOUS_VIDEO_GENERATOR_MACHINE_TYPE=${VIDEO_GENERATOR_MACHINE_TYPE:=e2-standard-2}
+    echo -n "What machine type should video generator use?[${VIDEO_GENERATOR_MACHINE_TYPE:=${PREVIOUS_VIDEO_GENERATOR_MACHINE_TYPE}}] : "
+    read -r VIDEO_GENERATOR_MACHINE_TYPE
+    export VIDEO_GENERATOR_MACHINE_TYPE=${VIDEO_GENERATOR_MACHINE_TYPE:=${PREVIOUS_VIDEO_GENERATOR_MACHINE_TYPE}}
 }
 
 selectVideoGeneratorNodesCount(){
@@ -253,6 +261,7 @@ main() {
         selectStorage
         selectRegionAndZone
         selectGcrRegistry
+        selectVideoGeneratorMachineType
         selectVideoGeneratorNodesCount
         selectVideoGeneratorReplicasCount
         selectWebClientId
