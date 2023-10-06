@@ -143,7 +143,7 @@ selectVideoGeneratorReplicasCount(){
     PREVIOUS_VIDEO_GENERATOR_REPLICAS=${VIDEO_GENERATOR_REPLICAS:=1}
     echo -n "How many parallel video generator processes to set up?[${VIDEO_GENERATOR_REPLICAS:=${PREVIOUS_VIDEO_GENERATOR_REPLICAS}}] : "
     read -r VIDEO_GENERATOR_REPLICAS
--   if [[ $VIDEO_GENERATOR_REPLICAS  > 1 ]]; then
+    if [[ $VIDEO_GENERATOR_REPLICAS  > 1 ]]; then
         echo "More than one replica selected - Disabling Spreadsheet Logging.."
         export DISABLE_SHEET_LOGGING=TRUE
     else
