@@ -1,3 +1,4 @@
+functions-framework==3.2.1
 pandas
 google-api-python-client
 google-auth
@@ -5,3 +6,7 @@ google-auth-oauthlib
 google-cloud-storage
 requests
 google-cloud-secret-manager
+flask
+fsspec
+gcsfs
+pyyaml

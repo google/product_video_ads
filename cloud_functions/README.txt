@@ -1,2 +1,0 @@
-This cloud function can be deployed to read CSV from a GCS bucket and put it right into a selected sheet.
-This is intended to facilitate mass-scale transformation from any input CSV (JSON?) to video configuration

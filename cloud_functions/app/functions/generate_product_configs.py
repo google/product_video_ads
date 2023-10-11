@@ -1,26 +1,41 @@
+import functions_framework
 import pandas as pd
-import pva_util as pva_util
+import app
 import os
 #env
-VIDEO_NAME_SUFFIX = '_test'
-PRODUCT_SHEET = 'Prices'
-OFFER_TYPE = 'Sparkle'
+DEFAULT_VIDEO_NAME_SUFFIX = '_test'
+
+PRODUCT_SHEET = os.environ.get('PRODUCT_SHEET')
+VIDEO_NAME_SUFFIX = os.environ.get('VIDEO_NAME_SUFFIX')
+OFFER_TYPE = os.environ.get('OFFER_TYPE')
 PRODUCTS_PER_VIDEO = 2
-OFFERS_JSON_FILE_PATH = '2023_32_offers.json'
-MARKETS_JSON_FILE_PATH = 'Marktliste.csv'
-RANKING_JSON_FILE_PATH = '2023_32_ranking.json'
 
 #global
 PRODUCT_CONFIGS_RANGE = f'{PRODUCT_SHEET}!A1:ZZ'
 
-def main():
-    generate_product_configs()
+@functions_framework.http
+def generate_product_configs(request):
+    global OFFER_TYPE
+    OFFER_TYPE = request.args.get('offer_type')
+    if OFFER_TYPE is None:
+        OFFER_TYPE = os.environ.get('OFFER_TYPE')
+    global PRODUCTS_PER_VIDEO
+    PRODUCTS_PER_VIDEO = int(request.args.get('products_per_video'))
+    if PRODUCTS_PER_VIDEO is None:
+        PRODUCTS_PER_VIDEO = int(os.environ.get('PRODUCTS_PER_VIDEO'))
+        
+    global OFFERS_JSON_FILE_PATH
+    OFFERS_JSON_FILE_PATH = os.environ.get('OFFERS_JSON_FILE_PATH')
+    global MARKETS_CSV_FILE_PATH
+    MARKETS_CSV_FILE_PATH = os.environ.get('MARKETS_CSV_FILE_PATH')
+    global RANKING_JSON_FILE_PATH
+    RANKING_JSON_FILE_PATH = os.environ.get('RANKING_JSON_FILE_PATH')
 
-def generate_product_configs():
     ranking = get_product_ranking()
     video_configs = convert_ranking_to_video_configs(ranking)
-    pva_util.clean_range(PRODUCT_CONFIGS_RANGE)
-    pva_util.write_df_to_sheet(video_configs,PRODUCT_CONFIGS_RANGE)
+    app.clean_range(PRODUCT_CONFIGS_RANGE)
+    app.write_df_to_sheet(video_configs,PRODUCT_CONFIGS_RANGE)
+    return "OK"
 
 def convert_ranking_to_video_configs(ranking: pd.DataFrame):
     # column labels:    Id  OfferGroup  OfferType   Position        Title   Image   Price   ...
@@ -38,7 +53,7 @@ def convert_ranking_to_video_configs(ranking: pd.DataFrame):
 def get_product_ranking():
     df_offers = read_offers()
     df_ranking = read_ranking()
-
+    
     offers = df_offers.apply(transform_offer, axis=1, result_type="expand")
     # price, kg/liter price, crossoutprice
     ranking = pd.DataFrame(df_ranking['mediaCellList'].to_list())
@@ -48,7 +63,6 @@ def get_product_ranking():
     ranking = ranking.sort_values(['postcode', 'rankingorder']).groupby(
         ['postcode', 'rankingorder']).agg('first').groupby('postcode').head(PRODUCTS_PER_VIDEO).reset_index()
     ranking = ranking.merge(offers, how='left', on='nan')
-
     ranking = ranking.dropna()
     ranking = ranking.filter(
         ['nan', 'postcode', 'rankingorder', 'title', 'picture', 'price'])
@@ -78,17 +92,12 @@ def get_targeting():
     markets['postcode'] = markets['postcode'].astype("string")
     markets = markets.sort_values(['postcode', 'radius'])
 
-
 def read_offers():
     return pd.read_json(OFFERS_JSON_FILE_PATH)
 
-
 def read_markets():
-    return pd.read_csv(MARKETS_JSON_FILE_PATH)
-
+    return pd.read_csv(MARKETS_CSV_FILE_PATH)
 
 def read_ranking():
     return pd.read_json(RANKING_JSON_FILE_PATH)
 
-if __name__ == '__main__':
-    main()

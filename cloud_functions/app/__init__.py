@@ -3,14 +3,30 @@ from google.auth.transport.requests import Request
 import pickle
 import pandas as pd
 from googleapiclient.discovery import build
+import logging
+import sys
+import os
+
+log = logging.getLogger(__name__)
 
 # global var
 _sheet = None
 
-# env
-GCP_PROJECT_NUMBER = 53117150873
-SECRET_ID = "video_generator_auth_token"
-SPREADSHEET_ID = "1xLdnZSc_qI9lyREuJrUf0uE1VF6OxZ0djdxXwoP-Pmk"
+SPREADSHEET_ID = os.environ.get('SPREADSHEET_ID')
+GCP_PROJECT_ID = os.environ.get('GCP_PROJECT_ID')
+SECRET_ID = os.environ.get('SECRET_ID')
+
+IS_DEV = False
+def init(debug):
+    global IS_DEV
+    if debug:
+        if not log.handlers:
+            log.setLevel(logging.DEBUG)
+            formatter = logging.Formatter(fmt="%(asctime)s %(levelname)s %(module)s: %(message)s", datefmt="%H:%M:%S")
+            handler = logging.StreamHandler(sys.stdout)
+            handler.setLevel(logging.DEBUG)
+            handler.setFormatter(formatter)
+            log.addHandler(handler)
 
 def sheet():
     global _sheet
@@ -21,7 +37,7 @@ def sheet():
 
 def get_credentials_from_secret_manager():
     client = secretmanager.SecretManagerServiceClient()
-    version_name = f"projects/{GCP_PROJECT_NUMBER}/secrets/{SECRET_ID}/versions/latest"
+    version_name = f"projects/{GCP_PROJECT_ID}/secrets/{SECRET_ID}/versions/latest"
     response = client.access_secret_version(request={"name": version_name})
     credentials = pickle.loads(response.payload.data)
     credentials.refresh(Request())
