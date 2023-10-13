@@ -83,6 +83,7 @@ enableApis(){
     gcloud services enable container.googleapis.com
     gcloud services enable secretmanager.googleapis.com
     gcloud services enable file.googleapis.com
+    gcloud services enable eventarc.googleapis.com
 }
 
 selectSpreadsheet(){

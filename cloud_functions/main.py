@@ -1,3 +1,3 @@
-from app.functions.generate_video_configs import *
-from app.functions.generate_product_configs import *
-from app.functions.generate_video_targeting import *
+from generate_product_configs import generate_product_configs
+from generate_video_configs import generate_video_configs
+from generate_video_targeting import generate_video_targeting

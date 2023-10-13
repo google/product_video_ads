@@ -1,29 +1,24 @@
 import functions_framework
+from cloudevents.http import CloudEvent
+from google.cloud import pubsub_v1
 import pandas as pd
-import app
 import os
+from pva import *
+
 #env
 DEFAULT_VIDEO_NAME_SUFFIX = '_test'
 
 PRODUCT_SHEET = os.environ.get('PRODUCT_SHEET')
 VIDEO_NAME_SUFFIX = os.environ.get('VIDEO_NAME_SUFFIX')
 OFFER_TYPE = os.environ.get('OFFER_TYPE')
-PRODUCTS_PER_VIDEO = 2
-
+PRODUCTS_PER_VIDEO = int(os.environ.get('PRODUCTS_PER_VIDEO'))
+PROJECT_ID=os.environ.get('GCP_PROJECT_ID')
+TOPIC_ID=os.environ.get('CONFIG_GENERATED_TOPIC_NAME')
 #global
 PRODUCT_CONFIGS_RANGE = f'{PRODUCT_SHEET}!A1:ZZ'
 
-@functions_framework.http
-def generate_product_configs(request):
-    global OFFER_TYPE
-    OFFER_TYPE = request.args.get('offer_type')
-    if OFFER_TYPE is None:
-        OFFER_TYPE = os.environ.get('OFFER_TYPE')
-    global PRODUCTS_PER_VIDEO
-    PRODUCTS_PER_VIDEO = int(request.args.get('products_per_video'))
-    if PRODUCTS_PER_VIDEO is None:
-        PRODUCTS_PER_VIDEO = int(os.environ.get('PRODUCTS_PER_VIDEO'))
-        
+@functions_framework.cloud_event
+def generate_product_configs(cloud_event: CloudEvent):        
     global OFFERS_JSON_FILE_PATH
     OFFERS_JSON_FILE_PATH = os.environ.get('OFFERS_JSON_FILE_PATH')
     global MARKETS_CSV_FILE_PATH
@@ -33,9 +28,11 @@ def generate_product_configs(request):
 
     ranking = get_product_ranking()
     video_configs = convert_ranking_to_video_configs(ranking)
-    app.clean_range(PRODUCT_CONFIGS_RANGE)
-    app.write_df_to_sheet(video_configs,PRODUCT_CONFIGS_RANGE)
-    return "OK"
+    clean_range(PRODUCT_CONFIGS_RANGE)
+    write_df_to_sheet(video_configs,PRODUCT_CONFIGS_RANGE)
+    publisher = pubsub_v1.PublisherClient()
+    topic_path = publisher.topic_path(PROJECT_ID, TOPIC_ID)
+    publisher.publish(topic_path,b"Product Configs Generated")    
 
 def convert_ranking_to_video_configs(ranking: pd.DataFrame):
     # column labels:    Id  OfferGroup  OfferType   Position        Title   Image   Price   ...

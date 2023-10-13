@@ -1,9 +1,10 @@
-functions-framework==3.2.1
+functions-framework==3.3.0
 pandas
 google-api-python-client
 google-auth
 google-auth-oauthlib 
 google-cloud-storage
+google-cloud-pubsub
 requests
 google-cloud-secret-manager
 flask

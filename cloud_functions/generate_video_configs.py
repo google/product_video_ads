@@ -1,9 +1,9 @@
 import functions_framework
+from cloudevents.http import CloudEvent
 import pandas as pd
 from datetime import datetime
 import json
-from flask import abort
-import app
+from pva import *
 import os
 
 #env
@@ -17,16 +17,14 @@ OFFER_TYPES_SHEET = 'OfferTypes'
 PRODUCT_CONFIGS_RANGE = f'{PRODUCT_SHEET}!A1:ZZ'
 VIDEO_CONFIGS_RANGE = f'{VIDEOS_SHEET}!A1:ZZ'
 
-@functions_framework.http
-def generate_video_configs(request):
-    initial_video_status = request.args.get('video_status')
-    if initial_video_status is None:
-        initial_video_status = os.environ.get('INITIAL_VIDEO_STATUS', DEFAULT_INITIAL_VIDEO_STATUS)
+@functions_framework.cloud_event
+def generate_video_configs(cloud_event: CloudEvent):
+    initial_video_status = os.environ.get('INITIAL_VIDEO_STATUS', DEFAULT_INITIAL_VIDEO_STATUS)
 
     product_configs = read_products_from_sheet()
     video_configs = create_campaigns_sheet_data(product_configs, initial_video_status)
-    app.clean_range(VIDEO_CONFIGS_RANGE)
-    app.write_df_to_sheet(video_configs, VIDEO_CONFIGS_RANGE)
+    clean_range(VIDEO_CONFIGS_RANGE)
+    write_df_to_sheet(video_configs, VIDEO_CONFIGS_RANGE)
     return "OK"
 
 def create_campaigns_sheet_data(video_configs: pd.DataFrame, initial_video_status:str):
@@ -86,11 +84,11 @@ def get_video_metadata(offer_type:str, df_offer_types: pd.DataFrame):
 
 
 def read_offer_types():
-    return app.read_df_from_sheet(f'{OFFER_TYPES_SHEET}!A:C')
+    return read_df_from_sheet(f'{OFFER_TYPES_SHEET}!A:C')
 
 def read_bases():
-    return app.read_df_from_sheet(f'{BASES_SHEET}!A:C')
+    return read_df_from_sheet(f'{BASES_SHEET}!A:C')
 
 def read_products_from_sheet():
-    return app.read_df_from_sheet(PRODUCT_CONFIGS_RANGE)
+    return read_df_from_sheet(PRODUCT_CONFIGS_RANGE)
 

@@ -3,11 +3,7 @@ from google.auth.transport.requests import Request
 import pickle
 import pandas as pd
 from googleapiclient.discovery import build
-import logging
-import sys
 import os
-
-log = logging.getLogger(__name__)
 
 # global var
 _sheet = None
@@ -15,18 +11,6 @@ _sheet = None
 SPREADSHEET_ID = os.environ.get('SPREADSHEET_ID')
 GCP_PROJECT_ID = os.environ.get('GCP_PROJECT_ID')
 SECRET_ID = os.environ.get('SECRET_ID')
-
-IS_DEV = False
-def init(debug):
-    global IS_DEV
-    if debug:
-        if not log.handlers:
-            log.setLevel(logging.DEBUG)
-            formatter = logging.Formatter(fmt="%(asctime)s %(levelname)s %(module)s: %(message)s", datefmt="%H:%M:%S")
-            handler = logging.StreamHandler(sys.stdout)
-            handler.setLevel(logging.DEBUG)
-            handler.setFormatter(formatter)
-            log.addHandler(handler)
 
 def sheet():
     global _sheet
