@@ -10,12 +10,12 @@ import os
 DEFAULT_INITIAL_VIDEO_STATUS = 'Preview'
 
 #global
-VIDEOS_SHEET = 'Campaigns'
-PRODUCT_SHEET = 'Prices'
-BASES_SHEET = 'Bases'
-OFFER_TYPES_SHEET = 'OfferTypes'
+VIDEO_CONFIGS_SHEET = os.environ.get('VIDEO_CONFIGS_SHEET')
+PRODUCT_SHEET = os.environ.get('PRODUCT_SHEET')
+BASES_SHEET = os.environ.get('BASES_SHEET')
+OFFER_TYPES_SHEET = os.environ.get('OFFER_TYPES_SHEET')
 PRODUCT_CONFIGS_RANGE = f'{PRODUCT_SHEET}!A1:ZZ'
-VIDEO_CONFIGS_RANGE = f'{VIDEOS_SHEET}!A1:ZZ'
+VIDEO_CONFIGS_RANGE = f'{VIDEO_CONFIGS_SHEET}!A1:ZZ'
 
 @functions_framework.cloud_event
 def generate_video_configs(cloud_event: CloudEvent):
@@ -84,7 +84,8 @@ def get_video_metadata(offer_type:str, df_offer_types: pd.DataFrame):
 
 
 def read_offer_types():
-    return read_df_from_sheet(f'{OFFER_TYPES_SHEET}!A:C')
+    new_var = f'{OFFER_TYPES_SHEET}!A:C'
+    return read_df_from_sheet(new_var)
 
 def read_bases():
     return read_df_from_sheet(f'{BASES_SHEET}!A:C')
