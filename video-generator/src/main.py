@@ -43,7 +43,8 @@ def main():
     spreadsheet_id = os.environ.get('SPREADSHEET_ID')
     gcs_bucket_name = os.environ.get('GCS_BUCKET_NAME')
     gcp_project_number = os.environ.get('GCP_PROJECT_NUMBER')
-    disable_sheet_logging = os.getenv("DISABLE_SHEET_LOGGING", 'False').lower() in ('true', '1', 't')
+    disable_sheet_logging = os.getenv(
+        "DISABLE_SHEET_LOGGING", 'False').lower() in ('true', '1', 't')
     lock_path = os.environ.get('SHEET_LOCK_FILE')
     lock = filelock.FileLock(lock_path)
     cloud_preview = False
@@ -63,7 +64,8 @@ def main():
     logger.info('[v2] Started processing...')
 
     # Dependencies
-    configuration = Configuration(spreadsheet_id, credentials, not disable_sheet_logging)
+    configuration = Configuration(
+        spreadsheet_id, credentials, not disable_sheet_logging)
     storage = StorageHandler(configuration.get_drive_folder(), credentials)
     cloud_storage = CloudStorageHandler(gcs_bucket_name=gcs_bucket_name)
     video_processor = VideoProcessor(
@@ -83,7 +85,7 @@ def main():
             lock.acquire()
             logger.info('Lock Acquired, checking queue')
             rows_todo = handler.rows_to_be_processed()
-            if(len(rows_todo) > 0):
+            if (len(rows_todo) > 0):
                 row_to_process = rows_todo[0]
                 (metadata, original_status) = handler.mark_row_in_progress(
                     row_to_process)
@@ -94,14 +96,22 @@ def main():
                     row_to_process, metadata, original_status)
                 logger.info('Re-Acquiring lock to mark processing done')
                 lock.acquire()
-                handler.update_status(row_to_process, new_status, result_id)
                 logger.info(f'Marking row {row_to_process} as {new_status}')
+                handler.update_status(row_to_process, new_status, result_id)
             else:
                 logger.info(f'Sleeping for {interval} seconds')
                 time.sleep(int(interval * 60))
 
         except Exception as e:
             logger.error(e)
+            if (row_to_process != None):
+                logger.info(
+                    f'Resetting row {row_to_process} status to {original_status} and backing off')
+                time.sleep(int(interval * 60))
+                lock.acquire()
+                handler.update_status(row_to_process, original_status)
+                lock.release()                
+                
         finally:
             logger.info('Releasing lock')
             lock.release()
