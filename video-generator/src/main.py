@@ -85,6 +85,7 @@ def main():
             lock.acquire()
             logger.info('Lock Acquired, checking queue')
             rows_todo = handler.rows_to_be_processed()
+            row_to_process = None
             if (len(rows_todo) > 0):
                 row_to_process = rows_todo[0]
                 (metadata, original_status) = handler.mark_row_in_progress(
