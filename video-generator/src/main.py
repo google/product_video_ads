@@ -100,7 +100,7 @@ def main():
                 logger.info(f'Marking row {row_to_process} as {new_status}')
                 handler.update_status(row_to_process, new_status, result_id)
             else:
-                logger.info(f'Sleeping for {interval} seconds')
+                logger.info(f'Sleeping for {interval} minutes')
                 time.sleep(int(interval * 60))
 
         except Exception as e:
