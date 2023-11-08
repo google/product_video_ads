@@ -1,5 +1,4 @@
 import functions_framework
-from cloudevents.http import CloudEvent
 import pandas as pd
 from datetime import datetime
 import json
@@ -17,8 +16,8 @@ OFFER_TYPES_SHEET = os.environ.get('OFFER_TYPES_SHEET')
 PRODUCT_CONFIGS_RANGE = f'{PRODUCT_SHEET}!A1:ZZ'
 VIDEO_CONFIGS_RANGE = f'{VIDEO_CONFIGS_SHEET}!A1:ZZ'
 
-@functions_framework.cloud_event
-def generate_video_configs(cloud_event: CloudEvent):
+@functions_framework.http
+def generate_video_configs(request):
     initial_video_status = os.environ.get('INITIAL_VIDEO_STATUS', DEFAULT_INITIAL_VIDEO_STATUS)
 
     product_configs = read_products_from_sheet()

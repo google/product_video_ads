@@ -1,5 +1,4 @@
 import functions_framework
-from cloudevents.http import CloudEvent
 import pandas as pd
 import os
 from pva import *
@@ -12,8 +11,8 @@ VIDEO_CONFIGS_SHEET = os.environ.get('VIDEO_CONFIGS_SHEET')
 TARGETING_CONFIG_RANGE = f'{TARGETING_SHEET}!A1:ZZ'
 VIDEO_CONFIGS_RANGE = f'{VIDEO_CONFIGS_SHEET}!A1:ZZ'
 
-@functions_framework.cloud_event
-def generate_video_targeting(cloud_event: CloudEvent):
+@functions_framework.http
+def generate_video_targeting(request):
     targeting = get_targeting()
     update_ads_metadata(targeting)
 

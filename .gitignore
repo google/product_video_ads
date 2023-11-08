@@ -11,3 +11,5 @@ pva.conf.*
 .venv
 cloud_functions/env.yaml
 cloud_functions/test.http
+cloud_functions/docs.md
+

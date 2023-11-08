@@ -4,7 +4,7 @@ google-api-python-client
 google-auth
 google-auth-oauthlib 
 google-cloud-storage
-google-cloud-pubsub
+# google-cloud-pubsub
 requests
 google-cloud-secret-manager
 flask

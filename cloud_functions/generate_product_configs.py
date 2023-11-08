@@ -1,6 +1,4 @@
 import functions_framework
-from cloudevents.http import CloudEvent
-from google.cloud import pubsub_v1
 import pandas as pd
 import os
 from pva import *
@@ -17,8 +15,8 @@ TOPIC_ID=os.environ.get('CONFIG_GENERATED_TOPIC_NAME')
 #global
 PRODUCT_CONFIGS_RANGE = f'{PRODUCT_SHEET}!A1:ZZ'
 
-@functions_framework.cloud_event
-def generate_product_configs(cloud_event: CloudEvent):        
+@functions_framework.http
+def generate_product_configs(request):      
     global OFFERS_JSON_FILE_PATH
     OFFERS_JSON_FILE_PATH = os.environ.get('OFFERS_JSON_FILE_PATH')
     global MARKETS_CSV_FILE_PATH
@@ -30,9 +28,7 @@ def generate_product_configs(cloud_event: CloudEvent):
     video_configs = convert_ranking_to_video_configs(ranking)
     clean_range(PRODUCT_CONFIGS_RANGE)
     write_df_to_sheet(video_configs,PRODUCT_CONFIGS_RANGE)
-    publisher = pubsub_v1.PublisherClient()
-    topic_path = publisher.topic_path(PROJECT_ID, TOPIC_ID)
-    publisher.publish(topic_path,b"Product Configs Generated")    
+    return "OK"
 
 def convert_ranking_to_video_configs(ranking: pd.DataFrame):
     # column labels:    Id  OfferGroup  OfferType   Position        Title   Image   Price   ...
