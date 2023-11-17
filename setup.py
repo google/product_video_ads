@@ -34,7 +34,7 @@ SCOPES = [
 # Configs for PVA. Installed into Sheets
 CONFIGS = {
     'title': 'PVA Template - New',
-    'time_interval': 1,
+    'time_interval': 60,
     'country': 'US',
     'lang': 'en',
 }
@@ -306,7 +306,7 @@ def create_sheet(credentials: Credentials, drive_id: str) -> str:
             _add_sheet_request(8, 'Campaigns', hidden=True),
             _add_sheet_request(9, 'Generator', hidden=True),
             _paste_data_request(1, row=5, col=1, data=f"DriveConfigFolder, {drive_id}"),
-            _paste_data_request(1, row=6, col=1, data="Interval In Minutes, {0}".format(
+            _paste_data_request(1, row=6, col=1, data="Interval In Seconds, {0}".format(
                 CONFIGS['time_interval'])),
             _paste_data_request(
                 1, row=7, col=1, data="MC - Target Country, {0}".format(CONFIGS['country'])),

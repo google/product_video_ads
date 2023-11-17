@@ -5,3 +5,9 @@ node_modules
 */**/token
 appscript/script.js
 pva.conf
+.vscode
+cloud_functions/__pycache__
+cloud_functions/env
+cloud_functions/*.json
+cloud_functions/*.csv
+pva.conf.*

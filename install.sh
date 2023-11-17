@@ -21,8 +21,29 @@ export BLUE='\033[1;34m'
 export NC='\033[0m' # No Color
 export BOLD=$(tput bold)
 export NORMAL=$(tput sgr0)
+export UNSUPERVISED=false
+export SKIP_FRONTEND=false
+export SKIP_BACKEND=false
+while [ $# -gt 0 ]; do
+  case $1 in
+    -u | --unsupervised)
+        echo "Running in UNSUPERVISED mode - using only pva.conf variables"
+        export UNSUPERVISED=true
+    ;;
+    -sf | --skip-frontend)
+        echo "Will NOT run frontend installation"
+        export SKIP_FRONTEND=true
+    ;;
+    -sb | --skip-backend)
+        echo "Will NOT run backend installation"
+        export SKIP_BACKEND=true
+    ;;
+  esac
+  shift
+done
 
 CONFIG_FILE=pva.conf
+
 
 printInitialPrompt(){
     echo -e "${BOLD}Welcome to the Product Video Ads Installer${NORMAL}"
@@ -36,6 +57,10 @@ saveConfig(){
     echo "export GCP_REGION=${GCP_REGION}" >> $CONFIG_FILE
     echo "export GCP_ZONE=${GCP_ZONE}" >> $CONFIG_FILE
     echo "export GCR_URL=${GCR_URL}" >> $CONFIG_FILE
+    echo "export VIDEO_GENERATOR_REPLICAS=${VIDEO_GENERATOR_REPLICAS}" >> $CONFIG_FILE
+    echo "export VIDEO_GENERATOR_NODES=${VIDEO_GENERATOR_NODES}" >> $CONFIG_FILE
+    echo "export VIDEO_GENERATOR_MACHINE_TYPE=${VIDEO_GENERATOR_MACHINE_TYPE}" >> $CONFIG_FILE
+    echo "export DISABLE_SHEET_LOGGING=${DISABLE_SHEET_LOGGING}" >> $CONFIG_FILE
     echo "export FRONTEND_CLIENT_ID=${FRONTEND_CLIENT_ID}" >> $CONFIG_FILE
     echo "export FRONTEND_API_KEY=${FRONTEND_API_KEY}" >> $CONFIG_FILE
     echo "export DESKTOP_CLIENT_ID=${DESKTOP_CLIENT_ID}" >> $CONFIG_FILE
@@ -57,6 +82,7 @@ enableApis(){
     gcloud services enable storagetransfer.googleapis.com
     gcloud services enable container.googleapis.com
     gcloud services enable secretmanager.googleapis.com
+    gcloud services enable file.googleapis.com
 }
 
 selectSpreadsheet(){
@@ -93,7 +119,6 @@ selectStorage(){
 }
 
 selectRegionAndZone() {
-    
     PREVIOUS_REGION=${GCP_REGION:=us-central}
     PREVIOUS_ZONE=${GCP_ZONE:=us-central1-a}
     gcloud app regions list | grep REGION:
@@ -113,7 +138,33 @@ selectGcrRegistry(){
     echo -n "Select base GCP Container Registry URL [${GCR_URL:=${PREVIOUS_GCR}}] : "
     read -r GCR_URL
     export GCR_URL=${GCR_URL:=${PREVIOUS_GCR}}
-    # echo "Will use GCR registry under ${GCR_URL}"
+}
+
+selectVideoGeneratorReplicasCount(){
+    PREVIOUS_VIDEO_GENERATOR_REPLICAS=${VIDEO_GENERATOR_REPLICAS:=1}
+    echo -n "How many parallel video generator processes to set up?[${VIDEO_GENERATOR_REPLICAS:=${PREVIOUS_VIDEO_GENERATOR_REPLICAS}}] : "
+    read -r VIDEO_GENERATOR_REPLICAS
+    if [[ $VIDEO_GENERATOR_REPLICAS  > 1 ]]; then
+        echo "More than one replica selected - Disabling Spreadsheet Logging.."
+        export DISABLE_SHEET_LOGGING=TRUE
+    else
+        export DISABLE_SHEET_LOGGING=FALSE
+    fi
+    export VIDEO_GENERATOR_REPLICAS=${VIDEO_GENERATOR_REPLICAS:=${PREVIOUS_VIDEO_GENERATOR_REPLICAS}}
+}
+
+selectVideoGeneratorMachineType(){
+    PREVIOUS_VIDEO_GENERATOR_MACHINE_TYPE=${VIDEO_GENERATOR_MACHINE_TYPE:=e2-standard-2}
+    echo -n "What machine type should video generator use?[${VIDEO_GENERATOR_MACHINE_TYPE:=${PREVIOUS_VIDEO_GENERATOR_MACHINE_TYPE}}] : "
+    read -r VIDEO_GENERATOR_MACHINE_TYPE
+    export VIDEO_GENERATOR_MACHINE_TYPE=${VIDEO_GENERATOR_MACHINE_TYPE:=${PREVIOUS_VIDEO_GENERATOR_MACHINE_TYPE}}
+}
+
+selectVideoGeneratorNodesCount(){
+    PREVIOUS_VIDEO_GENERATOR_NODES=${VIDEO_GENERATOR_NODES:=1}
+    echo -n "How many cluster nodes should video generator use?[${VIDEO_GENERATOR_NODES:=${PREVIOUS_VIDEO_GENERATOR_NODES}}] : "
+    read -r VIDEO_GENERATOR_NODES
+    export VIDEO_GENERATOR_NODES=${VIDEO_GENERATOR_NODES:=${PREVIOUS_VIDEO_GENERATOR_NODES}}
 }
 
 selectWebClientId(){
@@ -181,6 +232,10 @@ printReminderAndConfig(){
     echo -e "Frontend will use Web API key $FRONTEND_API_KEY"
     echo -e "Video Generator will use Desktop Client ID $DESKTOP_CLIENT_ID"
     echo -e "Video Generator will use Desktop Client Secret $DESKTOP_CLIENT_SECRET"
+    echo -e "Video Generator will run ${VIDEO_GENERATOR_REPLICAS} replicas"
+    echo -e "Video Generator will run ${VIDEO_GENERATOR_NODES} cluster nodes"
+    echo -e "Video Generator Spreadsheet Logging Disabled?: ${DISABLE_SHEET_LOGGING}"
+    echo -e "Video Generator operation might require increasing quota read & write requests per minute per user!"
 }
 
 installFrontend(){
@@ -198,18 +253,27 @@ installBackend(){
 main() {
     readConfig
     printInitialPrompt
-    enableApis
-    selectDesktopClientId
-    selectDesktopSecret
-    selectSpreadsheet
-    selectStorage
-    selectRegionAndZone
-    selectGcrRegistry
-    selectWebClientId
-    selectFrontendApiKey
-    saveConfig
-    installFrontend
-    installBackend
+    if [ "$UNSUPERVISED" = false ]; then
+        enableApis
+        selectDesktopClientId
+        selectDesktopSecret
+        selectSpreadsheet
+        selectStorage
+        selectRegionAndZone
+        selectGcrRegistry
+        selectVideoGeneratorMachineType
+        selectVideoGeneratorNodesCount
+        selectVideoGeneratorReplicasCount
+        selectWebClientId
+        selectFrontendApiKey
+        saveConfig
+    fi
+    if [ "$SKIP_FRONTEND" = false ]; then
+        installFrontend
+    fi
+    if [ "$SKIP_BACKEND" = false ]; then
+        installBackend
+    fi
     printReminderAndConfig
 }
 
