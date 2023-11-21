@@ -5,38 +5,40 @@ import json
 from pva import *
 import os
 
-# env
-DEFAULT_INITIAL_VIDEO_STATUS = 'On'
-
 
 @functions_framework.http
 def generate_video_configs(request):
-    read_environment()
-    initial_video_status = os.environ.get(
-        'INITIAL_VIDEO_STATUS', DEFAULT_INITIAL_VIDEO_STATUS)
+    args = request.args
+    video_configs_sheet = args.get(
+        'video_configs_sheet', default=os.environ.get('VIDEO_CONFIGS_SHEET'), type=str)
+    product_sheet = args.get(
+        'product_sheet', default=os.environ.get('PRODUCT_SHEET'), type=str)
+    bases_sheet = args.get(
+        'bases_sheet', default=os.environ.get('BASES_SHEET'), type=str)
+    offer_types_sheet = args.get(
+        'offer_types_sheet', default=os.environ.get('OFFER_TYPES_SHEET'), type=str)
+    video_name_suffix = args.get(
+        'video_name_suffix', default=os.environ.get('VIDEO_NAME_SUFFIX'), type=str)
+    initial_video_status = args.get('initial_video_status', default=os.environ.get(
+        'INITIAL_VIDEO_STATUS'), type=str)
 
-    product_configs = read_products_from_sheet()
+    video_configs_range = f'{video_configs_sheet}!A1:ZZ'
+    product_configs_range = f'{product_sheet}!A1:ZZ'
+    offer_types_range = f'{offer_types_sheet}!A:C'
+    bases_range = f'{bases_sheet}!A:C'
+
+    product_configs = read_df_from_sheet(product_configs_range)
+    bases = read_df_from_sheet(bases_range)
+    offer_types = read_df_from_sheet(offer_types_range)
     video_configs = create_campaigns_sheet_data(
-        product_configs, initial_video_status)
-    clean_range(VIDEO_CONFIGS_RANGE)
-    write_df_to_sheet(video_configs, VIDEO_CONFIGS_RANGE)
+        product_configs, initial_video_status, video_name_suffix, product_sheet, offer_types, bases)
+
+    clean_range(video_configs_range)
+    write_df_to_sheet(video_configs, video_configs_range)
     return "OK"
 
 
-def read_environment():
-    global VIDEO_CONFIGS_SHEET, PRODUCT_SHEET, BASES_SHEET, OFFER_TYPES_SHEET, VIDEO_NAME_SUFFIX, PRODUCT_CONFIGS_RANGE, VIDEO_CONFIGS_RANGE
-    VIDEO_CONFIGS_SHEET = os.environ.get('VIDEO_CONFIGS_SHEET')
-    PRODUCT_SHEET = os.environ.get('PRODUCT_SHEET')
-    BASES_SHEET = os.environ.get('BASES_SHEET')
-    OFFER_TYPES_SHEET = os.environ.get('OFFER_TYPES_SHEET')
-    VIDEO_NAME_SUFFIX = os.environ.get('VIDEO_NAME_SUFFIX')
-    PRODUCT_CONFIGS_RANGE = f'{PRODUCT_SHEET}!A1:ZZ'
-    VIDEO_CONFIGS_RANGE = f'{VIDEO_CONFIGS_SHEET}!A1:ZZ'
-
-
-def create_campaigns_sheet_data(video_configs: pd.DataFrame, initial_video_status: str):
-    bases = read_bases()
-    df_offer_types = read_offer_types()
+def create_campaigns_sheet_data(video_configs: pd.DataFrame, initial_video_status: str, video_name_suffix: str, product_sheet: str, df_offer_types: pd.DataFrame, bases: pd.DataFrame):
     date = datetime.now().strftime('%d/%m/%Y, %H:%M:%S')
 
     data = pd.DataFrame(
@@ -45,25 +47,25 @@ def create_campaigns_sheet_data(video_configs: pd.DataFrame, initial_video_statu
     video_groups = video_configs[[
         'OfferGroup', 'OfferType', 'Id', 'Position']].groupby('OfferGroup')
     metadatas = video_groups.apply(
-        lambda group: video_metadata_generator(group, bases, df_offer_types, date))
+        lambda group: video_metadata_generator(group, bases, df_offer_types, date, product_sheet))
 
     data['VideoMetadata'] = metadatas
     data['Status'] = initial_video_status
     data['GeneratedVideo'] = ''
     data['Date'] = date
     data['AdsMetadata'] = video_groups.apply(
-        lambda group: ads_metadata_generator(group))
+        lambda group: ads_metadata_generator(group, video_name_suffix))
     return data
 
 
-def ads_metadata_generator(product_group):
+def ads_metadata_generator(product_group, video_name_suffix: str):
     offer_group = product_group['OfferGroup'].values[0]
-    campaign_name = offer_group.replace(VIDEO_NAME_SUFFIX, '')
-    return f'{"campaign_name": "{campaign_name}"}'
+    campaign_name = offer_group.replace(video_name_suffix, '')
+    return '{"campaign_name": "'+campaign_name+'"}'
 
 
-def video_metadata_generator(product_group, bases: pd.DataFrame, df_offer_types: pd.DataFrame, date: str):
-    products_label = PRODUCT_SHEET
+def video_metadata_generator(product_group, bases: pd.DataFrame, df_offer_types: pd.DataFrame, date: str, product_sheet: str):
+    products_label = product_sheet
     custom_dir = ''
     description = ''
     visibility = ''
@@ -102,19 +104,9 @@ def get_video_metadata(offer_type: str, df_offer_types: pd.DataFrame):
     return video_metadata, base
 
 
-def read_offer_types():
-    new_var = f'{OFFER_TYPES_SHEET}!A:C'
-    return read_df_from_sheet(new_var)
-
-
-def read_bases():
-    return read_df_from_sheet(f'{BASES_SHEET}!A:C')
-
-
-def read_products_from_sheet():
-    return read_df_from_sheet(PRODUCT_CONFIGS_RANGE)
-
-
 if __name__ == "__main__":
+    from werkzeug.datastructures import ImmutableMultiDict
     load_local_environment()
-    generate_video_configs(None)
+    request = Request()
+    request.args = ImmutableMultiDict([])
+    generate_video_configs(request)

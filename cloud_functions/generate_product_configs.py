@@ -3,55 +3,49 @@ import pandas as pd
 import os
 from pva import *
 
-DEFAULT_VIDEO_NAME_SUFFIX = '_test'
-
 
 @functions_framework.http
 def generate_product_configs(request):
-    read_environment()
-    request.args.get('video_name_suffix')
-    global OFFERS_JSON_FILE_PATH
-    OFFERS_JSON_FILE_PATH = os.environ.get('OFFERS_JSON_FILE_PATH')
-    global MARKETS_CSV_FILE_PATH
-    MARKETS_CSV_FILE_PATH = os.environ.get('MARKETS_CSV_FILE_PATH')
-    global RANKING_JSON_FILE_PATH
-    RANKING_JSON_FILE_PATH = os.environ.get('RANKING_JSON_FILE_PATH')
+    args = request.args
+    video_name_suffix = args.get(
+        'video_name_suffix', default=os.environ.get('VIDEO_NAME_SUFFIX'), type=str)
+    offers_json_file_path = args.get(
+        'offers_json_file_path', default=os.environ.get('OFFERS_JSON_FILE_PATH'), type=str)
+    ranking_json_file_path = args.get(
+        'ranking_json_file_path', default=os.environ.get('RANKING_JSON_FILE_PATH'), type=str)
+    product_sheet = args.get(
+        'product_sheet', default=os.environ.get('PRODUCT_SHEET'), type=str)
+    offer_type = args.get(
+        'offer_type', default=os.environ.get('OFFER_TYPE'), type=str)
+    products_per_video = args.get(
+        'products_per_video', default=os.environ.get('PRODUCTS_PER_VIDEO'), type=int)
 
-    ranking = get_product_ranking()
-    video_configs = convert_ranking_to_video_configs(ranking)
-    clean_range(PRODUCT_CONFIGS_RANGE)
-    write_df_to_sheet(video_configs, PRODUCT_CONFIGS_RANGE)
+    product_configs_range = f'{product_sheet}!A1:ZZ'
+
+    ranking = get_product_ranking(products_per_video=products_per_video,
+                                  df_offers=pd.read_json(
+                                      offers_json_file_path),
+                                  df_ranking=pd.read_json(ranking_json_file_path))
+    video_configs = convert_ranking_to_video_configs(
+        ranking, offer_type, video_name_suffix)
+
+    clean_range(product_configs_range)
+    write_df_to_sheet(video_configs, product_configs_range)
     return "OK"
 
 
-def read_environment():
-    global PRODUCT_SHEET, VIDEO_NAME_SUFFIX, OFFER_TYPE, PRODUCTS_PER_VIDEO, PROJECT_ID, PRODUCT_CONFIGS_RANGE
-
-    PRODUCT_SHEET = os.environ.get('PRODUCT_SHEET')
-    VIDEO_NAME_SUFFIX = os.environ.get('VIDEO_NAME_SUFFIX')
-    OFFER_TYPE = os.environ.get('OFFER_TYPE')
-    PRODUCTS_PER_VIDEO = int(os.environ.get('PRODUCTS_PER_VIDEO'))
-    PROJECT_ID = os.environ.get('GCP_PROJECT_ID')
-    # global
-    PRODUCT_CONFIGS_RANGE = f'{PRODUCT_SHEET}!A1:ZZ'
-
-
-def convert_ranking_to_video_configs(ranking: pd.DataFrame):
-    # column labels:    Id  OfferGroup  OfferType   Position        Title   Image   Price   ...
-    # fields:           nan video_title offer_type  rankingorder    Title   picture price   ...
+def convert_ranking_to_video_configs(ranking: pd.DataFrame, offer_type: str, video_name_suffix: str):
     columns = ['Id', 'OfferGroup', 'OfferType',
                'Position'] + list(ranking.columns.values)
     configs = ranking
     configs['Id'] = configs['nan']
-    configs['OfferType'] = OFFER_TYPE
+    configs['OfferType'] = offer_type
     configs['Position'] = configs['rankingorder']
-    configs['OfferGroup'] = configs['postcode']+VIDEO_NAME_SUFFIX
+    configs['OfferGroup'] = configs['postcode']+video_name_suffix
     return configs[columns]
 
 
-def get_product_ranking():
-    df_offers = read_offers()
-    df_ranking = read_ranking()
+def get_product_ranking(products_per_video: int, df_offers: pd.DataFrame, df_ranking: pd.DataFrame):
 
     offers = df_offers.apply(transform_offer, axis=1, result_type="expand")
     # price, kg/liter price, crossoutprice
@@ -60,15 +54,15 @@ def get_product_ranking():
     # TODO pin down selection logic for same-ranking products
     # TODO drop this after logic is clear
     ranking = ranking.sort_values(['postcode', 'rankingorder']).groupby(
-        ['postcode', 'rankingorder']).agg('first').groupby('postcode').head(PRODUCTS_PER_VIDEO).reset_index()
+        ['postcode', 'rankingorder']).agg('first').groupby('postcode').head(products_per_video).reset_index()
     ranking = ranking.merge(offers, how='left', on='nan')
     ranking = ranking.dropna()
     # ranking = ranking.filter(
     #     ['nan', 'postcode', 'rankingorder', 'title', 'picture', 'price'])
     ranking = ranking.sort_values(['postcode', 'rankingorder']).groupby(
-        ['postcode', 'rankingorder']).agg('first').groupby('postcode').head(PRODUCTS_PER_VIDEO).reset_index()
+        ['postcode', 'rankingorder']).agg('first').groupby('postcode').head(products_per_video).reset_index()
     ranking = ranking[(ranking.groupby(
-        'postcode').rankingorder.transform('count') == PRODUCTS_PER_VIDEO)]
+        'postcode').rankingorder.transform('count') == products_per_video)]
     return ranking
 
 
@@ -85,34 +79,13 @@ def transform_offer(x):
             'Auslobung': x.texts['Auslobungmittel'] if 'Auslobungmittel' in x.texts else x.texts['Auslobungkurz'] if 'Auslobungkurz' in x.texts else '',
             'refundText': x.facets['RefundText'] if 'RefundText' in x.facets else '',
             'Werbeartikelbezeichnung': x.texts['Werbeartikelbezeichnung'] if 'Werbeartikelbezeichnung' in x.texts else ''
-
             }
 
 
-def get_targeting():
-    df_markets = read_markets()
-    markets = df_markets
-    markets = markets.rename(
-        columns={"Postleitzahl": "postcode", "Breitengrad": "lat", "Längengrad": "lon", "Einzugsgebiet (Radius)": "radius"})
-    markets = markets.filter(
-        ['postcode', 'lat', 'lon', 'radius'],
-        axis=1)
-    markets['postcode'] = markets['postcode'].astype("string")
-    markets = markets.sort_values(['postcode', 'radius'])
-
-
-def read_offers():
-    return pd.read_json(OFFERS_JSON_FILE_PATH)
-
-
-def read_markets():
-    return pd.read_csv(MARKETS_CSV_FILE_PATH)
-
-
-def read_ranking():
-    return pd.read_json(RANKING_JSON_FILE_PATH)
-
-
 if __name__ == "__main__":
+    from werkzeug.datastructures import ImmutableMultiDict
     load_local_environment()
-    generate_product_configs(None)
+    request = Request()
+    request.args = ImmutableMultiDict(
+        [('video_name_suffix', '_test'), ('products_per_video', '2'), ('offer_type', 'REWE_TOP')])
+    generate_product_configs(request)
