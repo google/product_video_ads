@@ -6,7 +6,7 @@ from pva import *
 import os
 
 # env
-DEFAULT_INITIAL_VIDEO_STATUS = 'Preview'
+DEFAULT_INITIAL_VIDEO_STATUS = 'On'
 
 
 @functions_framework.http
@@ -59,7 +59,7 @@ def create_campaigns_sheet_data(video_configs: pd.DataFrame, initial_video_statu
 def ads_metadata_generator(product_group):
     offer_group = product_group['OfferGroup'].values[0]
     campaign_name = offer_group.replace(VIDEO_NAME_SUFFIX, '')
-    return f'["campaign_name": "{campaign_name}"]'
+    return f'{"campaign_name": "{campaign_name}"}'
 
 
 def video_metadata_generator(product_group, bases: pd.DataFrame, df_offer_types: pd.DataFrame, date: str):

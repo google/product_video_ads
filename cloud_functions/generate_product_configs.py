@@ -9,6 +9,7 @@ DEFAULT_VIDEO_NAME_SUFFIX = '_test'
 @functions_framework.http
 def generate_product_configs(request):
     read_environment()
+    request.args.get('video_name_suffix')
     global OFFERS_JSON_FILE_PATH
     OFFERS_JSON_FILE_PATH = os.environ.get('OFFERS_JSON_FILE_PATH')
     global MARKETS_CSV_FILE_PATH
@@ -79,7 +80,7 @@ def transform_offer(x):
             'crossOutPrice': x.price['crossOutPrice'],
             'advantage': x.price['advantage'],
             'title': x.texts['Werbeartikelbezeichnung'],
-            'image_url': x.pictures[0]['url'] if len(x.pictures) > 0 else '',
+            'image_url': x.pictures[0]['url'].strip() if len(x.pictures) > 0 else '',
             'revision': x.revision,
             'Auslobung': x.texts['Auslobungmittel'] if 'Auslobungmittel' in x.texts else x.texts['Auslobungkurz'] if 'Auslobungkurz' in x.texts else '',
             'refundText': x.facets['RefundText'] if 'RefundText' in x.facets else '',
