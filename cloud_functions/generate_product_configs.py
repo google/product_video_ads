@@ -18,7 +18,7 @@ def generate_product_configs(request):
     offer_type = args.get(
         'offer_type', default=os.environ.get('OFFER_TYPE'), type=str)
     products_per_video = args.get(
-        'products_per_video', default=os.environ.get('PRODUCTS_PER_VIDEO'), type=int)
+        'products_per_video', default=int(os.environ.get('PRODUCTS_PER_VIDEO')), type=int)
 
     product_configs_range = f'{product_sheet}!A1:ZZ'
 
