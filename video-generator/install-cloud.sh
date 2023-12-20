@@ -36,8 +36,7 @@ create_cluster(){
     --machine-type=${VIDEO_GENERATOR_MACHINE_TYPE} \
     --addons=GcpFilestoreCsiDriver \
     --no-enable-autoupgrade \
-#    --enable-shielded-nodes --shielded-secure-boot --shielded-integrity-monitoring \
-    --scopes=https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/youtube,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/devstorage.read_write,https://www.googleapis.com/auth/cloud-platform
+    --scopes=https://www.googleapis.com/auth/cloud-platform,https://www.googleapis.com/auth/spreadsheets,https://www.googleapis.com/auth/youtube,https://www.googleapis.com/auth/drive,https://www.googleapis.com/auth/devstorage.read_write
 
     # gcloud container clusters update video-generator-cluster --update-addons=GcpFilestoreCsiDriver=ENABLED --zone ${GCP_ZONE}
 }
