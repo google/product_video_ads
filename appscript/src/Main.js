@@ -17,10 +17,37 @@ limitations under the License.
 // Trigger to create menu option when spreadsheet opens
 function onOpen() {
 
-  SpreadsheetApp.getUi().createMenu('Merchant Center')
+  SpreadsheetApp.getUi().createMenu('PVA')
     .addItem('Fetch Product Feed', 'getProductsFromMerchantCenter')
     .addItem('Translate Product IDs', 'translateMcIds')
+    .addItem('[GCP] Generate Product Configs', 'callGenerateProductConfigs')
+    .addItem('[GCP] Generate Video Configs', 'callGenerateVideoConfigs')
+    .addItem('[GCP] Generate Video Targeting', 'callGenerateProductConfigs')
     .addToUi()
+}
+
+function callCloudFunction(url) {
+  const params = {
+    contentType: 'application/json',
+    muteHttpExceptions: true,
+    headers: {
+      Authorization: `Bearer ${ScriptApp.getIdentityToken()}`,
+    },
+  }
+  const res = UrlFetchApp.fetch(url, params);
+  console.log(res.getContentText());
+}
+
+function callGenerateProductConfigs() {
+  callCloudFunction(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Configuration').getRange('C13').getValue());
+}
+
+function callGenerateVideoConfigs() {
+  callCloudFunction(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Configuration').getRange('C14').getValue());
+}
+
+function callGenerateProductConfigs() {
+  callCloudFunction(SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Configuration').getRange('C15').getValue());
 }
 
 // Helper function to Log results on Configuration sheet
