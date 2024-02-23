@@ -23,18 +23,18 @@ def generate_video_targeting(request):
         'markets_csv_file_path', default=os.environ.get('MARKETS_CSV_FILE_PATH'), type=str)
 
     campaign_status = args.get(
-        'campaign_status', default=os.environ('CAMPAIGN_STATUS'), type=str)
+        'campaign_status', default=os.environ.get('CAMPAIGN_STATUS'), type=str)
     adgroup_status = args.get(
-        'adgroup_status', default=os.environ('ADGROUP_STATUS'), type=str)
+        'adgroup_status', default=os.environ.get('ADGROUP_STATUS'), type=str)
     adgroup_action = args.get(
-        'adgroup_action', default=os.environ('ADGROUP_ACTION'), type=str)
+        'adgroup_action', default=os.environ.get('ADGROUP_ACTION'), type=str)
     campaign_action = args.get(
-        'campaign_action', default=os.environ('CAMPAIGN_ACTION'), type=str)
+        'campaign_action', default=os.environ.get('CAMPAIGN_ACTION'), type=str)
     ad_action = args.get(
-        'ad_action', default=os.environ('AD_ACTION'), type=str)
+        'ad_action', default=os.environ.get('AD_ACTION'), type=str)
     adgroup_type = args.get(
-        'adgroup_type', default=os.environ('ADGROUP_TYPE'), type=str)
-    ad_type = args.get('ad_type', default=os.environ('AD_TYPE'), type=str)
+        'adgroup_type', default=os.environ.get('ADGROUP_TYPE'), type=str)
+    ad_type = args.get('ad_type', default=os.environ.get('AD_TYPE'), type=str)
 
     markets = pd.read_csv(markets_csv_file_path)
 
