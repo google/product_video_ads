@@ -110,10 +110,10 @@ def main():
             if (row_to_process != None):
                 logger.info(
                     f'Resetting row {row_to_process} status to {original_status} and backing off')
-                time.sleep(int(interval * 60))
                 lock.acquire()
                 handler.update_status(row_to_process, original_status)
-                lock.release()                
+                lock.release()
+            time.sleep(int(interval * 60))                
                 
         finally:
             logger.info('Releasing lock')
