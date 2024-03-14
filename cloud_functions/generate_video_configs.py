@@ -30,6 +30,7 @@ def generate_video_configs(request):
     product_configs = read_df_from_sheet(product_configs_range)
     bases = read_df_from_sheet(bases_range)
     offer_types = read_df_from_sheet(offer_types_range)
+
     video_configs = create_campaigns_sheet_data(
         product_configs, initial_video_status, video_name_suffix, product_sheet, offer_types, bases)
 
@@ -60,8 +61,8 @@ def create_campaigns_sheet_data(video_configs: pd.DataFrame, initial_video_statu
 
 def ads_metadata_generator(product_group, video_name_suffix: str):
     offer_group = product_group['OfferGroup'].values[0]
-    campaign_name = offer_group.replace(video_name_suffix, '')
-    return '{"campaign_name": "'+campaign_name+'"}'
+    postcode = offer_group.replace(video_name_suffix, '')
+    return '{"postcode": "'+postcode+'"}'
 
 
 def video_metadata_generator(product_group, bases: pd.DataFrame, df_offer_types: pd.DataFrame, date: str, product_sheet: str):

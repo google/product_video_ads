@@ -3,6 +3,8 @@ import pandas as pd
 import os
 from pva import *
 
+# TODO generate only videos for postcodes that HAVE A MARKET
+
 
 @functions_framework.http
 def generate_product_configs(request):
@@ -13,6 +15,8 @@ def generate_product_configs(request):
         'offers_json_file_path', default=os.environ.get('OFFERS_JSON_FILE_PATH'), type=str)
     ranking_json_file_path = args.get(
         'ranking_json_file_path', default=os.environ.get('RANKING_JSON_FILE_PATH'), type=str)
+    markets_csv_file_path = args.get(
+        'markets_csv_file_path', default=os.environ.get('MARKETS_CSV_FILE_PATH'), type=str)
     product_sheet = args.get(
         'product_sheet', default=os.environ.get('PRODUCT_SHEET'), type=str)
     offer_type = args.get(
@@ -22,10 +26,14 @@ def generate_product_configs(request):
 
     product_configs_range = f'{product_sheet}!A1:ZZ'
 
+    offers = pd.read_json(offers_json_file_path)
+    ranking = pd.read_json(ranking_json_file_path)
+    markets = pd.read_csv(markets_csv_file_path)
+
     ranking = get_product_ranking(products_per_video=products_per_video,
-                                  df_offers=pd.read_json(
-                                      offers_json_file_path),
-                                  df_ranking=pd.read_json(ranking_json_file_path))
+                                  df_offers=offers,
+                                  df_ranking=ranking)
+    ranking = ranking[ranking['postcode'].isin(markets['Postleitzahl'].astype(str).str.zfill(5))]
     video_configs = convert_ranking_to_video_configs(
         ranking, offer_type, video_name_suffix)
 
@@ -86,6 +94,8 @@ if __name__ == "__main__":
     from werkzeug.datastructures import ImmutableMultiDict
     load_local_environment()
     request = Request()
-    request.args = ImmutableMultiDict(
-        [('video_name_suffix', '_test'), ('products_per_video', '2'), ('offer_type', 'REWE_TOP')])
+    request.args = ImmutableMultiDict([
+        # ('offers_json_file_path', 'https://hop-wmam.paas.rewe.local/offers/2024/10'),
+        # ('ranking_json_file_path', 'https://storage.cloud.google.com/wam-wmps-prod-hop-ranking/2024/10/ranking.json')
+    ])
     generate_product_configs(request)
