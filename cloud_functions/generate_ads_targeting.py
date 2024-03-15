@@ -14,36 +14,37 @@ AD_NAME_PREFIX = "PVA_AD_"
 
 @functions_framework.http
 def generate_ads_targeting(request):
-    args = request.args
+    payload = request.get_json()
+    print(payload)
 
-    campaigns_sheet = os.environ.get('CAMPAIGNS_SHEET')
-    adgroups_sheet = os.environ.get('ADGROUPS_SHEET')
-    ads_sheet = os.environ.get('ADS_SHEET')
-    video_configs_sheet = os.environ.get('VIDEO_CONFIGS_SHEET')
+    campaigns_sheet = payload.get('campaigns_sheet', os.environ.get('CAMPAIGNS_SHEET'))
+    adgroups_sheet = payload.get('adgroups_sheet', os.environ.get('ADGROUPS_SHEET'))
+    ads_sheet = payload.get('ads_sheet', os.environ.get('ADS_SHEET'))
+    video_configs_sheet = payload.get('video_configs_sheet', os.environ.get('VIDEO_CONFIGS_SHEET'))
+
+    markets_csv_file_path = payload.get(
+        'markets_csv_file_path', os.environ.get('MARKETS_CSV_FILE_PATH'))
+    campaign_status = payload.get(
+        'campaign_status', os.environ.get('CAMPAIGN_STATUS'))
+    adgroup_status = payload.get(
+        'adgroup_status', os.environ.get('ADGROUP_STATUS'))
+    adgroup_action = payload.get(
+        'adgroup_action', os.environ.get('ADGROUP_ACTION'))
+    campaign_action = payload.get(
+        'campaign_action', os.environ.get('CAMPAIGN_ACTION'))
+    ad_action = payload.get(
+        'ad_action', os.environ.get('AD_ACTION'))
+    adgroup_type = payload.get(
+        'adgroup_type', os.environ.get('ADGROUP_TYPE'))
+    ad_type = payload.get('ad_type', os.environ.get('AD_TYPE'))
+    langing_page_url = payload.get('landing_page_url', os.environ.get('LANDING_PAGE_URL'))
 
     video_configs_range = f'{video_configs_sheet}!A1:ZZ'
     campaigns_config_range = f'{campaigns_sheet}!A1:ZZ'
     adgroups_config_range = f'{adgroups_sheet}!A1:ZZ'
     ad_config_range = f'{ads_sheet}!A1:ZZ'
 
-    markets_csv_file_path = args.get(
-        'markets_csv_file_path', default=os.environ.get('MARKETS_CSV_FILE_PATH'), type=str)
-
-    campaign_status = args.get(
-        'campaign_status', default=os.environ.get('CAMPAIGN_STATUS'), type=str)
-    adgroup_status = args.get(
-        'adgroup_status', default=os.environ.get('ADGROUP_STATUS'), type=str)
-    adgroup_action = args.get(
-        'adgroup_action', default=os.environ.get('ADGROUP_ACTION'), type=str)
-    campaign_action = args.get(
-        'campaign_action', default=os.environ.get('CAMPAIGN_ACTION'), type=str)
-    ad_action = args.get(
-        'ad_action', default=os.environ.get('AD_ACTION'), type=str)
-    adgroup_type = args.get(
-        'adgroup_type', default=os.environ.get('ADGROUP_TYPE'), type=str)
-    ad_type = args.get('ad_type', default=os.environ.get('AD_TYPE'), type=str)
-    langing_page_url = args.get('landing_page_url', default=os.environ.get('LANDING_PAGE_URL'), type=str)
-
+    logging.warn(f"reading markets from {markets_csv_file_path}")
     markets = pd.read_csv(markets_csv_file_path)
 
     campaigns_targeting = get_campaigns_targeting(
@@ -149,11 +150,3 @@ def get_ads_targeting_df(campaigns_targeting: pd.DataFrame, video_configs: pd.Da
     ads['Video'] = 'https://www.youtube.com/watch?v=' + ads['GeneratedVideo']
     ads['Final Url'] = landing_page_url
     return ads[['Row Type', 'Action', 'Ad status', 'Final Url', 'Headline', 'Description 1', 'Description 2', 'Ad name', 'Ad type', 'Video', 'Campaign', 'Ad group', 'Campaign type']]
-
-
-if __name__ == "__main__":
-    from werkzeug.datastructures import ImmutableMultiDict
-    load_local_environment()
-    request = Request()
-    request.args = ImmutableMultiDict([])
-    generate_ads_targeting(request)

@@ -3,31 +3,24 @@ import pandas as pd
 import os
 from pva import *
 
-# TODO generate only videos for postcodes that HAVE A MARKET
-
-
 @functions_framework.http
 def generate_product_configs(request):
-    args = request.args
-    video_name_suffix = args.get(
-        'video_name_suffix', default=os.environ.get('VIDEO_NAME_SUFFIX'), type=str)
-    offers_json_file_path = args.get(
-        'offers_json_file_path', default=os.environ.get('OFFERS_JSON_FILE_PATH'), type=str)
-    ranking_json_file_path = args.get(
-        'ranking_json_file_path', default=os.environ.get('RANKING_JSON_FILE_PATH'), type=str)
-    markets_csv_file_path = args.get(
-        'markets_csv_file_path', default=os.environ.get('MARKETS_CSV_FILE_PATH'), type=str)
-    product_sheet = args.get(
-        'product_sheet', default=os.environ.get('PRODUCT_SHEET'), type=str)
-    offer_type = args.get(
-        'offer_type', default=os.environ.get('OFFER_TYPE'), type=str)
-    products_per_video = args.get(
-        'products_per_video', default=int(os.environ.get('PRODUCTS_PER_VIDEO')), type=int)
+    payload = request.get_json()
+    print(payload)
+    video_name_suffix = payload.get('video_name_suffix', os.environ.get('VIDEO_NAME_SUFFIX'))
+    offers_json_file_path = payload.get('offers_json_file_path', os.environ.get('OFFERS_JSON_FILE_PATH'))
+    ranking_json_file_path = payload.get('ranking_json_file_path', os.environ.get('RANKING_JSON_FILE_PATH'))
+    markets_csv_file_path = payload.get('markets_csv_file_path', os.environ.get('MARKETS_CSV_FILE_PATH'))
+    product_sheet = payload.get('product_sheet', os.environ.get('PRODUCT_SHEET'))
+    offer_type = payload.get('offer_type', os.environ.get('OFFER_TYPE'))
+    products_per_video = int(payload.get('products_per_video', os.environ.get('PRODUCTS_PER_VIDEO')))
 
     product_configs_range = f'{product_sheet}!A1:ZZ'
-
+    print(f"reading offers from {offers_json_file_path}")
     offers = pd.read_json(offers_json_file_path)
+    print(f"reading ranking from {ranking_json_file_path}")
     ranking = pd.read_json(ranking_json_file_path)
+    print(f"reading markets from {markets_csv_file_path}")
     markets = pd.read_csv(markets_csv_file_path)
 
     ranking = get_product_ranking(products_per_video=products_per_video,
@@ -40,7 +33,6 @@ def generate_product_configs(request):
     clean_range(product_configs_range)
     write_df_to_sheet(video_configs, product_configs_range)
     return "OK"
-
 
 def convert_ranking_to_video_configs(ranking: pd.DataFrame, offer_type: str, video_name_suffix: str):
     columns = ['Id', 'OfferGroup', 'OfferType',
@@ -89,13 +81,3 @@ def transform_offer(x):
             'Werbeartikelbezeichnung': x.texts['Werbeartikelbezeichnung'] if 'Werbeartikelbezeichnung' in x.texts else ''
             }
 
-
-if __name__ == "__main__":
-    from werkzeug.datastructures import ImmutableMultiDict
-    load_local_environment()
-    request = Request()
-    request.args = ImmutableMultiDict([
-        # ('offers_json_file_path', 'https://hop-wmam.paas.rewe.local/offers/2024/10'),
-        # ('ranking_json_file_path', 'https://storage.cloud.google.com/wam-wmps-prod-hop-ranking/2024/10/ranking.json')
-    ])
-    generate_product_configs(request)

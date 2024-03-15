@@ -4,6 +4,9 @@ import pickle
 import pandas as pd
 from googleapiclient.discovery import build
 import os
+import logging
+
+logging.getLogger().setLevel(logging.DEBUG)
 
 # global variables
 _sheet = None

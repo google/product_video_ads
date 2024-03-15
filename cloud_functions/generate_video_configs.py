@@ -8,19 +8,14 @@ import os
 
 @functions_framework.http
 def generate_video_configs(request):
-    args = request.args
-    video_configs_sheet = args.get(
-        'video_configs_sheet', default=os.environ.get('VIDEO_CONFIGS_SHEET'), type=str)
-    product_sheet = args.get(
-        'product_sheet', default=os.environ.get('PRODUCT_SHEET'), type=str)
-    bases_sheet = args.get(
-        'bases_sheet', default=os.environ.get('BASES_SHEET'), type=str)
-    offer_types_sheet = args.get(
-        'offer_types_sheet', default=os.environ.get('OFFER_TYPES_SHEET'), type=str)
-    video_name_suffix = args.get(
-        'video_name_suffix', default=os.environ.get('VIDEO_NAME_SUFFIX'), type=str)
-    initial_video_status = args.get('initial_video_status', default=os.environ.get(
-        'INITIAL_VIDEO_STATUS'), type=str)
+    payload = request.get_json()
+    print(payload)
+    video_configs_sheet = payload.get('video_configs_sheet', os.environ.get('VIDEO_CONFIGS_SHEET'))
+    product_sheet = payload.get('product_sheet', os.environ.get('PRODUCT_SHEET'))
+    bases_sheet = payload.get('bases_sheet', os.environ.get('BASES_SHEET'))
+    offer_types_sheet = payload.get('offer_types_sheet', os.environ.get('OFFER_TYPES_SHEET'))
+    video_name_suffix = payload.get('video_name_suffix', os.environ.get('VIDEO_NAME_SUFFIX'))
+    initial_video_status = payload.get('initial_video_status', os.environ.get('INITIAL_VIDEO_STATUS'))
 
     video_configs_range = f'{video_configs_sheet}!A1:ZZ'
     product_configs_range = f'{product_sheet}!A1:ZZ'
@@ -103,11 +98,3 @@ def get_video_metadata(offer_type: str, df_offer_types: pd.DataFrame):
     video_metadata = df_offer_types.iloc[0]['Configs']
     base = df_offer_types.iloc[0]['Base']
     return video_metadata, base
-
-
-if __name__ == "__main__":
-    from werkzeug.datastructures import ImmutableMultiDict
-    load_local_environment()
-    request = Request()
-    request.args = ImmutableMultiDict([])
-    generate_video_configs(request)
