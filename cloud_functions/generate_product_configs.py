@@ -16,6 +16,7 @@ def generate_product_configs(request):
     products_per_video = int(payload.get('products_per_video', os.environ.get('PRODUCTS_PER_VIDEO')))
 
     product_configs_range = f'{product_sheet}!A1:ZZ'
+
     print(f"reading offers from {offers_json_file_path}")
     offers = pd.read_json(offers_json_file_path)
     print(f"reading ranking from {ranking_json_file_path}")

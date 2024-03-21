@@ -17,10 +17,15 @@ def generate_ads_targeting(request):
     payload = request.get_json()
     print(payload)
 
-    campaigns_sheet = payload.get('campaigns_sheet', os.environ.get('CAMPAIGNS_SHEET'))
-    adgroups_sheet = payload.get('adgroups_sheet', os.environ.get('ADGROUPS_SHEET'))
+    campaigns_sheet = payload.get(
+        'campaigns_sheet', os.environ.get('CAMPAIGNS_SHEET'))
+    adgroups_sheet = payload.get(
+        'adgroups_sheet', os.environ.get('ADGROUPS_SHEET'))
     ads_sheet = payload.get('ads_sheet', os.environ.get('ADS_SHEET'))
-    video_configs_sheet = payload.get('video_configs_sheet', os.environ.get('VIDEO_CONFIGS_SHEET'))
+    video_configs_sheet = payload.get(
+        'video_configs_sheet', os.environ.get('VIDEO_CONFIGS_SHEET'))
+    configuration_sheet = payload.get(
+        'configuration_sheet', os.environ.get('CONFIGURATION_SHEET'))
 
     markets_csv_file_path = payload.get(
         'markets_csv_file_path', os.environ.get('MARKETS_CSV_FILE_PATH'))
@@ -37,7 +42,8 @@ def generate_ads_targeting(request):
     adgroup_type = payload.get(
         'adgroup_type', os.environ.get('ADGROUP_TYPE'))
     ad_type = payload.get('ad_type', os.environ.get('AD_TYPE'))
-    langing_page_url = payload.get('landing_page_url', os.environ.get('LANDING_PAGE_URL'))
+    langing_page_url = payload.get(
+        'landing_page_url', os.environ.get('LANDING_PAGE_URL'))
 
     video_configs_range = f'{video_configs_sheet}!A1:ZZ'
     campaigns_config_range = f'{campaigns_sheet}!A1:ZZ'
@@ -68,6 +74,18 @@ def generate_ads_targeting(request):
 
 
 def get_campaigns_targeting(markets: pd.DataFrame, campaign_action: str, campaign_status: str):
+    stores = markets.dropna().rename(columns={
+        "Postleitzahl": "postcode",
+        "Breitengrad": "lat",
+        "Längengrad": "lon",
+        "Einzugsgebiet (Radius)": "radius"
+        "wwIdent": "store_id"
+    )[['Postcode', 'store_id','lat','lon','radius','store_id']]
+    stores = stores.groupby(
+        'store_id').apply(generateLocations).reset_index(name='Location')
+    
+
+
     campaigns = markets.dropna()
     campaigns = campaigns.rename(columns={
         "Postleitzahl": "Postcode",
@@ -76,14 +94,31 @@ def get_campaigns_targeting(markets: pd.DataFrame, campaign_action: str, campaig
         "Einzugsgebiet (Radius)": "radius",
         "Beschreibung": "description",
         "wwIdent": "store_id",
-        "Mediabudget Social PRO TAG": "Budget"
-    })[['Postcode', 'store_id', 'description', 'lat', 'lon', 'radius', 'Budget']]
+        "Mediabudget Social PRO TAG": "Budget",
+        "Kampagnenstart", "Campaign start date",
+        "Kampagnenende": "Campaign end date"
+    })[['Postcode', 'store_id', 'description', 'lat', 'lon', 'radius', 'Budget', 'Campaign end date', 'Campaign end date']]
+
     campaigns['Postcode'] = campaigns['Postcode'].sort_values().astype(
         str).str.zfill(5)
+# //TODO naming convention
+# start_date
+# end date
+# daily budget
+# location
+
+# //TODO
+# what can change for a given market?
+# start-end date
+# daily budget
+# radius - as markets open nearby
+# wwIdent - if that changes, then campaign end date is set in the past (ID stays in markets file)
+
+# ads valid sunday to saturday (updates to homepage on Sat night)
+# sunday 10AM - saturday 6PM
 
     store_postcodes = campaigns[["store_id", "Postcode"]]
-    campaigns = campaigns[['radius', 'lat', 'lon', 'store_id']].groupby(
-        'store_id').apply(generateLocations).reset_index(name='Location')
+    campaigns = campaigns[['radius', 'lat', 'lon', 'store_id']]
     campaigns = campaigns.merge(store_postcodes, on="store_id")
 
     campaigns = campaigns.sort_values(['Postcode'])
@@ -93,7 +128,7 @@ def get_campaigns_targeting(markets: pd.DataFrame, campaign_action: str, campaig
     campaigns['Campaign'] = CAMPAIGN_NAME_PREFIX + \
         campaigns['store_id'].astype(str)
     campaigns['Currency code'] = 'EUR'
-    campaigns['Budget'] = 1
+    # campaigns['Budget'] = 1
     campaigns['Budget type'] = 'Daily'
     campaigns['Status'] = 'Eligible'
     campaigns['Campaign type'] = 'Video'
