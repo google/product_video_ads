@@ -11,15 +11,45 @@ logging.getLogger().setLevel(logging.DEBUG)
 # global variables
 _sheet = None
 _ENV_READ = False
+_CONFIG = False
 
 def _read_environment():
-    global SPREADSHEET_ID, GCP_PROJECT_ID, SECRET_ID, _ENV_READ
+    global SPREADSHEET_ID, GCP_PROJECT_ID, SECRET_ID, _ENV_READ, CONFIG_SHEET_NAME
     if _ENV_READ:
         return
-    _ENV_READ = True
+    load_local_environment()
     SPREADSHEET_ID = os.environ.get('SPREADSHEET_ID')
     GCP_PROJECT_ID = os.environ.get('GCP_PROJECT_ID')
     SECRET_ID = os.environ.get('SECRET_ID')
+    CONFIG_SHEET_NAME = os.environ.get('CONFIG_SHEET_NAME')
+    _ENV_READ = True
+
+
+def config():
+    global _CONFIG
+    if _CONFIG:
+        return _CONFIG
+    else :
+        _read_environment()
+        _CONFIG =  read_config_from_sheet()
+    return _CONFIG
+
+def config_value(key: str, payload = {}):
+    try:
+        return config()[key]
+    except Exception as e:
+        logging.error(e)
+        return None
+    
+
+def read_config_from_sheet():
+    config = {}
+    configuration_sheet_range=f'{CONFIG_SHEET_NAME}!A1:B'
+    config_df = read_df_from_sheet(configuration_sheet_range)
+    # config_df = pd.transpose(config_df)
+    for _,row in config_df.iterrows():
+        config[row['name']] = row['value']
+    return config
 
 
 def sheet():
@@ -81,7 +111,10 @@ def clean_range(range: str):
 def load_local_environment():
     import os
     import yaml
-    with open("env.yaml") as env:
-        data = yaml.load(env, Loader=yaml.FullLoader)
-        for key, value in data.items():
-            os.environ[key] = value
+    try:
+        with open("env.yaml") as env:
+            data = yaml.load(env, Loader=yaml.FullLoader)
+            for key, value in data.items():
+                os.environ[key] = value
+    except FileNotFoundError:
+        pass
