@@ -4,7 +4,8 @@ import os
 from pva import *
 
 @functions_framework.http
-def generate_product_configs():
+def generate_product_configs(request):
+    
     product_configs_range = f"{config_value('PRODUCT_SHEET')}!A1:ZZ"
 
     print(f"reading offers from {config_value('OFFERS_JSON_FILE_PATH')}")
@@ -70,4 +71,4 @@ def transform_offer(x):
             }
 
 if __name__ == "__main__":
-    generate_product_configs()
+    generate_product_configs(None)

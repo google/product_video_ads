@@ -7,7 +7,7 @@ from pva import *
 
 
 @functions_framework.http
-def generate_ads_targeting():
+def generate_ads_targeting(request):
     markets_csv_file_path = config_value('MARKETS_CSV_FILE_PATH')
     video_configs_range = f"{config_value('VIDEO_CONFIGS_SHEET')}!A1:ZZ"
     campaigns_config_range = f"{config_value('CAMPAIGNS_SHEET')}!A1:ZZ"
@@ -136,4 +136,4 @@ def read_value(sheet, row, col, default=""):
     return sheet.cell(row=row, column=col).value if sheet.cell(row=row, column=col).value else default
 
 if __name__ == "__main__":
-    generate_ads_targeting()
+    generate_ads_targeting(None)

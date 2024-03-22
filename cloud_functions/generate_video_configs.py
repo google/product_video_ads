@@ -7,7 +7,7 @@ import os
 
 
 @functions_framework.http
-def generate_video_configs():
+def generate_video_configs(request):
     video_configs_range = f"{config_value('VIDEO_CONFIGS_SHEET')}!A1:ZZ"
     product_configs_range = f"{config_value('PRODUCT_SHEET')}!A1:ZZ"
     offer_types_range = f"{config_value('OFFER_TYPES_SHEET')}!A:C"
@@ -89,4 +89,4 @@ def get_video_metadata(offer_type: str, df_offer_types: pd.DataFrame):
     base = df_offer_types.iloc[0]['Base']
     return video_metadata, base
 if __name__ == "__main__":
-    generate_video_configs()
+    generate_video_configs(None)
