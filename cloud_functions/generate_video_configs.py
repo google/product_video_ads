@@ -7,34 +7,24 @@ import os
 
 
 @functions_framework.http
-def generate_video_configs(request):
-    payload = request.get_json()
-    print(payload)
-    video_configs_sheet = payload.get('video_configs_sheet', os.environ.get('VIDEO_CONFIGS_SHEET'))
-    product_sheet = payload.get('product_sheet', os.environ.get('PRODUCT_SHEET'))
-    bases_sheet = payload.get('bases_sheet', os.environ.get('BASES_SHEET'))
-    offer_types_sheet = payload.get('offer_types_sheet', os.environ.get('OFFER_TYPES_SHEET'))
-    video_name_suffix = payload.get('video_name_suffix', os.environ.get('VIDEO_NAME_SUFFIX'))
-    initial_video_status = payload.get('initial_video_status', os.environ.get('INITIAL_VIDEO_STATUS'))
-
-    video_configs_range = f'{video_configs_sheet}!A1:ZZ'
-    product_configs_range = f'{product_sheet}!A1:ZZ'
-    offer_types_range = f'{offer_types_sheet}!A:C'
-    bases_range = f'{bases_sheet}!A:C'
+def generate_video_configs():
+    video_configs_range = f"{config_value('VIDEO_CONFIGS_SHEET')}!A1:ZZ"
+    product_configs_range = f"{config_value('PRODUCT_SHEET')}!A1:ZZ"
+    offer_types_range = f"{config_value('OFFER_TYPES_SHEET')}!A:C"
+    bases_range = f"{config_value('BASES_SHEET')}!A:C"
 
     product_configs = read_df_from_sheet(product_configs_range)
     bases = read_df_from_sheet(bases_range)
     offer_types = read_df_from_sheet(offer_types_range)
 
-    video_configs = create_campaigns_sheet_data(
-        product_configs, initial_video_status, video_name_suffix, product_sheet, offer_types, bases)
+    video_configs = create_campaigns_sheet_data(product_configs, offer_types, bases)
 
     clean_range(video_configs_range)
     write_df_to_sheet(video_configs, video_configs_range)
     return "OK"
 
 
-def create_campaigns_sheet_data(video_configs: pd.DataFrame, initial_video_status: str, video_name_suffix: str, product_sheet: str, df_offer_types: pd.DataFrame, bases: pd.DataFrame):
+def create_campaigns_sheet_data(video_configs: pd.DataFrame, df_offer_types: pd.DataFrame, bases: pd.DataFrame):
     date = datetime.now().strftime('%d/%m/%Y, %H:%M:%S')
 
     data = pd.DataFrame(
@@ -43,14 +33,14 @@ def create_campaigns_sheet_data(video_configs: pd.DataFrame, initial_video_statu
     video_groups = video_configs[[
         'OfferGroup', 'OfferType', 'Id', 'Position']].groupby('OfferGroup')
     metadatas = video_groups.apply(
-        lambda group: video_metadata_generator(group, bases, df_offer_types, date, product_sheet))
+        lambda group: video_metadata_generator(group, bases, df_offer_types, date, config_value('PRODUCT_SHEET')))
 
     data['VideoMetadata'] = metadatas
-    data['Status'] = initial_video_status
+    data['Status'] = config_value('INITIAL_VIDEO_STATUS')
     data['GeneratedVideo'] = ''
     data['Date'] = date
     data['AdsMetadata'] = video_groups.apply(
-        lambda group: ads_metadata_generator(group, video_name_suffix))
+        lambda group: ads_metadata_generator(group, config_value('VIDEO_NAME_SUFFIX')))
     return data
 
 
@@ -98,3 +88,5 @@ def get_video_metadata(offer_type: str, df_offer_types: pd.DataFrame):
     video_metadata = df_offer_types.iloc[0]['Configs']
     base = df_offer_types.iloc[0]['Base']
     return video_metadata, base
+if __name__ == "__main__":
+    generate_video_configs()

@@ -84,7 +84,9 @@ def read_df_from_sheet(range: str):
     return pd.DataFrame(values[1:], columns=values[0])
 
 
-def write_df_to_sheet(df: pd.DataFrame, range: str):
+def write_df_to_sheet(df: pd.DataFrame, range: str, clear: bool = False):
+    if clear:
+        clean_range(range)
     values = [df.columns.to_list()] + df.values.tolist()
     write_values_to_sheet(values, range)
 

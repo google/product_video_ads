@@ -4,49 +4,36 @@ import os
 from pva import *
 
 @functions_framework.http
-def generate_product_configs(request):
-    payload = request.get_json()
-    print(payload)
-    video_name_suffix = payload.get('video_name_suffix', os.environ.get('VIDEO_NAME_SUFFIX'))
-    offers_json_file_path = payload.get('offers_json_file_path', os.environ.get('OFFERS_JSON_FILE_PATH'))
-    ranking_json_file_path = payload.get('ranking_json_file_path', os.environ.get('RANKING_JSON_FILE_PATH'))
-    markets_csv_file_path = payload.get('markets_csv_file_path', os.environ.get('MARKETS_CSV_FILE_PATH'))
-    product_sheet = payload.get('product_sheet', os.environ.get('PRODUCT_SHEET'))
-    offer_type = payload.get('offer_type', os.environ.get('OFFER_TYPE'))
-    products_per_video = int(payload.get('products_per_video', os.environ.get('PRODUCTS_PER_VIDEO')))
+def generate_product_configs():
+    product_configs_range = f"{config_value('PRODUCT_SHEET')}!A1:ZZ"
 
-    product_configs_range = f'{product_sheet}!A1:ZZ'
+    print(f"reading offers from {config_value('OFFERS_JSON_FILE_PATH')}")
+    offers = pd.read_json(config_value('OFFERS_JSON_FILE_PATH'))
+    print(f"reading ranking from {config_value('RANKING_JSON_FILE_PATH')}")
+    ranking = pd.read_json(config_value('RANKING_JSON_FILE_PATH'))
+    print(f"reading markets from {config_value('MARKETS_CSV_FILE_PATH')}")
+    markets = pd.read_csv(config_value('MARKETS_CSV_FILE_PATH'))
 
-    print(f"reading offers from {offers_json_file_path}")
-    offers = pd.read_json(offers_json_file_path)
-    print(f"reading ranking from {ranking_json_file_path}")
-    ranking = pd.read_json(ranking_json_file_path)
-    print(f"reading markets from {markets_csv_file_path}")
-    markets = pd.read_csv(markets_csv_file_path)
-
-    ranking = get_product_ranking(products_per_video=products_per_video,
-                                  df_offers=offers,
-                                  df_ranking=ranking)
+    ranking = get_product_ranking(offers, ranking)
     ranking = ranking[ranking['postcode'].isin(markets['Postleitzahl'].astype(str).str.zfill(5))]
-    video_configs = convert_ranking_to_video_configs(
-        ranking, offer_type, video_name_suffix)
+    video_configs = convert_ranking_to_video_configs(ranking)
 
-    clean_range(product_configs_range)
-    write_df_to_sheet(video_configs, product_configs_range)
+    write_df_to_sheet(video_configs, product_configs_range, True)
     return "OK"
 
-def convert_ranking_to_video_configs(ranking: pd.DataFrame, offer_type: str, video_name_suffix: str):
+def convert_ranking_to_video_configs(ranking: pd.DataFrame):
     columns = ['Id', 'OfferGroup', 'OfferType',
                'Position'] + list(ranking.columns.values)
     configs = ranking
     configs['Id'] = configs['nan']
-    configs['OfferType'] = offer_type
+    configs['OfferType'] = config_value('OFFER_TYPE')
     configs['Position'] = configs['rankingorder']
-    configs['OfferGroup'] = configs['postcode']+video_name_suffix
+    configs['OfferGroup'] = configs['postcode'] + config_value('VIDEO_NAME_SUFFIX')
     return configs[columns]
 
 
-def get_product_ranking(products_per_video: int, df_offers: pd.DataFrame, df_ranking: pd.DataFrame):
+def get_product_ranking(df_offers: pd.DataFrame, df_ranking: pd.DataFrame):
+    products_per_video = int(config_value('PRODUCTS_PER_VIDEO'))
 
     offers = df_offers.apply(transform_offer, axis=1, result_type="expand")
     # price, kg/liter price, crossoutprice
@@ -82,3 +69,5 @@ def transform_offer(x):
             'Werbeartikelbezeichnung': x.texts['Werbeartikelbezeichnung'] if 'Werbeartikelbezeichnung' in x.texts else ''
             }
 
+if __name__ == "__main__":
+    generate_product_configs()
