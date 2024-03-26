@@ -56,19 +56,34 @@ def get_product_ranking(df_offers: pd.DataFrame, df_ranking: pd.DataFrame):
 
 
 def transform_offer(x):
+    auslobungmittel = x.texts['Auslobungmittel'] if 'Auslobungmittel' in x.texts else ''
+    auslobungkurz = x.texts['Auslobungkurz'] if 'Auslobungkurz' in x.texts else ''
+    auslobung = auslobungmittel if auslobungmittel != '' else auslobungkurz
+    
+    amount = x.facets['amount'] if 'amount' in x.facets else ''
+    baseprice = x.price['basePrice'] if 'basePrice' in x.price else ''
+    drippedOffWeight = x.facets['DrippedOffWeight'] if 'DrippedOffWeight' in x.facets else ''
+    refundtext = x.facets['RefundText'] if 'RefundText' in x.facets else ''
+    
+    produktDatei = '\n'.join([ s for s in [auslobung, amount, baseprice, refundtext, drippedOffWeight] if s is not None and s != ''])
+    
+    price = int(x.price['price'])
+    priceEuro = int(price / 100)
+    priceCents = price % 100
+    priceOneDigit = priceEuro < 10
+    
     return {'nan': x.nan,
             'id': x.id,
-            'revision': x.revision,
+            'title': x.texts['title'] if 'title' in x.texts else '',
             'price': x.price['price'],
-            'crossOutPrice': x.price['crossOutPrice'],
-            'advantage': x.price['advantage'],
-            'title': x.texts['Werbeartikelbezeichnung'],
+            'price_euro': priceEuro,
+            'price_cents': priceCents,
+            'price_one_digit': priceOneDigit,
             'image_url': x.pictures[0]['url'].strip() if len(x.pictures) > 0 else '',
-            'revision': x.revision,
-            'Auslobung': x.texts['Auslobungmittel'] if 'Auslobungmittel' in x.texts else x.texts['Auslobungkurz'] if 'Auslobungkurz' in x.texts else '',
-            'refundText': x.facets['RefundText'] if 'RefundText' in x.facets else '',
-            'Werbeartikelbezeichnung': x.texts['Werbeartikelbezeichnung'] if 'Werbeartikelbezeichnung' in x.texts else ''
-            }
+            'Herkunftsland': x.facets['Herkunftsland'] if 'Herkunftsland' in x.facets else '',
+            'Werbeartikelbezeichnung': x.texts['Werbeartikelbezeichnung'] if 'Werbeartikelbezeichnung' in x.texts else '',
+            'ProduktDatei' : produktDatei,
+    }
 
 if __name__ == "__main__":
     generate_product_configs(None)
