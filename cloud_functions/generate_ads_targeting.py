@@ -73,21 +73,18 @@ def get_campaigns_targeting(markets: pd.DataFrame):
     campaigns['Action'] = config_value('CAMPAIGN_ACTION')
     campaigns['Campaign status'] = config_value('CAMPAIGN_STATUS')
     campaigns['Campaign'] = config_value('CAMPAIGN_NAME_PREFIX') + campaigns['store_id'].astype(str)
-    campaigns['Currency code'] = 'EUR'
-    campaigns['Budget'] = 1
-    campaigns['Budget type'] = 'Daily'
-    campaigns['Status'] = 'Eligible'
-    campaigns['Campaign type'] = 'Video'
-    campaigns['Campaign subtype'] = 'Standard'
-    campaigns['Bid strategy type'] = 'Manual CPV'
+    campaigns['Budget type'] = config_value('CAMPAIGN_BUDGET_TYPE')
+    campaigns['Campaign type'] = config_value('CAMPAIGN_TYPE')
+    campaigns['Campaign subtype'] = config_value('CAMPAIGN_SUBTYPE')
+    campaigns['Bid strategy type'] = config_value('CAMPAIGN_BID_STRATEGY_TYPE')
 
-    return campaigns[['Row Type', 'Action', 'Campaign status', 'Campaign', 'Currency code', 'Budget', 'Budget type', 'Status', 'Campaign type', 'Campaign subtype', 'Bid strategy type', 'Location', 'Postcode', 'store_id']]
+    return campaigns[['Row Type', 'Action', 'Campaign status', 'Campaign', 'Campaign start date', 'Campaign end date', 'Currency', 'Budget', 'Budget type', 'Campaign type', 'Campaign subtype', 'Bid strategy type', 'Location', 'Postcode', 'store_id']]
 
 def date_formatter(date):
     if '-' in date:
-        return pd.to_datetime(date, format='%Y-%m-%d')
+        return pd.to_datetime(date, format='%Y-%m-%d').strftime('%Y-%m-%d')
     else:
-        return pd.to_datetime(date, format='%m/%d/%Y')
+        return pd.to_datetime(date, format='%m/%d/%Y').strftime('%Y-%m-%d')
 
 def generateLocations(market_group):
     locations = []

@@ -30,8 +30,9 @@ def create_campaigns_sheet_data(video_configs: pd.DataFrame, df_offer_types: pd.
     data = pd.DataFrame(
         columns=['Date', 'AdsMetadata', 'VideoMetadata', 'Status', 'GeneratedVideo'])
 
-    video_groups = video_configs[[
-        'OfferGroup', 'OfferType', 'Id', 'Position']].groupby('OfferGroup')
+    # video_groups = video_configs[[
+    #     'OfferGroup', 'OfferType', 'Id', 'Position']].groupby('OfferGroup')
+    video_groups = video_configs.groupby(['OfferGroup'])
     metadatas = video_groups.apply(
         lambda group: video_metadata_generator(group, bases, df_offer_types, date, config_value('PRODUCT_SHEET')))
 
@@ -65,11 +66,13 @@ def video_metadata_generator(product_group, bases: pd.DataFrame, df_offer_types:
     for row in product_group.to_dict(orient='records'):
         product_elements = json.loads(template_json)
         for el in product_elements:
-            el['key'] = row['Id']
-            position = int(row['Position'])
-            el['start_time'] = timings[position-1]['start_time']
-            el['end_time'] = timings[position-1]['end_time']
-            configs.append(el)
+            if conditions_met(row,el):
+                if el['type'] == 'product':
+                    el['key'] = row['Id']
+                position = int(row['Position'])
+                el['start_time'] = timings[position-1]['start_time']
+                el['end_time'] = timings[position-1]['end_time']
+                configs.append(el)
     metadata = {
         "name": offer_group,
         "base_video": base_video,
@@ -81,6 +84,16 @@ def video_metadata_generator(product_group, bases: pd.DataFrame, df_offer_types:
         "date": date
     }
     return json.dumps(metadata)
+
+def conditions_met(row, el):
+    if 'conditions' in el:    
+        for condition in el['conditions']:
+            key = condition['key']
+            value = condition['value']
+            if str(row[key]) == str(value):
+                if condition['action'] == 'hide':
+                    return False
+    return True
 
 
 def get_video_metadata(offer_type: str, df_offer_types: pd.DataFrame):

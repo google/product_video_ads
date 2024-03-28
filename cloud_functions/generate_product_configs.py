@@ -3,9 +3,14 @@ import pandas as pd
 import os
 from pva import *
 
+# TODO: Herkunftsland
+# TODO: Title, Herkunftsland longer than 23 letters -> ...
+# TODO: Werbeartikelbezeichnung: line breaks <br/>
+# TODO: put dot into price_euros AS A STRING!
+
 @functions_framework.http
 def generate_product_configs(request):
-    
+
     product_configs_range = f"{config_value('PRODUCT_SHEET')}!A1:ZZ"
 
     print(f"reading offers from {config_value('OFFERS_JSON_FILE_PATH')}")
@@ -16,20 +21,24 @@ def generate_product_configs(request):
     markets = pd.read_csv(config_value('MARKETS_CSV_FILE_PATH'))
 
     ranking = get_product_ranking(offers, ranking)
-    ranking = ranking[ranking['postcode'].isin(markets['Postleitzahl'].astype(str).str.zfill(5))]
+    ranking = ranking[ranking['postcode'].isin(
+        markets['Postleitzahl'].astype(str).str.zfill(5))]
     video_configs = convert_ranking_to_video_configs(ranking)
 
     write_df_to_sheet(video_configs, product_configs_range, True)
     return "OK"
 
+
 def convert_ranking_to_video_configs(ranking: pd.DataFrame):
     columns = ['Id', 'OfferGroup', 'OfferType',
                'Position'] + list(ranking.columns.values)
     configs = ranking
-    configs['Id'] = configs['nan']
+    configs['Id'] = configs['nan'].astype(
+        str)+"_"+configs["postcode"].astype(str)
     configs['OfferType'] = config_value('OFFER_TYPE')
     configs['Position'] = configs['rankingorder']
-    configs['OfferGroup'] = configs['postcode'] + config_value('VIDEO_NAME_SUFFIX')
+    configs['OfferGroup'] = configs['postcode'] + \
+        config_value('VIDEO_NAME_SUFFIX')
     return configs[columns]
 
 
@@ -59,31 +68,32 @@ def transform_offer(x):
     auslobungmittel = x.texts['Auslobungmittel'] if 'Auslobungmittel' in x.texts else ''
     auslobungkurz = x.texts['Auslobungkurz'] if 'Auslobungkurz' in x.texts else ''
     auslobung = auslobungmittel if auslobungmittel != '' else auslobungkurz
-    
+
     amount = x.facets['amount'] if 'amount' in x.facets else ''
     baseprice = x.price['basePrice'] if 'basePrice' in x.price else ''
     drippedOffWeight = x.facets['DrippedOffWeight'] if 'DrippedOffWeight' in x.facets else ''
     refundtext = x.facets['RefundText'] if 'RefundText' in x.facets else ''
-    
-    produktDatei = '\n'.join([ s for s in [auslobung, amount, baseprice, refundtext, drippedOffWeight] if s is not None and s != ''])
-    
+
+    produktDatei = '\n'.join([s for s in [auslobung, amount, baseprice,
+                             refundtext, drippedOffWeight] if s is not None and s != ''])
+
     price = int(x.price['price'])
     priceEuro = int(price / 100)
     priceCents = price % 100
     priceOneDigit = priceEuro < 10
-    
+
     return {'nan': x.nan,
             'id': x.id,
-            'title': x.texts['title'] if 'title' in x.texts else '',
             'price': x.price['price'],
             'price_euro': priceEuro,
             'price_cents': priceCents,
             'price_one_digit': priceOneDigit,
             'image_url': x.pictures[0]['url'].strip() if len(x.pictures) > 0 else '',
-            'Herkunftsland': x.facets['Herkunftsland'] if 'Herkunftsland' in x.facets else '',
+            'Herkunftsland': x.texts['Herkunftsland'] if 'Herkunftsland' in x.texts else '',
             'Werbeartikelbezeichnung': x.texts['Werbeartikelbezeichnung'] if 'Werbeartikelbezeichnung' in x.texts else '',
-            'ProduktDatei' : produktDatei,
-    }
+            'ProduktDatei': produktDatei,
+            }
+
 
 if __name__ == "__main__":
     generate_product_configs(None)
