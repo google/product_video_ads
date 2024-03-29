@@ -95,7 +95,7 @@ def _wrap_text(text, charaters_per_line):
     words = []
 
     if charaters_per_line == 0:
-        words.append(text.split('\n'))
+        words = text.split('\n')
     else:
 
         # Splits words for each line width
