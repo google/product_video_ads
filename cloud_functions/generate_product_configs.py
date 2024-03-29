@@ -3,10 +3,10 @@ import pandas as pd
 import os
 from pva import *
 
-# TODO: Herkunftsland
-# TODO: Title, Herkunftsland longer than 23 letters -> ...
-# TODO: Werbeartikelbezeichnung: line breaks <br/>
-# TODO: put dot into price_euros AS A STRING!
+#DONE TODO: Herkunftsland
+#DONE  TODO: Title, Herkunftsland longer than 23 letters -> ...
+#DONE  TODO: Werbeartikelbezeichnung: line breaks <br/>
+#DONE TODO: put dot into price_euros AS A STRING!
 
 @functions_framework.http
 def generate_product_configs(request):
@@ -74,13 +74,22 @@ def transform_offer(x):
     drippedOffWeight = x.facets['DrippedOffWeight'] if 'DrippedOffWeight' in x.facets else ''
     refundtext = x.facets['RefundText'] if 'RefundText' in x.facets else ''
 
-    produktDatei = '\n'.join([s for s in [auslobung, amount, baseprice,
+    produktDatei = '<br/>'.join([s for s in [auslobung, amount, baseprice,
                              refundtext, drippedOffWeight] if s is not None and s != ''])
 
     price = int(x.price['price'])
-    priceEuro = int(price / 100)
+    priceEuro = str(int(price / 100))+'.'
     priceCents = price % 100
-    priceOneDigit = priceEuro < 10
+    priceOneDigit = price >= 1000
+
+    length_limit = int(config_value('TITLE_LENGHT_LIMIT'))
+    herkunftsland = x.texts['Herkunftsland'] if 'Herkunftsland' in x.texts else ''
+    if len(herkunftsland) > length_limit:
+        herkunftsland = herkunftsland[:length_limit] + '...'
+
+    werbeartikelbezeichnung = x.texts['Werbeartikelbezeichnung'] if 'Werbeartikelbezeichnung' in x.texts else ''
+    if len(werbeartikelbezeichnung) > length_limit:
+        werbeartikelbezeichnung = werbeartikelbezeichnung[:length_limit] + '...'
 
     return {'nan': x.nan,
             'id': x.id,
@@ -89,8 +98,8 @@ def transform_offer(x):
             'price_cents': priceCents,
             'price_one_digit': priceOneDigit,
             'image_url': x.pictures[0]['url'].strip() if len(x.pictures) > 0 else '',
-            'Herkunftsland': x.texts['Herkunftsland'] if 'Herkunftsland' in x.texts else '',
-            'Werbeartikelbezeichnung': x.texts['Werbeartikelbezeichnung'] if 'Werbeartikelbezeichnung' in x.texts else '',
+            'Herkunftsland': herkunftsland,
+            'Werbeartikelbezeichnung': werbeartikelbezeichnung,
             'ProduktDatei': produktDatei,
             }
 
