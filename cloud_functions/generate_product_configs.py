@@ -74,7 +74,7 @@ def transform_offer(x):
     drippedOffWeight = x.facets['DrippedOffWeight'] if 'DrippedOffWeight' in x.facets else ''
     refundtext = x.facets['RefundText'] if 'RefundText' in x.facets else ''
 
-    produktDatei = '<br/>'.join([s for s in [auslobung, amount, baseprice,
+    produktDatei = '\n'.join([s for s in [auslobung, amount, baseprice,
                              refundtext, drippedOffWeight] if s is not None and s != ''])
 
     price = int(x.price['price'])
