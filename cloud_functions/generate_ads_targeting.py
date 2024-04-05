@@ -59,7 +59,7 @@ def get_campaigns_targeting(markets: pd.DataFrame):
     })[['store_id', 'Postcode',  'Budget', 'Campaign start date', 'Campaign end date']]
     campaigns['Postcode'] = campaigns['Postcode'].astype(str).str.zfill(5)
     campaigns['Currency'] = "EUR"
-    campaigns['Budget'] = campaigns['Budget'].str[:-3].astype(float)
+    campaigns['Budget'] = campaigns['Budget'].str[:-3].replace(',','.').astype(float)
     campaigns['Campaign start date'] = campaigns['Campaign start date'].apply(
         date_formatter)
     campaigns['Campaign end date'] = campaigns['Campaign end date'].apply(
@@ -92,9 +92,12 @@ def generateLocations(market_group):
     locations = []
     for row in market_group.to_dict(orient='records'):
         try:
+            lat = row['lat'].replace(',', '.')
+            lat = '{:.6f}'.format(float(lat))
+            lon = row['lon'].replace(',', '.')
+            lon = '{:.6f}'.format(float(lon))
+            radius = row['radius'].replace(',', '.')
             radius = max(1, round(row['radius']/1000))
-            lat = '{:.6f}'.format(float(row['lat']))
-            lon = '{:.6f}'.format(float(row['lon']))
             locations.append(f"{radius}|km|{lat},{lon}")
         except Exception:
             pass
