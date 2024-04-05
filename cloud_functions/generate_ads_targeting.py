@@ -53,7 +53,7 @@ def get_campaigns_targeting(markets: pd.DataFrame):
         "wwIdent": "store_id",
         "Postleitzahl": "Postcode",
         # daily budget
-        "Mediabudget Social PRO TAG": "Budget",
+        "Tagesbudget pro Markt": "Budget",
         "Kampagnenstart": "Campaign start date",
         "Kampagnenende": "Campaign end date"
     })[['store_id', 'Postcode',  'Budget', 'Campaign start date', 'Campaign end date']]
@@ -91,10 +91,13 @@ def date_formatter(date):
 def generateLocations(market_group):
     locations = []
     for row in market_group.to_dict(orient='records'):
-        radius = max(1, round(row['radius']/1000))
-        lat = '{:.6f}'.format(row['lat'])
-        lon = '{:.6f}'.format(row['lon'])
-        locations.append(f"{radius}|km|{lat},{lon}")
+        try:
+            radius = max(1, round(row['radius']/1000))
+            lat = '{:.6f}'.format(float(row['lat']))
+            lon = '{:.6f}'.format(float(row['lon']))
+            locations.append(f"{radius}|km|{lat},{lon}")
+        except Exception:
+            pass
     return ';'.join(locations)
 
 

@@ -36,7 +36,8 @@ def convert_ranking_to_video_configs(ranking: pd.DataFrame):
     configs['Id'] = configs['nan'].astype(
         str)+"_"+configs["postcode"].astype(str)
     configs['OfferType'] = config_value('OFFER_TYPE')
-    configs['Position'] = configs['rankingorder']
+    # configs['Position'] = configs['rankingorder']
+    configs['Position'] = configs.groupby(['postcode'])['postcode'].rank(method='first',ascending=True)
     configs['OfferGroup'] = configs['postcode'] + \
         config_value('VIDEO_NAME_SUFFIX')
     return configs[columns]
@@ -46,22 +47,23 @@ def get_product_ranking(df_offers: pd.DataFrame, df_ranking: pd.DataFrame):
     products_per_video = int(config_value('PRODUCTS_PER_VIDEO'))
 
     offers = df_offers.apply(transform_offer, axis=1, result_type="expand")
-    # price, kg/liter price, crossoutprice
+    #some anomaly that gets us multiple (same-valued) offers for the same nan. 'id' is to blame
+    offers = offers.sort_values('nan').groupby(['nan']).agg('first').reset_index()
+    #expand data format of ranking list
     ranking = pd.DataFrame(df_ranking['mediaCellList'].to_list())
     ranking["postcode"] = ranking["postcode"].astype('string')
-    # TODO pin down selection logic for same-ranking products
-    # TODO drop this after logic is clear
-    ranking = ranking.sort_values(['postcode', 'rankingorder']).groupby(
-        ['postcode', 'rankingorder']).agg('first').groupby('postcode').head(products_per_video).reset_index()
-    ranking = ranking.merge(offers, how='left', on='nan')
-    ranking = ranking.dropna()
-    # ranking = ranking.filter(
-    #     ['nan', 'postcode', 'rankingorder', 'title', 'picture', 'price'])
-    ranking = ranking.sort_values(['postcode', 'rankingorder']).groupby(
-        ['postcode', 'rankingorder']).agg('first').groupby('postcode').head(products_per_video).reset_index()
-    ranking = ranking[(ranking.groupby(
-        'postcode').rankingorder.transform('count') == products_per_video)]
-    return ranking
+    
+    merged = ranking.merge(offers, how='left',on='nan')
+    #avoid non-matching NaNs
+    merged = merged.dropna()
+
+    merged = merged.sort_values(['postcode', 'rankingorder']).groupby(
+        ['postcode', 'rankingorder']).agg('first').reset_index()
+    
+    # #take top ranking products per postcode from those that have offer data
+    merged = merged.groupby('postcode').head(products_per_video).reset_index(drop=True)
+ 
+    return merged
 
 
 def transform_offer(x):
@@ -92,10 +94,9 @@ def transform_offer(x):
         werbeartikelbezeichnung = werbeartikelbezeichnung[:length_limit] + '...'
 
     return {'nan': x.nan,
-            'id': x.id,
             'price': x.price['price'],
             'price_euro': priceEuro,
-            'price_cents': priceCents,
+            'price_cents': f"{priceCents:02d}",
             'price_one_digit': priceOneDigit,
             'image_url': x.pictures[0]['url'].strip() if len(x.pictures) > 0 else '',
             'Herkunftsland': herkunftsland,
