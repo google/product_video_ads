@@ -53,13 +53,14 @@ def get_campaigns_targeting(markets: pd.DataFrame):
         "wwIdent": "store_id",
         "Postleitzahl": "Postcode",
         # daily budget
-        "Tagesbudget pro Markt": "Budget",
+        " Tagesbudget pro Markt": "Budget",
         "Kampagnenstart": "Campaign start date",
         "Kampagnenende": "Campaign end date"
     })[['store_id', 'Postcode',  'Budget', 'Campaign start date', 'Campaign end date']]
     campaigns['Postcode'] = campaigns['Postcode'].astype(str).str.zfill(5)
     campaigns['Currency'] = "EUR"
-    campaigns['Budget'] = campaigns['Budget'].str[:-3].replace(',','.').astype(float)
+    campaigns['Budget'] = campaigns['Budget'].str[:-
+                                                  3].apply(lambda x: x.strip().replace('.', '').replace(',', '.')).astype(float)
     campaigns['Campaign start date'] = campaigns['Campaign start date'].apply(
         date_formatter)
     campaigns['Campaign end date'] = campaigns['Campaign end date'].apply(
@@ -77,15 +78,18 @@ def get_campaigns_targeting(markets: pd.DataFrame):
     campaigns['Campaign type'] = config_value('CAMPAIGN_TYPE')
     campaigns['Campaign subtype'] = config_value('CAMPAIGN_SUBTYPE')
     campaigns['Bid strategy type'] = config_value('CAMPAIGN_BID_STRATEGY_TYPE')
+    campaigns['Target CPM bid'] = config_value('CAMPAIGN_TARGET_CPM_BID')
+    campaigns['Networks'] = config_value('CAMPAIGN_NETWORKS')
 
-    return campaigns[['Row Type', 'Action', 'Campaign status', 'Campaign', 'Campaign start date', 'Campaign end date', 'Currency', 'Budget', 'Budget type', 'Campaign type', 'Campaign subtype', 'Bid strategy type', 'Location', 'Postcode', 'store_id']]
+    return campaigns[['Row Type', 'Action', 'Campaign status', 'Campaign', 'Campaign start date', 'Campaign end date', 'Currency', 'Budget', 'Budget type', 'Campaign type', 'Campaign subtype', 'Bid strategy type', 'Target CPM bid', 'Location', 'Postcode', 'Networks', 'store_id']]
 
 
 def date_formatter(date):
-    date_object = pd.to_datetime(date, format='%Y-%m-%d') if '-' in date else pd.to_datetime(date, format='%m/%d/%Y')
+    date_object = pd.to_datetime(
+        date, format='%Y-%m-%d') if '-' in date else pd.to_datetime(date, format='%m/%d/%Y')
     # if date_object < datetime.date.today():
     #     date_object = datetime.date.today().strftime('%Y-%m-%d')
-    return date_object.strftime('%Y-%m-%d') 
+    return date_object.strftime('%Y-%m-%d')
 
 
 def generateLocations(market_group):
@@ -112,7 +116,8 @@ def get_adgroups_targeting(campaigns_targeting: pd.DataFrame):
     adgroups['Action'] = config_value('ADGROUP_ACTION')
     adgroups['Status'] = config_value('ADGROUP_STATUS')
     adgroups['Ad group type'] = config_value('ADGROUP_TYPE')
-    return adgroups[['Action', 'Campaign', 'Ad group', 'Status', 'Ad group type']]
+    adgroups['Target CPM'] = config_value('ADGROUP_TARGET_CPM')
+    return adgroups[['Action', 'Campaign', 'Ad group', 'Status', 'Ad group type', 'Target CPM']]
 
 
 def get_ads_targeting_df(campaigns_targeting: pd.DataFrame, video_configs: pd.DataFrame):
@@ -135,7 +140,7 @@ def get_ads_targeting_df(campaigns_targeting: pd.DataFrame, video_configs: pd.Da
     ads['Description 2'] = config_value(
         'DEFAULT_HEADLINE_TEXT') + " description 2"
     ads['Ad type'] = config_value('AD_TYPE')
-    ads['Campaign type'] = 'Video'
+    # ads['Campaign type'] = 'Video'
     ads = ads.merge(
         video_configs[['Postcode', 'GeneratedVideo']], on='Postcode').reset_index()
     ads['Video'] = 'https://www.youtube.com/watch?v=' + ads['GeneratedVideo']
