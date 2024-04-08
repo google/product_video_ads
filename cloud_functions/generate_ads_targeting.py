@@ -100,8 +100,8 @@ def generateLocations(market_group):
             lat = '{:.6f}'.format(float(lat))
             lon = row['lon'].replace(',', '.')
             lon = '{:.6f}'.format(float(lon))
-            radius = row['radius'].replace(',', '.')
-            radius = max(1, round(row['radius']/1000))
+            radius = float(row['radius'].replace(',', '.'))
+            radius = max(1, round(radius/1000))
             locations.append(f"{radius}|km|{lat},{lon}")
         except Exception:
             pass
@@ -134,18 +134,14 @@ def get_ads_targeting_df(campaigns_targeting: pd.DataFrame, video_configs: pd.Da
     ads['Ad status'] = config_value('AD_STATUS')
     ads['Ad name'] = config_value(
         'AD_NAME_PREFIX') + campaigns_targeting['store_id'].astype(str)
-    # ads['Headline'] = config_value('DEFAULT_HEADLINE_TEXT') + " headline"
-    # ads['Description 1'] = config_value(
-    #     'DEFAULT_HEADLINE_TEXT') + " description 1"
-    # ads['Description 2'] = config_value(
-    #     'DEFAULT_HEADLINE_TEXT') + " description 2"
+    ads['Call to action text'] = config_value('AD_CALL_TO_ACTION_TEXT')
     ads['Ad type'] = config_value('AD_TYPE')
     ads = ads.merge(
         video_configs[['Postcode', 'GeneratedVideo']], on='Postcode').reset_index()
     ads['Video'] = 'https://www.youtube.com/watch?v=' + ads['GeneratedVideo']
-    ads['Final Url'] = config_value('LANDING_PAGE_URL')
-    ads['Display Url'] = config_value('LANDING_PAGE_URL')
-    return ads[['Row Type', 'Action', 'Ad status','Display Url', 'Final Url', 'Ad name', 'Ad type', 'Video', 'Campaign', 'Ad group']]
+    ads['Final Url'] = config_value('AD_FINAL_URL')
+    ads['Display Url'] = config_value('AD_DISPLAY_URL')
+    return ads[['Row Type', 'Action', 'Ad status', 'Display Url', 'Final Url', 'Call to action text', 'Ad name', 'Ad type', 'Video', 'Campaign', 'Ad group']]
 
 
 def read_value(sheet, row, col, default=""):
