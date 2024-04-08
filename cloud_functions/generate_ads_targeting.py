@@ -134,18 +134,18 @@ def get_ads_targeting_df(campaigns_targeting: pd.DataFrame, video_configs: pd.Da
     ads['Ad status'] = config_value('AD_STATUS')
     ads['Ad name'] = config_value(
         'AD_NAME_PREFIX') + campaigns_targeting['store_id'].astype(str)
-    ads['Headline'] = config_value('DEFAULT_HEADLINE_TEXT') + " headline"
-    ads['Description 1'] = config_value(
-        'DEFAULT_HEADLINE_TEXT') + " description 1"
-    ads['Description 2'] = config_value(
-        'DEFAULT_HEADLINE_TEXT') + " description 2"
+    # ads['Headline'] = config_value('DEFAULT_HEADLINE_TEXT') + " headline"
+    # ads['Description 1'] = config_value(
+    #     'DEFAULT_HEADLINE_TEXT') + " description 1"
+    # ads['Description 2'] = config_value(
+    #     'DEFAULT_HEADLINE_TEXT') + " description 2"
     ads['Ad type'] = config_value('AD_TYPE')
-    # ads['Campaign type'] = 'Video'
     ads = ads.merge(
         video_configs[['Postcode', 'GeneratedVideo']], on='Postcode').reset_index()
     ads['Video'] = 'https://www.youtube.com/watch?v=' + ads['GeneratedVideo']
     ads['Final Url'] = config_value('LANDING_PAGE_URL')
-    return ads[['Row Type', 'Action', 'Ad status', 'Final Url', 'Headline', 'Description 1', 'Description 2', 'Ad name', 'Ad type', 'Video', 'Campaign', 'Ad group', 'Campaign type']]
+    ads['Display Url'] = config_value('LANDING_PAGE_URL')
+    return ads[['Row Type', 'Action', 'Ad status','Display Url', 'Final Url', 'Ad name', 'Ad type', 'Video', 'Campaign', 'Ad group']]
 
 
 def read_value(sheet, row, col, default=""):
