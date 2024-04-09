@@ -15,7 +15,7 @@
 # limitations under the License.
 
 #Service accounts are described by several lines, hence the grep/grep/sed combo
-export COMPUTE_ENGINE_SERVICE_ACCOUNT_EMAIL=$(gcloud iam service-accounts list | grep -a1 Compute | grep EMAIL | sed 's/EMAIL: //')
+export COMPUTE_ENGINE_SERVICE_ACCOUNT_EMAIL=$(gcloud iam service-accounts list | grep -a1 -i Compute | grep EMAIL | sed 's/EMAIL: //')
 PROJECT_NAME=video-generator:latest
 export SECRET_ID=video_generator_auth_token
 
