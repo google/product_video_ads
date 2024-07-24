@@ -2,6 +2,8 @@
 
 <img src="https://github.com/google/product_video_ads/blob/main/logo.png" alt="PVA Logo" width="300"/>
 
+Disclaimer: This is not an official Google product.
+
 Product Video Ads is an open-source solution that builds videos at scale, by reading
 product data from Google Sheets or Google Merchant Center and generating videos
 with product information (name, image, price) automatically. These videos are 
