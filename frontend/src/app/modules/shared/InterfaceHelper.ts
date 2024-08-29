@@ -50,7 +50,7 @@ export class InterfaceHelper {
           }`
 
             const node = document.createElement('style');
-            node.innerHTML = styles;
+            node.innerText = styles;
             document.head.appendChild(node);
 
             loaded_fonts.add(font_name)
