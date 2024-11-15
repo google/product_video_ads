@@ -35,7 +35,7 @@ class SpreadsheetConfiguration(object):
 
     logger = log.getLogger()
 
-    def __init__(self, spreadsheet_id, credentials):
+    def __init__(self, spreadsheet_id, credentials, enable_sheet_logging=True):
 
         self.spreadsheet_id = spreadsheet_id
 
@@ -44,14 +44,17 @@ class SpreadsheetConfiguration(object):
         self.logger.info('Spreadsheet configuration for ID %s initialized...',
                          spreadsheet_id)
 
-        # Add log handler to write to configuration spreadsheet
-        def log_callback(message, position):
-            self.write_log(message, position)
+        if (enable_sheet_logging):
+            #Add log handler to write to configuration spreadsheet
+            def log_callback(message, position):
+                self.write_log(message, position)
 
-        trix_handler = SpreadsheetHandler(log_callback)
-        trix_handler.setFormatter(self.logger.handlers[0].formatter)
-        self.logger.addHandler(trix_handler)
-        self.logger.info('Spreadsheet log handler configured')
+            trix_handler = SpreadsheetHandler(log_callback)
+            trix_handler.setFormatter(self.logger.handlers[0].formatter)
+            self.logger.addHandler(trix_handler)
+            self.logger.info('Spreadsheet log handler configured')
+        else:
+            self.logger.info('Not logging to sheet to lower RW Sheet API footprint')
 
     def write_log(self, message, position):
         # Clear first

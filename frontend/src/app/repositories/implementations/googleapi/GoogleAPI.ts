@@ -90,23 +90,32 @@ export class GoogleAPI {
     return response.result.sheets.map(sheet => sheet.properties.title)
   }
   
-  async save_values(data : Array<any>, sheet? : string) : Promise<any> {
-    
-    sheet = sheet || this.sheet_id
+  async save_values(data: Array<any>, sheet?: string): Promise<any> {
 
-    // Clear values first
-    await this.gapi.client.sheets.spreadsheets.values.batchClear({
-      spreadsheetId: sheet,  
-      ranges: data.map(d => d.range)
-    })
-    
-    return this.gapi.client.sheets.spreadsheets.values.batchUpdate({
-      spreadsheetId: sheet,  
-      resource: {
-        data: data,
-        valueInputOption: 'RAW'
+      sheet = sheet || this.sheet_id
+      var ret = undefined, retries = 5;
+      while (ret === undefined && retries > 0) {
+        try {
+            // Clear values first
+          await this.gapi.client.sheets.spreadsheets.values.batchClear({
+              spreadsheetId: sheet,
+              ranges: data.map(d => d.range)
+          })
+
+          ret = this.gapi.client.sheets.spreadsheets.values.batchUpdate({
+              spreadsheetId: sheet,
+              resource: {
+                  data: data,
+                  valueInputOption: 'RAW'
+              }
+          })
+        } catch (e) {
+          console.log(e);
+          retries--;
+          await new Promise(r => setTimeout(r, 5000));
+        }
       }
-    })
+      return ret;
   }
   
   /** Drive **/
