@@ -59,16 +59,19 @@ class ClaspManager {
     );
   }
 
-  static async alreadyConfiguredSheetLink(rootDir: string){
-    const claspConfig = JSON.parse(fs.readFileSync(path.join(rootDir,".clasp-dev.json")))
-    return `https://docs.google.com/spreadsheets/d/${claspConfig.parentId}`
+  static async alreadyConfiguredSheetLink(rootDir: string) {
+    const claspConfig = JSON.parse(
+      fs.readFileSync(path.join(rootDir, ".clasp-dev.json"))
+    );
+    return `https://docs.google.com/spreadsheets/d/${claspConfig.parentId}`;
   }
 
-  static async alreadyConfiguredScriptLink(rootDir: string){
-    const claspConfig = JSON.parse(fs.readFileSync(path.join(rootDir,".clasp-dev.json")))
-    return `https://script.google.com/home/projects/${claspConfig.scriptId}`
+  static async alreadyConfiguredScriptLink(rootDir: string) {
+    const claspConfig = JSON.parse(
+      fs.readFileSync(path.join(rootDir, ".clasp-dev.json"))
+    );
+    return `https://script.google.com/home/projects/${claspConfig.scriptId}`;
   }
-
 
   static extractSheetsLink(output: string) {
     const sheetsLink = output.match(/Google Sheet: ([^\n]*)/);
@@ -101,8 +104,8 @@ class ClaspManager {
       ],
       { encoding: "utf-8" }
     );
-    if (res.status !== 0){
-      throw res.error
+    if (res.status !== 0) {
+      throw res.error;
     }
 
     await fs.move(
@@ -157,7 +160,10 @@ export class GcpDeploymentHandler {
     console.log(
       "Deploying the 'pva-lite' service on Cloud Run / Cloud Functions..."
     );
-    const res = spawn.sync("npm run deploy-service", { stdio: "inherit", shell: true });
+    const res = spawn.sync("npm run deploy-service", {
+      stdio: "inherit",
+      shell: true,
+    });
     if (res.status !== 0) {
       throw new Error("Failed to deploy GCP components.");
     }
@@ -171,7 +177,7 @@ export class AppsScriptDeploymentHandler {
     const claspConfigExists = await ClaspManager.isConfigured("./appsscript");
     if (!claspConfigExists) {
       console.log("Creating Apps Script Project...");
-      await ClaspManager.create("PVA Lite", "./dist", "./appsscript");
+      await ClaspManager.create("Product Video Ads", "./dist", "./appsscript");
     } else {
       console.log("Using existing Apps Script Project");
     }
@@ -183,30 +189,38 @@ export class AppsScriptDeploymentHandler {
     spawn.sync("npm run deploy-appsscript", { stdio: "inherit", shell: true });
   }
 
-  static async printProjectLinks(){
-    console.log(`IMPORTANT -> Apps Script Link: ${await ClaspManager.alreadyConfiguredScriptLink("./appsscript")}.`);
-    console.log(`IMPORTANT -> Google Sheets Link: ${await ClaspManager.alreadyConfiguredSheetLink("./appsscript")}`);
+  static async printProjectLinks() {
+    console.log(
+      `IMPORTANT -> Apps Script Link: ${await ClaspManager.alreadyConfiguredScriptLink(
+        "./appsscript"
+      )}.`
+    );
+    console.log(
+      `IMPORTANT -> Google Sheets Link: ${await ClaspManager.alreadyConfiguredSheetLink(
+        "./appsscript"
+      )}`
+    );
   }
 }
 
 export class UserConfigManager {
   static alreadyCopiedFiles: string[] = [];
 
-  static getCurrentConfig(){
-    if(fs.existsSync(".config.json")){
-      return JSON.parse(fs.readFileSync(".config.json"))
+  static getCurrentConfig() {
+    if (fs.existsSync(".config.json")) {
+      return JSON.parse(fs.readFileSync(".config.json"));
     } else {
       console.log("No config found, using default values");
       return {
         gcpRegion: DEFAULT_GCP_REGION,
         gcsLocation: DEFAULT_GCS_LOCATION,
         pubsubTopic: DEFAULT_PUBSUB_TOPIC,
-      }
+      };
     }
   }
 
-  static saveConfig(config: any){
-    fs.writeFileSync(".config.json", JSON.stringify(config))
+  static saveConfig(config: any) {
+    fs.writeFileSync(".config.json", JSON.stringify(config));
   }
 
   static setUserConfig(response: PromptsResponse) {
@@ -244,9 +258,9 @@ export class UserConfigManager {
       gcpProjectId: gcpProjectIdSanitized,
       gcpRegion: gcpRegion,
       gcsLocation: gcsLocation,
-      pubsubTopic: pubSubTopic
-    }
-    this.saveConfig(config)
+      pubsubTopic: pubSubTopic,
+    };
+    this.saveConfig(config);
 
     configReplace({
       regex: "<gcp-project-id>",
@@ -269,19 +283,13 @@ export class UserConfigManager {
     configReplace({
       regex: "<gcs-bucket>",
       replacement: gcsBucket,
-      paths: [
-        "./service/deploy-config.sh",
-        "./service/.env.yaml",
-      ],
+      paths: ["./service/deploy-config.sh", "./service/.env.yaml"],
     });
 
     configReplace({
       regex: "<pubsub-topic>",
       replacement: pubSubTopic,
-      paths: [
-        "./service/.env.yaml",
-        "./service/deploy-config.sh",
-      ],
+      paths: ["./service/.env.yaml", "./service/deploy-config.sh"],
     });
     console.log();
   }
