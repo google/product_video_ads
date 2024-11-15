@@ -1,0 +1,36 @@
+{
+  "name": "pva-lite",
+  "version": "1.0.0",
+  "description": "PVA Lite - Build product video ads at scale.",
+  "keywords": [
+    "google-cloud",
+    "video",
+    "ads",
+    "merchant-center",
+    "shopping"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "npm i --silent && npm run build && node dist/index.js",
+    "deploy": "npm run start",
+    "update-app": "npm run build && node dist/update.js",
+    "deploy-appsscript": "cd appsscript && npm run deploy",
+    "deploy-service": "cd service && bash deploy.sh",
+    "postinstall": "cd appsscript && npm install"
+  },
+  "engines": {
+    "node": ">=12"
+  },
+  "dependencies": {
+    "cross-spawn": "^7.0.3",
+    "fs-extra": "^11.2.0",
+    "prompts": "^2.4.2",
+    "replace": "^1.2.2",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/cross-spawn": "^6.0.6",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.12.7"
+  }
+}
