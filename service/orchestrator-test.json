@@ -1,0 +1,68 @@
+[
+  {
+    "ad_group": "Hamburg",
+    "template_video": "base.mp4",
+    "content": [
+      {
+        "offset_s": 1.1,
+        "duration_s": 2.3,
+        "placements": [
+          {
+            "position_x": 20,
+            "position_y": 20,
+            "text_value": "€5",
+            "text_size": 14,
+            "text_alignment": "left",
+            "text_color": "#ff0000",
+            "text_width": 20
+          },
+          {
+            "position_x": 700,
+            "position_y": 100,
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Biscits_or_cookiess.jpg/320px-Biscits_or_cookiess.jpg",
+            "image_width": 200,
+            "image_height": 200
+          },
+          {
+            "position_x": 5,
+            "position_y": 50,
+            "text_value": "Cookies",
+            "text_size": "14",
+            "text_alignment": "center",
+            "text_color": "#0000ff"
+          }
+        ]
+      },
+      {
+        "offset_s": 4.0,
+        "duration_s": 1.3,
+        "placements": [
+          {
+            "position_x": 20,
+            "position_y": 20,
+            "text_value": "€3",
+            "text_size": 14,
+            "text_alignment": "left",
+            "text_color": "#ff0000",
+            "text_width": 20
+          },
+          {
+            "position_x": 200,
+            "position_y": 20,
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Asparagus-Bundle.jpg/236px-Asparagus-Bundle.jpg",
+            "image_width": 200,
+            "image_height": 200
+          },
+          {
+            "position_x": 5,
+            "position_y": 50,
+            "text_value": "Asparagus",
+            "text_size": "14",
+            "text_alignment": "center",
+            "text_color": "#0000ff"
+          }
+        ]
+      }
+    ]
+  }
+]

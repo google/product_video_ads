@@ -1,0 +1,34 @@
+{
+  "timeZone": "Europe/Berlin",
+  "dependencies": {
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "Drive",
+        "version": "v3",
+        "serviceId": "drive"
+      },
+      {
+        "userSymbol": "ShoppingContent",
+        "version": "v2.1",
+        "serviceId": "content"
+      },
+      {
+        "userSymbol": "YouTube",
+        "version": "v3",
+        "serviceId": "youtube"
+      }
+    ]
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/cloud-platform",
+    "https://www.googleapis.com/auth/spreadsheets.currentonly",
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/script.scriptapp",
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/content",
+    "https://www.googleapis.com/auth/script.container.ui",
+    "https://www.googleapis.com/auth/youtube"
+  ]
+}

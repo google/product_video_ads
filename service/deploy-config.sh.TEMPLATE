@@ -1,0 +1,5 @@
+CONFIG_GCP_PROJECT_ID='<gcp-project-id>'
+CONFIG_GCS_BUCKET='<gcs-bucket>'
+CONFIG_GCS_LOCATION='<gcs-location>'
+CONFIG_GCP_REGION='<gcp-region>'
+CONFIG_GCP_PUBSUB_TOPIC='<pubsub-topic>'

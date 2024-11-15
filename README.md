@@ -1,146 +1,291 @@
-# Product Video Ads
+<!--
+Copyright 2024 Google LLC
 
-<img src="https://github.com/google/product_video_ads/blob/main/logo.png" alt="PVA Logo" width="300"/>
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-Disclaimer: This is not an official Google product.
+      https://www.apache.org/licenses/LICENSE-2.0
 
-Product Video Ads is an open-source solution that builds videos at scale, by reading
-product data from Google Sheets or Google Merchant Center and generating videos
-with product information (name, image, price) automatically. These videos are 
-automatically uploaded to YouTube or Drive, and can be configured to Google Ads campaigns.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
 
-The integrated installer will setup the project on Google Cloud so
-you are up and running right away.
+# Documentation
 
-## How does it work?
+[Purpose](#purpose) •
+[Requirements](#requirements) •
+[Deployment](#deployment) •
+[Configuration](#configuration) •
+[Regular Usage](#regular-usage) •
+[Architecture](#architecture) •
+[Alternatives](#alternatives)
 
-1. PVA works with a base-video, which is a template for the offers video. The average market video consists of an introduction, offers and closing, as described in the image below: 
+## Purpose
 
-    ![PVA Example](images/pva_example.png?raw=true "PVA Example")
-
-1. After you have selected a base-video you just need to configure your offers inside PVA, using your feed as in the example below:
-
-    [![PVA Demo](https://img.youtube.com/vi/nTVo8WQ99h4/0.jpg)](https://www.youtube.com/watch?v=nTVo8WQ99h4)
-
-1. Then, you can upload your video to YouTube and it can be used as a Google Ad. Updating your video in PVA will update the Ad automatically. Here's one example of a video ad generated with PVA:
-
-    [![Carrefour Brasil - PVA Video](images/pva_carrefour_example.png?raw=true)](https://www.youtube.com/watch?v=xk8hqo1lZbk&t)
+PVA builds ad videos by taking a base video (effectively a template) and putting product information (names, images, prices etc.) on them. For example, retailers who have different special offers in different cities, can use this mapping to automatically create localised video ads and and update them whenever the assignment changes.
 
 ## Requirements
 
-1. A Google Cloud Project with a user with Owner or Editor permissions (the installation will be on Cloud Shell)
+To use PVA "out of the box", you need at least
 
-2. [Apps Script enabled](https://script.google.com/home/usersettings) for the user involved on the deployment (can be a different user from the GCP)
+- Google Workspace, because the configuration is stored in Google Sheets and interpreted with Apps Script
+- Google Cloud Platform, because the videos are built with Cloud Functions and stored on Cloud Storage
+- YouTube to publish the videos
+- Google Ads to run them as ads
 
-3. Access to your account or Brand Account. It's important to fetch the emails related to the deployment. If you are using a Brand Account, you need to be the Brand Account Manager or Owner (the steps to fetch your brand account email is on the video)
+This documentation assumes that you want to use the tool as intended, with all its components. If for some reason you can't use Google Workspace, you would need to manually write configuration files, upload them to Cloud Storage and manually download (and further process) the resulting videos. In this case, you could also consider using Google Web Designer, as described under [Alternatives](#alternatives).
 
-#### 1. GCP Configuration
+### Quota Increase
 
-1. Go to ['APIs and Services' > 'OAuth Consent Screen'](https://console.cloud.google.com/apis/credentials/consent)
-	- **Type**: External (if using brand account), otherwise Internal
-	- **App name**: The name of your PVA Application that will show up on the screen, e.g.: pva-video-upload
-	- **Developer contact info**: Your development email
-	- **Scopes**: Click 'Save and Continue'
-	- **Test Users**: Add the emails that you are going to use for PVA (Brand Account included)
-	- Click 'Save and Continue'
-1. Go to ['APIs and Services' > Credentials](https://pantheon2.corp.google.com/apis/credentials)
-	- Click 'Create Credentials > API Key' which will generate a new key related to your GCP Project ID
-	- Click 'Create Credentials > OAuth Client Id':
-		- **Application type**: 'Web Application'
-		- **Name**: pva-web
-		- **Authorized JavaScript Origins**: 'https://\<your_project_id\>.\<your_region\>.r.appspot.com'
-		- **Authorized Redirect URIs**: 'https://\<your_project_id\>.\<your_region\>.r.appspot.com'
-		- Click 'Create'
-	- Click 'Create Credentials > OAuth Client Id'
-		- **Application type**: 'Desktop Application'
-		- **Name**: pva-desktop
-		- **Authorized JavaScript Origins**: 'https://\<your_project_id\>.\<your_region\>.r.appspot.com'
-		- **Authorized Redirect URIs**: 'https://\<your_project_id\>.\<your_region\>.r.appspot.com'
-		- Click 'Create'
+By default, YouTube allows at most six API-based uploads per day – resulting from the limit of [10 000 daily "units" available](https://developers.google.com/youtube/v3/guides/quota_and_compliance_audits) and a cost of [1600 such units per upload](https://developers.google.com/youtube/v3/determine_quota_cost). Given the intended scale of PVA, it hence makes sense to request an increase of this limit via [this form](https://support.google.com/youtube/contact/yt_api_form) – see the instructions on it.
 
-#### 2. Run the Installation Script
+## Deployment
 
-Just for example, lets suppose that we have: manager@gmail.com and brand_account@gmail.com
+Before being able to use PVA, the following steps are required:
 
-1. Open your project's [Cloud shell](https://console.cloud.google.com/?cloudshell=true).
-1. Run the following:
-	```bash
-	git clone https://github.com/google/product_video_ads.git
-	cd product_video_ads
-	./install.sh
-	```
-1. On first execution, it will enable the required APIs for your GCP Project: Drive, Sheets, YouTube and more. So, click Authorize.
-1. Your configuration choices made during the installation process are saved in `pva.conf` in case you need to re-run the installation. If you run into any problems, you can edit or delete this file with values of your choice. An example file is provided for reference or as a starting point (if you deploy to EU)
-1. [Desktop Credentials] Enter your Desktop Client ID and Client Secret, configured on Step 2 of the previous section ('pva-desktop')
-1. It will ask you for your Spreadsheet ID. If you don't have one, just leave it blank (it will be created)
-1. Ensure that Google Apps Script API is ENABLED for the deployment user in the [Apps Script Settings](https://script.google.com/home/usersettings), then press Enter
-1. Click on the URL. When selecting your account, remember that **you CAN'T use your brand account on this step**, because it will create your Drive and Sheets and it must be attached with an account that you can access, so we are going to use as example: manager@gmail.com. Then, allow everything that is prompted
-	- After selecting your account, you will see a `ERR_CONNECTION_REFUSED`, which is expected. Just copy the full localhost URL (it will look like: 'http://localhost:8080/?state=...') and paste it into the terminal.
-1. If everything is configured correctly, you will see your Drive and Sheets being created
-1. You will be prompted to use GCS if you want. If not, just leave it blank - PVA will use Google Drive as storage
-1. Now, you need to choose the GCP Region and Zone you want to use. You can use the default `us-central1-a`, or enter the full Zone name (Region will be inferred from that)
-1. Next, in case you want to use Google Container Registry different from the default one (**gcr.io** which sits in US), enter it to the prompt. Europe uses **eu.gcr.io** but the default should work for most installations. Leave blank for default
-1. [Web Credentials] Now, enter your Web Client ID (in this example we have created it as 'pva-web'. If you are using a Brand Account give access to Drive and Sheets on this account, like brand_account@gmail.com
-1. Enter your API Key (not the Web Client ID Secret)
-1. Now the frontend will be deployed on App Engine and a GKE Cluster will be created (this will take some time)
-1. For the backend part (GKE), if it's the first time, PVA might throw an error 'Secret Not Found', which is okay. PVA requires another authentication to upload to YouTube (if necessary). Follow the same steps when prompted with a URL:
-	- After selecting your account, you will see a `ERR_CONNECTION_REFUSED`, which is expected. Just copy the full localhost URL (it will look like: 'http://localhost:8080/?state=...'') and paste it into the terminal.
-1. If everything passes without errors, **Congratulations! The installation is complete.** 
-	- Click on the App Engine URL to run your app. And use the Sheet's ID prompted to log in
-	- **IMP**: Ensure cookies and pop-ups are allowed ([Allow pop-ups in Chrome](https://support.google.com/chrome/answer/95472?co=GENIE.Platform%3DDesktop&hl=en))
-	- You should see this screen: ![PVA Frontend](images/pva_frontend.png?raw=true "PVA Frontend")
-	- After logging in, try to generate the video and upload it to YouTube. If anything fails, please see our [Troubleshooting](#troubleshoot) section
+### A. Prepare your deployment environment
 
-#### 3. Test
+1. Make sure your system has an up-to-date installation of [Node.js, npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and `git`.
+2. Install [clasp](https://github.com/google/clasp) by running `npm install @google/clasp \-g`, then log in via `clasp login`.
+3. Navigate to the [Apps Script settings](https://script.google.com/home/usersettings) page and enable the Apps Script API.
+4. Make sure your system has an up-to-date installation of the [gcloud CLI](https://cloud.google.com/sdk/docs/install), then login via `gcloud auth login`.
 
-1. After login, go to Generate > Select Base Example > Price
+### B. Check out the code
 
-    ![PVA Video Config](images/pva_video_config_0.png?raw=true "PVA Video Config")
-
-1. To test the Youtube Upload, click Create One (YouTube)
-
-    ![PVA Video Config](images/pva_video_config_1.png?raw=true "PVA Video Config")
-
-1. To test, set:
-
-    **Offer Type**: My Test
-
-    **Product**: Your Product Name
-
-    **All other fields**: Leave blank
-
-1. Click 'Create Asset'
-
-    ![PVA Video Config](images/pva_video_config_2.png?raw=true "PVA Video Config")
-
-1. On Generator Logs, you can click on 'Update' to see PVA processing on GKE. And in Assets, you can see your video status.
-
-    ![PVA Video Config](images/pva_video_status.png?raw=true "PVA Video Config")
-
-## Troubleshoot
-
-Kubernetes:
-```bash
-gcloud container clusters get-credentials video-generator-cluster --zone us-west1-a
-kubectl get pods
-```
-
-If the Pod status is different from 'Running', use:
+Execute
 
 ```bash
-kubectl logs <pod_name>
-kubectl describe pod <pod_name>
+git clone https://github.com/google/product_video_ads
 ```
 
-Common errors are lack of permission and permission denied when accessing Sheets and Drive. If you encounter more errors and have solved them, feel free to contribute.
+### C. Execute the installation script
 
-## Contribute
+Execute the installation script on Google Cloud Platform (GCP):
 
-PVA is an open-source project, so you can help us improve the application! Every push will trigger a CI/CD application which we will verify its integrity. Aafter that, if everything is fine, we are going to merge your pull request :)
+`npm run deploy`
 
-*Optional:* Check that your Spreadsheet has access to Google Merchant Center as follows:
-1. [Optional] Navigate to _Tools_ > _Script Editor_ > _Settings (gear icon)_
-	1. Update the GCP Project ID
-	1. Test the Google Merchant Center connection by
-		1. Add an ID on "Prices" tab in the format `<Google Merchant Center id>:<product id>` 
-		1. Click _Merchant Center_ > _Run Now_
+You will be asked for
+
+- the (textual) ID of your GCP project,
+- the GCP region to locate the service,
+- the GCS (multi-)region to locate the temporary storage, and
+- the name of the Pub/Sub topic to be used (see [Architecture](#architecture) for details),
+- the ID of the Google Sheets document to host the configuration.
+
+It is recommended to not provide the latter, as then a clean new sheet will be created.
+
+> **Note:** Copy the address of the newly created document so you don't have to look for it in your Google Drive.
+
+### D. Initialise the Google Sheets config document
+
+1. Open the document whose link you obtained at the end of the installation.
+2. Click the menu item \[Extensions | Apps Script\], there open \[⚙ Project Settings\] and under _Google Cloud Platform (GCP) Project_ enter the number you find as _Project number_ on https://pantheon.corp.google.com/welcome?project=\[your-project-name\]
+3. In the document, click the menu utem \[🎬 Product Video Ads | Initialisation | ⚠️ Initialise sheet\] to populate it with the necessary sheets. (You can then the original "Sheet1" if you didn't put anything in before.)
+
+### E. Deploy the Ads Script in Google Ads
+
+For this, see the [official documentation](https://developers.google.com/google-ads/scripts/docs/getting-started) of how to use Ads Scripts, but instead of the provided example use [this code}(./adsScriptsScript.js).
+
+### F. Upload the needed template video(s) and font(s) to Google Cloud Storage
+
+Call up \[🎬 Product Video Ads | Upload files to GCS\] to show a dialog that allows you to upload arbitrary files to the configured Cloud Storage bucket.
+
+- Use this to upload the desired template video(s) – their name(s) is what you will later need to specify as _Template Video_ in the sheets _Timing_ and _Ad Groups_, all including the filename extension.
+- Likewise, put any `.ttf` font files here that you will want to reference as to be used in the sheet _Placement_ as _Text Font_, including the filename extension.
+
+> **Note:** Don't specify any subfolder names, as the files need to be in the root folder.
+
+> **Note:** While you can upload files of almost any size here, templates should be small enough so that the resulting videos do not exceed 50 MB: otherwise, the tool won't be able to get them (for uploading to YouTube) due to the [limit for "URL Fetch response size"](https://developers.google.com/apps-script/guides/services/quotas#current_limitations).
+
+### G. Enter the desired configuration and product data in the sheet
+
+This is described in detail in the section [Configuration](#configuration).
+
+Once everything is set up, refer to the section [Regular Usage](#regular-usage) on next steps.
+
+## Configuration
+
+After initialisation, the pivotal Google Sheets document has seven sheets/tabs to control the process. Different parts of the configuration will see changes differently often:
+
+- Product details (_Offers_) and the decision which products to show (_Offers to Ad Groups_) change most often. It makes sense to set up automated updates for these.
+- _Ad Groups_ may also change if the number of target videos is variable, e.g. based on a variable set of locations with their own sets of locally promoted products. If it is a superset of what could be expected in _Offers to Ad Groups_, it can remain static, too.
+- Products' visual arrangement on the base video (defined in _Timing_ and _Placement_) can usually be fixed as long as that same template video is used.
+- _Base Config_ would usually only be set once, assuming that the Google Ads account, YouTube channel etc. are constant.
+- _Status_ is not meant for manual editing at all, but is used by the different components to communicate state.
+
+The sheets are described below, but PVA comes with an example configuration that you can try:
+
+1. Insert the example config into the document via: 🎬 Product Video Ads | Testing | ⚠️ Populate config
+2. Upload [this template video](https://raw.githubusercontent.com/eqadir/pva_lite/example_assets/template.mp4) in Cloud Storage as described in [Deployment](#deployment).
+3. Insert the name of your GCS bucket in the pertinent field on the [Base Config](#base-config) sheet.
+
+> **Note:** While the configuration sheet features numerous checks concerning the validity of entered values, they allow for mistakes (like the absence of a value) that will only get caught when the code runs and evaluates it.
+
+### Base Config
+
+Here, you enter references to other systems:
+
+- Google Cloud
+  - Storage Bucket: the bucket used to store data (including the videos) temporarily
+- Google Merchant Center
+  - Account ID: the account from which to import product data
+  - Feed Filtering: if set to `only mapped`, only imports products present in the _Offers to AdGroups_ sheet
+- YouTube
+  - Channel ID: the channel on which to publish the videos (find it [here](https://www.youtube.com/account_advanced)) – if left empty, the user's (primary) personal channel is used
+- Google Ads
+  - Account ID: the account on which to run the video ads
+  - Campaign Name: the campaign to use inside that account
+
+### Timing
+
+For each template video to be used, this specifies the temporal position & duration of each product occurrence, as well as references the visual arrangement. There needs to be at least one line per template video and product slot – e.g. three lines if there is just one such template and it is meant to show three products. If not all product elements (title, image etc.) are to appear and disappear at the same time (e.g. to make the video more interesting), then the number of lines would increase accordingly – e.g. two per slot, if first the image should appear and then the textual elements.
+
+The columns:
+
+- _Template Video_: file name as present in the bucket on Google Cloud Storage
+- _Offset \[s\]_: number of seconds from the start of the video at which product elements should be shown
+- _Duration \[s\]_: amount of seconds for which the product elements should be shown
+- _Placement ID_: reference to the spatial arrangement of the product elements (title, image etc.) at this time. This number may be the same for all lines if all positions in a template video are graphically identical and all product elements are to be shown at the same time.
+
+### Placement
+
+This defines those visual arrangements, defining textual and image elements along with their position, size and similar properties, but also the field in the product feed that provides the actual text or image to use.
+
+The columns:
+
+- _Placement ID_: number or text serving as the target of references to the namesake field on the sheet _Timing_
+- _Element Type_: either `Text` or `Image`
+- _Data Field_: the name of the field in the sheet _Offers_ that has the text or (the URL of the) image to be shown
+- _Position X_ and _Position Y_: horizontal/vertical coordinate on the base video at which to place the content – For images, this is their center, for text it is the upper left corner.
+- _Rotation Angle_: angle (in degrees) at which to rotate the content, positive values meaning clockwise rotation
+- _Image Width_ and _Image Height_: dimensions into which the image should be scaled – Its aspect ratio will be retained, so one of the resulting dimensions may be smaller.
+- _Text Font_: font name (file name including its extension)
+- _Text Size_: font size in pixels
+- _Text Width_: maximum width after which the text should be wrapped using a line break
+- _Text Alignment_: either `left`, `center` or `right`
+- _Text Color_: as a hexadecimal value with a leading `#`
+
+> **Note:** Your template may not allow for text to be rendered in several lines. In this case, ensure that the input feed has no entries that would result in line wrapping.
+
+### Offers
+
+This hosts the list of products, with their properties, that could theoretically be configured to be shown in the videos.
+
+As columns, only _Offer ID_ is compulsory. The others simply need to provide all the data that is ultimately meant to be shown on the generated video.
+
+### Offers to Ad Groups
+
+This defines how products should be grouped to form videos.
+
+The columns are hence simply:
+
+- _Offer ID_: reference to the value in the column on _Offers_ of the same name
+- _Output AdGroup_: reference to the value of the column on _AdGroups_ of the same name
+
+### Ad Groups
+
+For each of the aforementioned groups of products, this specifies the properties the resulting video ad (and its ad group) should have in Google Ads, as well as references the template video (and hence _Timing_ and _Placement_) to actually use.
+
+The columns:
+
+- _Output AdGroup_: the name of the ad group to be generated/replaced
+- _Template Video_: the name of the file (uploaded to the configured bucket on Cloud Storage) to be used for the videos in this ad group
+- _AdGroup Type_: the type of the ad group – possible values are enumerated [here](https://developers.google.com/google-ads/api/rest/reference/rest/v18/AdGroupType)
+- _Target Location_ – currently ignored, to be implemented
+- _Audience Name_ – currently ignored, to be implemented
+- Self-explanatory properties of the ad group:
+  - _URL_
+  - _Call to Action_
+  - _Headline_
+  - _Long Headline_
+  - _Description 1_
+  - _Description 2_
+
+> **Note:** Currently, an ad group can't be called "config" due to resulting name conflicts.
+
+### Status
+
+This is used by PVA to store status information coordinating the various independent processes, but also to inform the user of parts of the configuration being ignored due to errors.
+
+The columns:
+
+- _Output AdGroup_: reference to the entries in the sheet _Ad Groups_ – For each entry there, one is created here.
+- _Output Video ID_: the public ID the video has on YouTube – This is written here after being obtained from Cloud Storage, and used by the Ads Script creating/updating the ads. When a new version of the ad group's video is requested, this is deleted to signal to the code that it needs to check Cloud Storage for results regarding this ad group.
+- _Video Creation_: point in time at which the _Output Video ID_ was entered – Deleted when that is deleted. Only serves documentation purposes, is not read anywhere.
+- _Ad Creation_: point in time at which the most recent ad was created (i.e. the ad group was updated)
+- _Expected Status_: flag indicating whether the corresponding ad should currently be shown – This is set to `DISABLED` if the configuration of the ad group has an error, which will cause the Ads Script to pause this ad group if not already the case, or not create it in the first place. The pausing would happen if, for example, an entry disappears from the _Offers_ sheet but is still used in _Offers to AdGroups_: this can't be turned into a valid video, so the existing one is paused as a safety measure.
+- _Error(s)_: message(s) reflecting errors that occurred during processing of the configuration or during creation/update of the ad group – As described above, the harm of these errors should be limited by disabling of the ad groups, but not least as that could fail as well, it makes sense to regularly check up on this.
+- _Content Checksum_: a character sequence summarising the configuration of the ad group, including pixel positions, prices etc. – The code requesting video generation uses this to check whether anything changed since the last time (or whether there even was a "last time") to see whether a new video needs to be generated, in which case it then writes the new to be compared in future checks.
+- _Checksum Creation_: point in time at which the _Content Checksum_ was written – Only serves documentation purposes, is not read anywhere.
+- _Folder Name_: name of the folder in the Cloud Storage bucket that was created to host the files for the most recent video-creation request for this ad group – It is written whenever a request is made, and later used to look up results.
+
+## Regular Usage
+
+Once the configuration is complete, the there are two processes that need to be triggered:
+
+- Whenever the configuration or product data changed\*:
+  \[🎬 Product Video Ads | Request video creation\]
+- Whenever new videos were uploaded to YouTube:
+  \[🎬 Product Video Ads | Register video uploads\]
+
+These calls can be scheduled in Apps Script, which mainly makes sense if the data on offers (_Offers_ sheet) and its mapping to ad group (_Offers to Ad Groups_) are also automatically updated, to reflect those updates as soon as possible.
+
+> **Note:** When an ad group's config is detected as having changed, the old video remains active until the new one has been generated.
+
+### Feed import
+
+As the offers data can also be imported directly from Google Merchant Center, basic such functionality is built in:
+\[🎬 Product Video Ads | Get products from Merchant Center\]
+
+This puts the data into a sheet called _Offers Feed_, which is generated with a default setup if it does not yet exist. There are two main concerns when importing this data:
+
+- _What products to include_ – for which there are currently two options:
+  - Load all the products
+    This is the default.
+  - Only load products mapped to an ad group in _Offers to Ad Groups_
+    This can be chosen by entering `only mapped` in the _Feed Filtering_ configuration field.
+- _Which fields to include_ – which is determined via the column headers (i.e. first line) of the _Offers Feed_ sheet. For example, the aforementioned default setup puts `offerId`, `title` etc. there. See [this list](https://developers.google.com/shopping-content/reference/rest/v2.1/products#Product) for what is potentially available.
+
+The data in this sheet can then be used in the _Offers_ sheet via Google Sheets' `QUERY` function. However, more complex functionality (like putting together a price with a currency-dependent symbol) may require more other functions (like `VLOOKUP`), which bring issues with adapting their presence to changing sizes of product feeds.
+
+Of course, the code could also be changed to import the data directly into the _Offers_ sheet, with all the needed restrictions, formatting etc.
+
+## Architecture
+
+### Process coordination
+
+PVA has the following "actors" that communicate with each other via files on Cloud Storage or entries in the _Status_ sheet of the configuration sheet:
+
+1. Apps Script validating and exporting the configuration
+   By combining the content of the various sheets in the Google Sheets document, this script determines the ad groups to be generated. Those get requested by submitting the result to a unique folder on Cloud Storage. That folder is stored in the _Status_ sheet, as is a checksum of the video configuration, to inform a future need for re-generation.
+2. Cloud Function "orchestrator" determining what needs to be generated
+   By listening to Cloud Storage, this function detects new requests and queues their execution using Pub/Sub.
+3. Cloud Function "runner" actually generating the videos
+   By taking requests from the Pub/Sub queue, these instances merge the template video with the other elements and store the results on Cloud Storage in the same unique folder that the config was found in.
+4. Apps Script uploading videos to YouTube
+   Regularly checking the Cloud Storage folder that it created with the video configuration, this function detects new videos, uploads them to YouTube, and stores their IDs in the _Status_ sheet.
+5. Ads Scripts script generating or updating Google Ads
+   Based on the state and the _Status_ sheet, this creates, pauses and/or re-enables ad groups.
+
+## Alternatives
+
+The following are among the most relevant practical limitations of PVA:
+
+- In terms of the visual complexity of how the product information can appear on the template video, PVA is limited to (a subset of) the capabilities of the tool used for the actual video creation, [FFmpeg](https://www.ffmpeg.org/). While some additional flexibility could be achieved, e.g. by optionally allowing a partially transparent second template video to be layered on top, there are clear limits to this approach.
+- The placement of the products needs to be defined via the textual definition of pixel coordinates. While whoever created the template video should be able to provide these, this is far from the intuitive image of the future result that a graphical "What you see is what you get" interface would provide.
+- Videos over 50 MB in size cannot be uploaded to YouTube with the mechanism in this tool.
+
+A fundemantally different level of freedom and control is provided by [Google Web Designer](https://webdesigner.withgoogle.com/) (GWD), a tool that allows the creation of animated HTML files, often used for Display ads. GWD is able to generate videos from these, and can be used for scaled work by reading lists of input data. Effectively, it can hence be used to create product large videos, with special effects not supported by PVA, and by graphically placing elements with the mouse instead of having to provide numerical coordinates.
+
+Google Web Designer comes with its own downsides, however:
+
+- A tool for creating that input list would need to be implemented additionally.
+- Automatically getting the list into GWD and automatically triggering video generation is not supported out of the box and would require the implementation of macros at the level of the Operating System hosting the tool.
+- While the generated videos can be automatically uploaded to Google Drive, further upload to YouTube and Google Ads would also need to be implemented additionally.
+- The fact that the tool runs on a local machine without parallelisation limits its throughput. Moving this to the cloud and spawning several virtual machines that each run GWD would be complex.
+
+Note that Ads Creative Studio, which might be recommended in this context, is set to be [discontinued in early 2025](https://support.google.com/adscreativestudio/answer/10726939).
