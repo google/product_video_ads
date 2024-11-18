@@ -11,7 +11,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: video-generator-lock
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: standard-rwx
+  resources:
+    requests:
+      storage: 1Mi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -20,7 +31,7 @@ metadata:
   labels:
     app: video-generator
 spec:
-  replicas: 1
+  replicas: $VIDEO_GENERATOR_REPLICAS
   selector:
     matchLabels:
       app: "video-generator"
@@ -29,9 +40,16 @@ spec:
       labels:
         app: video-generator
     spec:
+      volumes:
+      - name: sheet-lock
+        persistentVolumeClaim:
+          claimName: video-generator-lock
       containers:
       - name: video-generator
         image: $IMAGE_NAME
+        volumeMounts:
+        - name: sheet-lock
+          mountPath: /sheet_lock
         env:
         - name: SPREADSHEET_ID
           value: $SPREADSHEET_ID
@@ -39,4 +57,7 @@ spec:
           value: $GCS_BUCKET_NAME
         - name: GCP_PROJECT_NUMBER
           value: "$GCP_PROJECT_NUMBER"
-
+        - name: SHEET_LOCK_FILE
+          value: "/sheet_lock/lock_file"
+        - name: DISABLE_SHEET_LOGGING
+          value: "$DISABLE_SHEET_LOGGING"
