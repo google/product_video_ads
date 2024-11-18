@@ -3,7 +3,7 @@
     cdkDrag
     *ngIf="element.view_type == 'text'" 
      id="{{element.id}}" 
-     innerHTML={{element.content}} 
+     innerText={{element.content}} 
      (dblclick)="dblclick.emit({id: element.id, event: $event})"
      (click)="singleclick.emit(element)"
      (cdkDragEnded)="on_drag_element({event: $event, element: element})"
