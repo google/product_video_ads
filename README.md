@@ -90,7 +90,7 @@ It is recommended to not provide the latter, as then a clean new sheet will be c
 ### D. Initialise the Google Sheets config document
 
 1. Open the document whose link you obtained at the end of the installation.
-2. Click the menu item \[Extensions | Apps Script\], there open \[⚙ Project Settings\] and under _Google Cloud Platform (GCP) Project_ enter the number you find as _Project number_ on https://pantheon.corp.google.com/welcome?project=[your-project-name]
+2. Click the menu item \[Extensions | Apps Script\], there open \[⚙ Project Settings\] and under _Google Cloud Platform (GCP) Project_ enter the number you find as _Project number_ on https://console.cloud.google.com/welcome?project=[your-project-name]
 3. In the document, click the menu item \[🎬 Product Video Ads | Initialisation | ⚠️ Initialise sheet\] to populate it with the necessary sheets. (You can then delete the original "Sheet1" if you didn't put anything in before.)
 
 ### E. Deploy the Ads Script in Google Ads
@@ -102,7 +102,7 @@ For this, see the [official documentation](https://developers.google.com/google-
 PVA expects the following files referenced in the [configuration](#configuration) to exist in the **root folder** of the storage bucket created by the installation script:
 
 - The template video(s) – their name(s) is what you will later need to specify as _Template Video_ in the sheets _Timing_ and _Ad Groups_.
-- The `.ttf` font files in the sheet _Placement_ as _Text Font_.
+- The `.ttf` font files specified as _Text Font_ in the sheet _Placement_.
 
 > **Note:** Templates should be small enough so that the resulting videos do not exceed 50 MB: otherwise, the tool won't be able to get them (for uploading to YouTube) due to the [limit for "URL Fetch response size"](https://developers.google.com/apps-script/guides/services/quotas#current_limitations).
 
