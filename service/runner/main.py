@@ -45,13 +45,11 @@ class PvaLiteRenderMessagePlacement:
       Attributes:
         position_x: The x position of the element.
         position_y: The y position of the element.
-        alignment: The alignment of the element.
-        angle: The angle of the element.
+        rotation_angle: The angle of the element.
       """
 
   position_x: float
   position_y: float
-  alignment: Optional[str] = 'center'
   rotation_angle: Optional[float] = 0
 
   def __init__(self, **kwargs):
@@ -65,8 +63,7 @@ class PvaLiteRenderMessagePlacement:
         'PvaLiteRenderMessagePlacement('
         f'position_x={self.position_x}, '
         f'position_y={self.position_y}, '
-        f'alignment={self.alignment}, '
-        f'angle={self.angle})'
+        f'rotation_angle={self.rotation_angle})'
     )
 
 
@@ -81,7 +78,7 @@ class PvaLiteRenderMessageTextPlacement(PvaLiteRenderMessagePlacement):
         text_size:  Font size for text values.
         text_color: Font color of the element.
         text_alignment: Align text element left, center or right.
-        text_angle: Optional angle of the text element.
+        rotation_angle: Optional rotation angle of the text element.
         text_font: Optional font for text values.
         text_width: Optional width text values.
       """
@@ -92,6 +89,7 @@ class PvaLiteRenderMessageTextPlacement(PvaLiteRenderMessagePlacement):
   text_size: float
   text_color: str
   text_alignment: str
+  rotation_angle: float = 0
   text_font: Optional[str] = None
   text_width: Optional[str] = None
 
@@ -104,13 +102,10 @@ class PvaLiteRenderMessageTextPlacement(PvaLiteRenderMessagePlacement):
   def __str__(self):
     return super().__str__() + (
         'PvaLiteRenderMessageTextPlacement('
-        f'position_x={self.position_x}, '
-        f'position_y={self.position_y}, '
         f'text_value={self.text_value}, '
         f'text_size={self.text_size}, '
         f'text_color={self.text_color}, '
         f'text_alignment={self.text_alignment}, '
-        f'text_angle={self.rotation_angle}, '
         f'text_font={self.text_font}, '
         f'text_width={self.text_width})'
     )
@@ -125,12 +120,14 @@ class PvaLiteRenderMessageImagePlacement(PvaLiteRenderMessagePlacement):
         image_width: Optional width of the image.
         image_height: Optional height of the image.
         keep_ratio: Optional keep ratio of the image.
+        rotation_angle: Optional rotation angle of the image element.
       """
   position_x: float
   position_y: float
   image_url: Optional[str] = None
   image_width: Optional[float] = 0
   image_height: Optional[float] = 0
+  rotation_angle: float = 0
   keep_ratio: Optional[bool] = True
 
   def __init__(self, **kwargs):
@@ -335,7 +332,6 @@ def convert_text_overlay(
     duration: float,
     placement: PvaLiteRenderMessageTextPlacement,
 ):
-  width = 20  # TODO(): Fix me.
   font_path = None
 
   if placement.text_font:
@@ -346,18 +342,19 @@ def convert_text_overlay(
     )
 
   # Wrap long texts to many smaller texts
-  words = _wrap_text(placement.text_value, width)
+  words = _wrap_text(placement.text_value, placement.text_width)
 
   # Create overlays to all lines broken down
   texts = []
 
-  for word in words:
+  for i, word in enumerate(words):
     texts.append({
         'start_time': offset,
         'end_time': offset + duration,
         'align': placement.text_alignment or "center",
         'x': placement.position_x,
-        'y': placement.position_y,
+        'y': placement.position_y +
+        (1.2 * i * placement.text_size),  # Add new line to wrap text.
         'angle': placement.rotation_angle,
         'text': word,
         'font': font_path,
@@ -368,10 +365,10 @@ def convert_text_overlay(
   return texts
 
 
-def _wrap_text(text, charaters_per_line):
+def _wrap_text(text, characters_per_line):
   words = []
 
-  if charaters_per_line == 0:
+  if characters_per_line == 0:
     words.append(text)
   else:
 
@@ -382,7 +379,7 @@ def _wrap_text(text, charaters_per_line):
 
     for i, word in enumerate(all_words):
 
-      if curr_chars + len(word) >= charaters_per_line:
+      if curr_chars + len(word) >= characters_per_line:
         words.append(' '.join(all_words[last_index:i]))
         last_index = i
         curr_chars = 0
