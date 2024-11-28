@@ -35,7 +35,7 @@ Product Video Ads (PVA) builds ad videos by taking a base video (effectively a t
 To use PVA "out of the box", you need at least
 
 - Google Workspace, because the configuration is stored in Google Sheets and interpreted with Apps Script
-- Google Cloud Platform, because the videos are built with Cloud Functions and stored on Cloud Storage
+- Google Cloud Platform (GCP), because the videos are built with Cloud Functions and stored on Cloud Storage
 - YouTube to publish the videos
 - Google Ads to run them as ads
 
@@ -53,8 +53,9 @@ Before being able to use PVA, the following steps are required:
 
 1. Make sure your system has an up-to-date installation of [Node.js, npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and `git`.
 2. Install [clasp](https://github.com/google/clasp) by running `npm install @google/clasp -g`, then log in via `clasp login`.
-3. Navigate to the [Apps Script settings](https://script.google.com/home/usersettings) page and enable the Apps Script API.
-4. Make sure your system has an up-to-date installation of the [gcloud CLI](https://cloud.google.com/sdk/docs/install), then login via `gcloud auth login`.
+3. In the [Apps Script settings](https://script.google.com/home/usersettings) page and ensure the Apps Script API is enabled.
+4. In your GCP project, ensure [OAuth consent](https://console.cloud.google.com/apis/credentials/consent) is [configured](https://developers.google.com/workspace/guides/configure-oauth-consent). (If possible, choose the "Internal" type to avoid the need for approval.)
+5. Make sure your system has an up-to-date installation of the [gcloud CLI](https://cloud.google.com/sdk/docs/install), then login via `gcloud auth login`.
 
 ### B. Check out the code
 
@@ -80,12 +81,13 @@ You will be asked for
 
 It is recommended to not provide the latter, as then a clean new sheet will be created. Its address will be output at the end of the process, but you could also simply look for it in your Google Drive under the name "Product Video Ads" or find its ID as `parentId` in `appsscript/.clasp.json`.
 
-> **Note:** During deployment, your GCS bucket will receive two folders:
+> **Notes:**
 >
-> - The folder named "gcf-v2-uploads-[...].cloudfunctions.appspot.com" needs no interaction but is required for PVA's operation.
-> - The folder composed of your GCP project's name and the suffix `-bucket` is where the videos will be generated, but also where initially content needs to be uploaded – see the corresponding later step in this list.
-
-> **Note:** If you installed the cloud components before but merely want to deploy the Sheets document, you can execute the deployment command in the `appsscript/` folder.
+> - During deployment, your GCS bucket will receive two folders:
+>   - The folder named "gcf-v2-uploads-[...].cloudfunctions.appspot.com" needs no interaction but is required for PVA's operation.
+>   - The folder composed of your GCP project's name and the suffix `-bucket` is where the videos will be generated, but also where initially content needs to be uploaded – see the corresponding later step in this list.
+> - If you installed the cloud components before but merely want to deploy the Sheets document, you can execute the deployment command in the `appsscript/` folder.
+> - If you get an error message about lacking permissions for Eventarc, try again after a couple of minutes.
 
 ### D. Initialise the Google Sheets config document
 
@@ -167,7 +169,7 @@ The columns:
 
 This defines those visual arrangements, defining textual and image elements along with their position, size and similar properties, but also the field in the product feed that provides the actual text or image to use.
 
-All columns need to have values, except those referring to a diffenent element type, like _Text Color_ for images:
+All columns need to have values, except _Text Font_ and those referring to a diffenent element type, like _Text Color_ for images:
 
 - _Placement ID_: number or text serving as the target of references to the namesake field on the sheet _Timing_
 - _Element Type_: either `Text` or `Image`
@@ -175,7 +177,7 @@ All columns need to have values, except those referring to a diffenent element t
 - _Position X_ and _Position Y_: horizontal/vertical coordinate on the base video at which to place the content – For images, this is their center, for text it is the upper left corner.
 - _Rotation Angle_: angle (in degrees) at which to rotate the content, positive values meaning clockwise rotation
 - _Image Width_ and _Image Height_: dimensions into which the image should be scaled – Its aspect ratio will be retained, so one of the resulting dimensions may be smaller.
-- _Text Font_: font filename (including its extension)
+- _Text Font_ (optional): font filename (including its extension)
 - _Text Size_: vertical size in pixels
 - _Text Width_: maximum width after which the text should be wrapped using a line break
 - _Text Alignment_: alignment inside the available width, either `left`, `center` or `right`
