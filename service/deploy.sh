@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+set -e
 # Read config variables
 CONFIG_FILE="$(dirname $0)/deploy-config.sh"
 if [ ! -r $CONFIG_FILE ]; then
@@ -27,7 +27,7 @@ gcloud services enable cloudresourcemanager.googleapis.com
 gcloud auth application-default set-quota-project $CONFIG_GCP_PROJECT_ID
 printf "\nINFO - GCP project set to '$CONFIG_GCP_PROJECT_ID' succesfully!\n"
 
-BUCKET_EXISTS=$(gcloud storage ls gs://$CONFIG_GCS_BUCKET > /dev/null 2>&1 && echo "true" || echo "false")
+BUCKET_EXISTS=$(gcloud storage ls gs://$CONFIG_GCS_BUCKET >/dev/null 2>&1 && echo "true" || echo "false")
 if "${BUCKET_EXISTS}"; then
   printf "\nWARN - Bucket '$CONFIG_GCS_BUCKET' already exists. Skipping bucket creation...\n"
 else
@@ -56,53 +56,53 @@ EVENTARC_SERVICE_ACCOUNT="service-${PROJECT_NUMBER}@gcp-sa-eventarc.iam.gservice
 COMPUTE_SERVICE_ACCOUNT="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 printf "\nINFO - Creating Service Agents and granting roles...\n"
 for SA in "storage.googleapis.com" "eventarc.googleapis.com" "pubsub.googleapis.com"; do
-    gcloud --no-user-output-enabled beta services identity create --project=$CONFIG_GCP_PROJECT_ID \
-        --service="${SA}"
+  gcloud --no-user-output-enabled beta services identity create --project=$CONFIG_GCP_PROJECT_ID \
+    --service="${SA}"
 done
 COMPUTE_SA_ROLES=(
-    "roles/eventarc.eventReceiver"
-    "roles/run.invoker"
-    "roles/cloudfunctions.invoker"
-    "roles/storage.objectAdmin"
-    "roles/aiplatform.user"
-    "roles/logging.logWriter"
-    "roles/artifactregistry.createOnPushWriter"
-    "roles/cloudbuild.builds.builder"
-    "roles/pubsub.editor"
+  "roles/eventarc.eventReceiver"
+  "roles/run.invoker"
+  "roles/cloudfunctions.invoker"
+  "roles/storage.objectAdmin"
+  "roles/aiplatform.user"
+  "roles/logging.logWriter"
+  "roles/artifactregistry.createOnPushWriter"
+  "roles/cloudbuild.builds.builder"
+  "roles/pubsub.editor"
 )
 for COMPUTE_SA_ROLE in "${COMPUTE_SA_ROLES[@]}"; do
-    gcloud --no-user-output-enabled projects add-iam-policy-binding \
-        $CONFIG_GCP_PROJECT_ID \
-        --member="serviceAccount:${COMPUTE_SERVICE_ACCOUNT}" \
-        --role="${COMPUTE_SA_ROLE}"
+  gcloud --no-user-output-enabled projects add-iam-policy-binding \
+    $CONFIG_GCP_PROJECT_ID \
+    --member="serviceAccount:${COMPUTE_SERVICE_ACCOUNT}" \
+    --role="${COMPUTE_SA_ROLE}"
 done
 gcloud --no-user-output-enabled projects add-iam-policy-binding \
-    $CONFIG_GCP_PROJECT_ID \
-    --member="serviceAccount:${STORAGE_SERVICE_ACCOUNT}" \
-    --role="roles/pubsub.publisher"
+  $CONFIG_GCP_PROJECT_ID \
+  --member="serviceAccount:${STORAGE_SERVICE_ACCOUNT}" \
+  --role="roles/pubsub.publisher"
 gcloud --no-user-output-enabled projects add-iam-policy-binding \
-    $CONFIG_GCP_PROJECT_ID \
-    --member="serviceAccount:${EVENTARC_SERVICE_ACCOUNT}" \
-    --role="roles/eventarc.serviceAgent"
+  $CONFIG_GCP_PROJECT_ID \
+  --member="serviceAccount:${EVENTARC_SERVICE_ACCOUNT}" \
+  --role="roles/eventarc.serviceAgent"
 printf "Operation finished successfully!\n"
 printf "\nINFO - Deploying the 'pva-lite-orchestrator' Cloud Function...\n"
 gcloud functions deploy pva-lite-orchestrator \
---env-vars-file .env.yaml \
---gen2 \
---region=$CONFIG_GCP_REGION \
---runtime=python310 \
---source=orchestrator \
---entry-point=gcs_file_uploaded \
---timeout=540s \
---memory=8Gi \
---cpu=2 \
---trigger-event-filters="type=google.cloud.storage.object.v1.finalized" \
---trigger-event-filters="bucket=$CONFIG_GCS_BUCKET" \
---trigger-location="$CONFIG_GCS_LOCATION"
+  --env-vars-file .env.yaml \
+  --gen2 \
+  --region=$CONFIG_GCP_REGION \
+  --runtime=python310 \
+  --source=orchestrator \
+  --entry-point=gcs_file_uploaded \
+  --timeout=540s \
+  --memory=8Gi \
+  --cpu=2 \
+  --trigger-event-filters="type=google.cloud.storage.object.v1.finalized" \
+  --trigger-event-filters="bucket=$CONFIG_GCS_BUCKET" \
+  --trigger-location="$CONFIG_GCS_LOCATION"
 test $? -eq 0 || exit
 
 printf "\nINFO - Creating the '$CONFIG_GCP_PUBSUB_TOPIC' Pub/Sub Topic...\n"
-TOPIC_EXISTS=$(gcloud pubsub topics list | grep topics/$CONFIG_GCP_PUBSUB_TOPIC > /dev/null 2>&1 && echo "true" || echo "false")
+TOPIC_EXISTS=$(gcloud pubsub topics list | grep topics/$CONFIG_GCP_PUBSUB_TOPIC >/dev/null 2>&1 && echo "true" || echo "false")
 if "${TOPIC_EXISTS}"; then
   printf "\nWARN - Topic '$CONFIG_GCP_PUBSUB_TOPIC' already exists. Skipping topic creation...\n"
 else
@@ -113,14 +113,14 @@ fi
 
 printf "\nINFO - Deploying the 'pva-lite-runner' Cloud Function...\n"
 gcloud functions deploy pva-lite-runner \
---env-vars-file .env.yaml \
---gen2 \
---region=$CONFIG_GCP_REGION \
---runtime=python310 \
---source=runner \
---entry-point=subscribe \
---timeout=540s \
---memory=32Gi \
---cpu=8 \
---trigger-topic=$CONFIG_GCP_PUBSUB_TOPIC
+  --env-vars-file .env.yaml \
+  --gen2 \
+  --region=$CONFIG_GCP_REGION \
+  --runtime=python310 \
+  --source=runner \
+  --entry-point=subscribe \
+  --timeout=540s \
+  --memory=32Gi \
+  --cpu=8 \
+  --trigger-topic=$CONFIG_GCP_PUBSUB_TOPIC
 test $? -eq 0 || exit
