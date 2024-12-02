@@ -35,6 +35,7 @@ else
   test $? -eq 0 || exit
   printf "\nINFO - Bucket '$CONFIG_GCS_BUCKET' created successfully in location '$CONFIG_GCS_LOCATION'!\n"
 fi
+sleep 60
 
 printf "\nINFO - Enabling GCP APIs...\n"
 gcloud services enable \
@@ -49,6 +50,7 @@ gcloud services enable \
   serviceusage.googleapis.com \
   storage.googleapis.com \
   youtube.googleapis.com
+sleep 60
 
 PROJECT_NUMBER=$(gcloud projects describe $CONFIG_GCP_PROJECT_ID --format="value(projectNumber)")
 STORAGE_SERVICE_ACCOUNT="service-${PROJECT_NUMBER}@gs-project-accounts.iam.gserviceaccount.com"
@@ -59,6 +61,8 @@ for SA in "storage.googleapis.com" "eventarc.googleapis.com" "pubsub.googleapis.
   gcloud --no-user-output-enabled beta services identity create --project=$CONFIG_GCP_PROJECT_ID \
     --service="${SA}"
 done
+sleep 60
+
 COMPUTE_SA_ROLES=(
   "roles/eventarc.eventReceiver"
   "roles/run.invoker"
@@ -76,6 +80,8 @@ for COMPUTE_SA_ROLE in "${COMPUTE_SA_ROLES[@]}"; do
     --member="serviceAccount:${COMPUTE_SERVICE_ACCOUNT}" \
     --role="${COMPUTE_SA_ROLE}"
 done
+sleep 60
+
 gcloud --no-user-output-enabled projects add-iam-policy-binding \
   $CONFIG_GCP_PROJECT_ID \
   --member="serviceAccount:${STORAGE_SERVICE_ACCOUNT}" \
