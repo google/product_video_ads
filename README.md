@@ -30,6 +30,31 @@ Disclaimer: This is not an officially supported Google product.
 
 Product Video Ads (PVA) builds ad videos by taking a base video (effectively a template) and putting product information (names, images, prices etc.) on them, updating automatically when there are changes to the configuration, prices etc. For example, retailers who have different special offers in different cities, can use this mapping to efficiently create localised video ads and and update them whenever the assignment changes.
 
+The following example illustrates the functionality with a single product in a single video: a template video (shown are frames from its beginning, middle and end) is combined with a product (data and image) to yield a video that advertises that product:
+
+<table>
+<tr>
+<td></td>
+<td><img src="documentation_assets/template-start.jpg" width="150"></td>
+<td><img src="documentation_assets/template-product.jpg" width="150"></td>
+<td><img src="documentation_assets/template-end.jpg" width="150"></td>
+</tr>
+
+<tr>
+<td style="font-size:200%">+</td>
+<td colspan="3" style="font-size:200%; text-align:center; vertical-align:middle;"><img style="margin:-15px 0 -10px; vertical-align:middle;" src="example_assets/apples.png" width="100"> / Apples / €1.09</td>
+</tr>
+
+<tr>
+<td style="font-size:200%">=</td>
+<td><img src="documentation_assets/template-start.jpg" width="150"></td>
+<td><img src="documentation_assets/result.jpg" width="150"></td>
+<td><img src="documentation_assets/template-end.jpg" width="150"></td>
+</tr>
+</table>
+
+Given a list of products and a configuration of which of them should be shown in the same video, PVA can generate many such videos automatically.
+
 ## Requirements
 
 To use PVA "out of the box", you need at least
@@ -53,9 +78,9 @@ Before being able to use PVA, the following steps are required:
 
 1. Make sure your system has an up-to-date installation of [Node.js, npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and `git`.
 2. Install [clasp](https://github.com/google/clasp) by running `npm install @google/clasp -g`, then log in via `clasp login`.
-3. In the [Apps Script settings](https://script.google.com/home/usersettings) page and ensure the Apps Script API is enabled.
+3. In the [Apps Script settings](https://script.google.com/home/usersettings), ensure that the Apps Script API is enabled.
 4. In your GCP project, ensure [OAuth consent](https://console.cloud.google.com/apis/credentials/consent) is [configured](https://developers.google.com/workspace/guides/configure-oauth-consent). (If possible, choose the "Internal" type to avoid the need for approval.)
-5. Make sure your system has an up-to-date installation of the [gcloud CLI](https://cloud.google.com/sdk/docs/install), then login via `gcloud auth login`.
+5. Make sure your system has an up-to-date installation of the [gcloud CLI](https://cloud.google.com/sdk/docs/install), then log in via `gcloud auth login`.
 
 ### B. Check out the code
 
@@ -69,7 +94,9 @@ git clone https://github.com/google/product_video_ads
 
 Execute the installation script on Google Cloud Platform (GCP):
 
-`npm run deploy`
+```bash
+npm run deploy
+```
 
 You will be asked for
 
@@ -97,7 +124,7 @@ It is recommended to not provide the latter, as then a clean new sheet will be c
 
 ### E. Deploy the Ads Script in Google Ads
 
-For this, see the [official documentation](https://developers.google.com/google-ads/scripts/docs/getting-started) of how to use Ads Scripts, but instead of the provided example use [this code](./adsScriptsScript.js).
+For this, see the [official documentation](https://developers.google.com/google-ads/scripts/docs/getting-started) of how to use Ads Scripts, but instead of the provided example use [this code](./adsScriptsScript.js). At its top, change the link to that of your own PVA spreadsheet.
 
 ### F. Upload the needed template video(s) and font(s) to Google Cloud Storage
 
@@ -169,7 +196,7 @@ The columns:
 
 This defines those visual arrangements, defining textual and image elements along with their position, size and similar properties, but also the field in the product feed that provides the actual text or image to use.
 
-All columns need to have values, except _Text Font_ and those referring to a diffenent element type, like _Text Color_ for images:
+All columns need to have values, except _Text Font_ and those referring to a different element type, like _Text Color_ for images:
 
 - _Placement ID_: number or text serving as the target of references to the namesake field on the sheet _Timing_
 - _Element Type_: either `Text` or `Image`
@@ -183,24 +210,22 @@ All columns need to have values, except _Text Font_ and those referring to a dif
 - _Text Alignment_: alignment inside the available width, either `left`, `center` or `right`
 - _Text Color_: color as a hexadecimal value with a leading `#`
 
-> **Note:** Rotation of images currently doesn't work.
-
 > **Note:** Your template may not allow for text to be rendered in several lines. In this case, ensure that the input feed has no entries that would result in line wrapping.
 
 ### Offers
 
 This hosts the list of products, with their properties, that could theoretically be configured to be shown in the videos.
 
-As columns, only _Offer ID_ is compulsory. The others simply need to provide all the data that is ultimately meant to be shown on the generated video.
+Among the columns, only _Offer ID_ is compulsory. The others simply need to provide all the data that is ultimately meant to be shown on the generated video.
 
 ### Offers to Ad Groups
 
-This defines how products should be grouped to form videos.
-
-The columns are hence simply:
+This defines how products should be grouped to form videos. The columns are:
 
 - _Offer ID_: reference to the value in the column on _Offers_ of the same name
 - _Output AdGroup_: reference to the value of the column on _AdGroups_ of the same name
+
+The order of entries here determines the order in which the corresponding products will appear in the generated video.
 
 ### Ad Groups
 
@@ -241,7 +266,7 @@ The columns:
 
 ## Regular Usage
 
-Once the configuration is complete, the there are two processes that need to be triggered:
+Once the configuration is complete, there are two processes that need to be triggered:
 
 - Whenever the configuration or product data changed\*:
   \[🎬 Product Video Ads | Request video creation\]
@@ -297,13 +322,13 @@ The following are among the most relevant practical limitations of PVA:
 - The placement of the products needs to be defined via the textual definition of pixel coordinates. While whoever created the template video should be able to provide these, this is far from the intuitive image of the future result that a graphical "What you see is what you get" interface would provide.
 - Videos over 50 MB in size cannot be uploaded to YouTube with the mechanism in this tool.
 
-A fundemantally different level of freedom and control is provided by [Google Web Designer](https://webdesigner.withgoogle.com/) (GWD), a tool that allows the creation of animated HTML files, often used for Display ads. GWD is able to generate videos from these, and can be used for scaled work by reading lists of input data. Effectively, it can hence be used to create product large videos, with special effects not supported by PVA, and by graphically placing elements with the mouse instead of having to provide numerical coordinates.
+A fundemantally different level of freedom and control is provided by [Google Web Designer](https://webdesigner.withgoogle.com/) (GWD), a tool that allows the creation of animated HTML files, often used for Display ads. GWD is able to generate videos from these, and can be used for scaled work by reading lists of input data. Effectively, it can hence be used to create product videos that, compared with what is supported by PVA, are larger, feature special effects, and allow elements to be graphically placed with the mouse instead of having to provide numerical coordinates.
 
 Google Web Designer comes with its own downsides, however:
 
-- A tool for creating that input list would need to be implemented additionally.
+- A tool for creating the needed input lists would need to be implemented additionally.
 - Automatically getting the list into GWD and automatically triggering video generation is not supported out of the box and would require the implementation of macros at the level of the Operating System hosting the tool.
 - While the generated videos can be automatically uploaded to Google Drive, further upload to YouTube and Google Ads would also need to be implemented additionally.
-- The fact that the tool runs on a local machine without parallelisation limits its throughput. Moving this to the cloud and spawning several virtual machines that each run GWD would be complex.
+- The fact that the tool runs on a local machine without parallelisation limits its throughput. Moving this to the cloud and spawning several virtual machines that each run GWD would be complex. (One option would be to export HTML files and then create videos by screen-recording Chrome running on VMs.)
 
 Note that Ads Creative Studio, which might be recommended in this context, is set to be [discontinued in early 2025](https://support.google.com/adscreativestudio/answer/10726939).
