@@ -17,6 +17,7 @@
 import { deleteAllSheets, populateConfig } from './devHelpers';
 import { getProductsFromMerchantCenter } from './feedImport';
 import { showGCSFileUploader } from './gcsFileUploader';
+import { showVideoPlacements } from './placementPreview';
 import { initialiseSheets } from './sheetInitialisation';
 import { uploadVideos } from './videoRegistration';
 import { exportConfig } from './videoRequest';
@@ -44,6 +45,7 @@ const onOpen = () => {
       getProductsFromMerchantCenter.name
     )
     .addItem('Upload files to GCS', showGCSFileUploader.name) // TODO(): Add after sheet initialized.
+    .addItem('Preview image and text placements', showVideoPlacements.name)
     .addItem('Request video creation', exportConfig.name)
     .addItem('Upload videos to YouTube', uploadVideos.name)
     .addToUi();

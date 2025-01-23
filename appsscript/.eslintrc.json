@@ -14,7 +14,8 @@
   "plugins": ["prettier"],
   "rules": {
     "prettier/prettier": "error",
-    "@typescript-eslint/no-duplicate-enum-values": "off" // !! debug without
+    "@typescript-eslint/no-duplicate-enum-values": "off", // !! debug without
+    "@typescript-eslint/no-useless-escape": "off" // !! debug without
   },
   "ignorePatterns": ["template/**/*", "template-ui/**/*"]
 }
