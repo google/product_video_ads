@@ -40,12 +40,12 @@ class VideoPlacements {
   private videoWidth: number = 0;
   private videoHeight: number = 0;
 
-  constructor() {
+  constructor(
+    readonly placements: Record<string, PlacementItemVisualConfig[]>
+  ) {
+    console.log('VideoPlacements constructor');
     this.videoFile = document.getElementById('videoFile') as HTMLInputElement;
     this.myVideo = document.getElementById('myVideo') as HTMLVideoElement;
-    // this.frameSlider = document.getElementById(
-    //   'frameSlider'
-    // ) as HTMLInputElement;
     this.videoContainer = document.getElementById(
       'video-container'
     ) as HTMLDivElement;
@@ -74,14 +74,13 @@ class VideoPlacements {
       'loadedmetadata',
       this.handleVideoMetadata.bind(this)
     );
-    // this.placementIdsInput.addEventListener(
-    //   'change',
-    //   this.handlePlacementIdChange.bind(this)
-    // );
-
+    this.placementIdsInput.addEventListener(
+      'change',
+      this.handlePlacementIdChange.bind(this)
+    );
     this.generateRectanglesButton.addEventListener(
       'click',
-      this.handleGenerateRectanglesClick.bind(this)
+      this.handlePlacementIdChange.bind(this)
     );
   }
 
@@ -92,84 +91,48 @@ class VideoPlacements {
     this.myVideo.load();
   }
 
-  // private handlePlacementIdChange(): void {
-  //   const placementId = parseInt(this.placementIdsInput.value);
-  // }
-
   private handleVideoMetadata(): void {
-    // this.frameSlider.max = this.myVideo.duration.toString();
     this.videoWidth = this.myVideo.videoWidth;
     this.videoHeight = this.myVideo.videoHeight;
     console.log('Video Dimensions:', this.videoWidth, this.videoHeight);
   }
 
-  // private handleFrameSliderInput(): void {
-  //   this.myVideo.currentTime = parseFloat(this.frameSlider.value);
-  // }
-
-  private handleGenerateRectanglesClick(): void {
-    const placementId = this.placementIdsInput.value;
-    const sheets = new Sheets();
-    const placementsConfig = sheets.getConfigTables([SheetName.placement])[
-      SheetName.placement
-    ];
-    const placementItems = placementsConfig?.filter(
-      p => p[ColumnName.placementId] === placementId
-    );
-    const colors = this.generateDistinctColors(placementItems!.length);
-    // Text
-    placementItems
-      ?.filter(i => i[ColumnName.elementType] === 'TEXT')
-      .forEach((i, index) => {
-        const fieldName = i[ColumnName.dataField];
-        const x = parseInt(i[ColumnName.positionX]);
-        const y = parseInt(i[ColumnName.positionY]);
-        const size = parseInt(i[ColumnName.textSize]);
-        const width = parseInt(i[ColumnName.textWidth]);
-        const rectangle = this.createRectangleElement(fieldName, colors[index]);
-        this.rectangles.push({
-          element: rectangle,
-          dataFieldName: fieldName,
-          x,
-          y,
-          width,
-          height: size,
-        });
-
-        this.videoContainer.appendChild(rectangle);
-        this.makeDraggable(rectangle);
-        this.createCoordinateDisplay(rectangle, fieldName);
-      });
-
-    // Image
+  private handlePlacementIdChange(): void {
+    console.log('handlePlacementIdChange');
+    this.clearRectangles();
+    this.populateRectancles(this.placementIdsInput.value);
   }
 
-  // private createRectangles(numFields: number): void {
-  //   this.rectangles = [];
-  //   this.videoContainer
-  //     .querySelectorAll('.draggable')
-  //     .forEach(el => el.remove());
-  //   this.coordinatesContainer.innerHTML = '';
+  private clearRectangles(): void {
+    console.log('clearRectangles');
+    this.rectangles = [];
+    this.videoContainer
+      .querySelectorAll('.draggable')
+      .forEach(el => el.remove());
+    this.coordinatesContainer.innerHTML = '';
+  }
 
-  //   const colors = this.generateDistinctColors(numFields);
-
-  //   for (let i = 0; i < numFields; i++) {
-  //     const dataFieldName = `Data Field ${i + 1}`;
-  //     const rectangle = this.createRectangleElement(dataFieldName, colors[i]);
-  //     this.rectangles.push({
-  //       element: rectangle,
-  //       dataFieldName,
-  //       x: 0,
-  //       y: 0,
-  //       width: 80,
-  //       height: 40,
-  //     });
-
-  //     this.videoContainer.appendChild(rectangle);
-  //     this.makeDraggable(rectangle);
-  //     this.createCoordinateDisplay(rectangle, dataFieldName);
-  //   }
-  // }
+  private populateRectancles(placementId: string): void {
+    console.log('populateRectangles');
+    const placementItems = this.placements[placementId];
+    console.log(placementItems);
+    const colors = this.generateDistinctColors(placementItems!.length);
+    this.rectangles = placementItems.map((i, index) => {
+      return {
+        element: this.createRectangleElement(i.dataField, colors[index]),
+        dataFieldName: i.dataField,
+        x: i.x,
+        y: i.y,
+        width: i.width,
+        height: i.height,
+      };
+    });
+    this.rectangles.forEach(r => {
+      this.videoContainer.appendChild(r.element);
+      this.makeDraggable(r.element);
+      this.createCoordinateDisplay(r.element, r.dataFieldName);
+    });
+  }
 
   private createRectangleElement(
     dataFieldName: string,
@@ -342,25 +305,60 @@ class VideoPlacements {
     return colors;
   }
 }
+/**
+ * Translation layer between AppsScript and popup's iFrame <script> namespaces
+ */
+export class PlacementItemVisualConfig {
+  constructor(
+    readonly x: number,
+    readonly y: number,
+    readonly width: number,
+    readonly height: number,
+    readonly dataField: string,
+    readonly type: string
+  ) {}
+}
+
+export const getPlacementVisualConfigs = () => {
+  const sheets = new Sheets();
+  const placementsConfig = sheets.getConfigTables([SheetName.placement])[
+    SheetName.placement
+  ];
+  const placements: Record<string, PlacementItemVisualConfig[]> = {};
+  placementsConfig?.forEach(i => {
+    const placementId: string = i[ColumnName.placementId];
+    let width: number = 100;
+    let height: number = 100;
+    if (i[ColumnName.elementType] === 'TEXT') {
+      width = parseInt(i[ColumnName.textWidth]);
+      height = parseInt(i[ColumnName.textSize]);
+    } else if (i[ColumnName.elementType] === 'IMAGE') {
+      width = parseInt(i[ColumnName.imageWidth]);
+      height = parseInt(i[ColumnName.imageHeight]);
+    }
+    const visConfig = new PlacementItemVisualConfig(
+      parseInt(i[ColumnName.positionX]),
+      parseInt(i[ColumnName.positionY]),
+      width,
+      height,
+      i[ColumnName.dataField],
+      i[ColumnName.elementType]
+    );
+    console.log(placementId);
+    console.log(visConfig);
+
+    if (!placements[placementId]) {
+      placements[placementId] = [visConfig];
+    } else {
+      placements[placementId].push(visConfig);
+    }
+    console.log(placements);
+  });
+  console.log(placements);
+  return placements;
+};
 
 export const showVideoPlacements = () => {
-  // const sheets = new Sheets();
-  // const placementsConfig = sheets.getConfigTables([SheetName.placement])[
-  //   SheetName.placement
-  // ];
-
-  // const placementIds = [
-  //   ...new Set(placementsConfig?.map(r => r[ColumnName.placementId])),
-  // ];
-  // const placementItems = placementsConfig?.filter(
-  //   p => p[ColumnName.placementId] === placementIds[0]
-  // );
-
-  // Get all the data fields for Placement id
-
-  // console.log(placementIds);
-  // Get all the unique values from ColumnName.placementId
-
   const html = `
 <style>
   #video-container {
@@ -407,11 +405,10 @@ export const showVideoPlacements = () => {
 <div id="coordinates-container"></div>
 
 <script>
-import { Sheets } from './sheetManagement';
-import { ColumnName, SheetName } from './structure';
-
 ${VideoPlacements.toString()}
-const videoPlacements = new VideoPlacements();
+const placements = JSON.parse('${JSON.stringify(getPlacementVisualConfigs())}');
+console.log(placements);
+const videoPlacements = new VideoPlacements(placements);
 </script>
   `;
 
