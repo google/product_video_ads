@@ -15,7 +15,7 @@
  */
 
 import { Sheets } from './sheetManagement';
-import { ColumnName, SheetName } from './structure';
+import { SheetName, ColumnName, ElementType } from './structure';
 
 interface Rectangle {
   element: HTMLDivElement;
@@ -32,7 +32,6 @@ class VideoPlacements {
   // private frameSlider: HTMLInputElement;
   private videoContainer: HTMLDivElement;
   private coordinatesContainer: HTMLDivElement;
-  private numFieldsInput: HTMLInputElement;
   private placementIdsInput: HTMLSelectElement;
   private generateRectanglesButton: HTMLButtonElement;
 
@@ -52,9 +51,6 @@ class VideoPlacements {
     this.coordinatesContainer = document.getElementById(
       'coordinates-container'
     ) as HTMLDivElement;
-    this.numFieldsInput = document.getElementById(
-      'numFields'
-    ) as HTMLInputElement;
     this.placementIdsInput = document.getElementById(
       'placementIds'
     ) as HTMLSelectElement;
@@ -76,11 +72,11 @@ class VideoPlacements {
     );
     this.placementIdsInput.addEventListener(
       'change',
-      this.handlePlacementIdChange.bind(this)
+      this.reloadPlacementVisuals.bind(this)
     );
     this.generateRectanglesButton.addEventListener(
       'click',
-      this.handlePlacementIdChange.bind(this)
+      this.reloadPlacementVisuals.bind(this)
     );
   }
 
@@ -97,8 +93,8 @@ class VideoPlacements {
     console.log('Video Dimensions:', this.videoWidth, this.videoHeight);
   }
 
-  private handlePlacementIdChange(): void {
-    console.log('handlePlacementIdChange');
+  public reloadPlacementVisuals(): void {
+    console.log('reloadPlacementVisuals');
     this.clearRectangles();
     this.populateRectancles(this.placementIdsInput.value);
   }
@@ -119,7 +115,7 @@ class VideoPlacements {
     const colors = this.generateDistinctColors(placementItems!.length);
     this.rectangles = placementItems.map((i, index) => {
       return {
-        element: this.createRectangleElement(i.dataField, colors[index]),
+        element: this.createRectangleElement(i, colors[index]),
         dataFieldName: i.dataField,
         x: i.x,
         y: i.y,
@@ -129,46 +125,49 @@ class VideoPlacements {
     });
     this.rectangles.forEach(r => {
       this.videoContainer.appendChild(r.element);
-      this.makeDraggable(r.element);
-      this.createCoordinateDisplay(r.element, r.dataFieldName);
+      this.makeDraggable(r);
+      this.createCoordinateDisplay(r);
     });
   }
 
   private createRectangleElement(
-    dataFieldName: string,
+    i: PlacementItemVisualConfig,
     color: string
   ): HTMLDivElement {
     const rect = document.createElement('div');
-    rect.id = dataFieldName.replace(/\s+/g, '-').toLowerCase();
+    rect.id = i.dataField.replace(/\s+/g, '-').toLowerCase();
     rect.classList.add('draggable');
     rect.style.backgroundColor = color;
-    rect.style.width = `80px`;
-    rect.style.height = `40px`;
-    rect.textContent = dataFieldName;
+    rect.style.width = `${i.width}px`;
+    rect.style.height = `${i.height}px`;
+    //TODO position x & y
+    rect.style.left = `${i.x}px`;
+    rect.style.top = `${i.y}px`;
+    rect.style.opacity = '0.5';
+    rect.textContent = i.dataField;
     return rect;
   }
 
-  private createCoordinateDisplay(
-    element: HTMLDivElement,
-    dataFieldName: string
-  ): void {
+  private createCoordinateDisplay(r: Rectangle): void {
     const coordDiv = document.createElement('div');
     coordDiv.classList.add('coords');
-    coordDiv.innerHTML = `${dataFieldName}:
-      X: <span id="${element.id}-x">0</span>
-      Y: <span id="${element.id}-y">0</span>
-      Width: <span id="${element.id}-width">80</span>
-      Height: <span id="${element.id}-height">40</span>`;
+    coordDiv.innerHTML = `${r.dataFieldName}:
+      X: <span id="${r.element.id}-x">${r.x}</span>
+      Y: <span id="${r.element.id}-y">${r.y}</span>
+      Width: <span id="${r.element.id}-width">${r.width}</span>
+      Height: <span id="${r.element.id}-height">${r.height}</span>`;
     this.coordinatesContainer.appendChild(coordDiv);
   }
 
-  private makeDraggable(element: HTMLDivElement): void {
+  private makeDraggable(r: Rectangle): void {
     let isDragging = false;
     let startX = 0,
       startY = 0,
       initialX = 0,
       initialY = 0;
+    const element = r.element;
 
+    // Drag Logic
     element.addEventListener('mousedown', (e: MouseEvent) => {
       if (e.target !== element) return;
 
@@ -329,10 +328,10 @@ export const getPlacementVisualConfigs = () => {
     const placementId: string = i[ColumnName.placementId];
     let width: number = 100;
     let height: number = 100;
-    if (i[ColumnName.elementType] === 'TEXT') {
+    if (i[ColumnName.elementType] === ElementType.text) {
       width = parseInt(i[ColumnName.textWidth]);
       height = parseInt(i[ColumnName.textSize]);
-    } else if (i[ColumnName.elementType] === 'IMAGE') {
+    } else if (i[ColumnName.elementType] === ElementType.image) {
       width = parseInt(i[ColumnName.imageWidth]);
       height = parseInt(i[ColumnName.imageHeight]);
     }
@@ -344,15 +343,11 @@ export const getPlacementVisualConfigs = () => {
       i[ColumnName.dataField],
       i[ColumnName.elementType]
     );
-    console.log(placementId);
-    console.log(visConfig);
-
     if (!placements[placementId]) {
       placements[placementId] = [visConfig];
     } else {
       placements[placementId].push(visConfig);
     }
-    console.log(placements);
   });
   console.log(placements);
   return placements;
@@ -409,6 +404,7 @@ ${VideoPlacements.toString()}
 const placements = JSON.parse('${JSON.stringify(getPlacementVisualConfigs())}');
 console.log(placements);
 const videoPlacements = new VideoPlacements(placements);
+videoPlacements.reloadPlacementVisuals();
 </script>
   `;
 
