@@ -33,7 +33,6 @@ class VideoPlacements {
   private videoContainer: HTMLDivElement;
   private coordinatesContainer: HTMLDivElement;
   private placementIdsInput: HTMLSelectElement;
-  private generateRectanglesButton: HTMLButtonElement;
 
   private rectangles: Rectangle[] = [];
   private videoWidth: number = 0;
@@ -54,9 +53,6 @@ class VideoPlacements {
     this.placementIdsInput = document.getElementById(
       'placementIds'
     ) as HTMLSelectElement;
-    this.generateRectanglesButton = document.getElementById(
-      'generateRectangles'
-    ) as HTMLButtonElement;
 
     this.addEventListeners();
   }
@@ -72,10 +68,6 @@ class VideoPlacements {
     );
     this.placementIdsInput.addEventListener(
       'change',
-      this.reloadPlacementVisuals.bind(this)
-    );
-    this.generateRectanglesButton.addEventListener(
-      'click',
       this.reloadPlacementVisuals.bind(this)
     );
   }
@@ -390,8 +382,6 @@ export const showVideoPlacements = () => {
     1
   </option>
 </select>
-<input type="number" id="numFields" placeholder="Placement Id">
-<button id="generateRectangles">Get</button>
 
 <div id="video-container">
 <video id="myVideo" controls></video>
@@ -403,6 +393,7 @@ export const showVideoPlacements = () => {
 ${VideoPlacements.toString()}
 const placements = JSON.parse('${JSON.stringify(getPlacementVisualConfigs())}');
 console.log(placements);
+//populate placement ids select
 const videoPlacements = new VideoPlacements(placements);
 videoPlacements.reloadPlacementVisuals();
 </script>
