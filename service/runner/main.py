@@ -341,13 +341,13 @@ def convert_text_overlay(
         output_dir=output_dir,
     )
 
-  # Wrap long texts to many smaller texts
-  words = _wrap_text(placement.text_value, placement.text_width)
+  # Wrap long texts to multiple lines.
+  lines = _wrap_text(placement.text_value, placement.text_width)
 
-  # Create overlays to all lines broken down
+  # Create overlays to all lines broken down.
   texts = []
 
-  for i, word in enumerate(words):
+  for i, line in enumerate(lines):
     texts.append({
         'start_time': offset,
         'end_time': offset + duration,
@@ -356,7 +356,7 @@ def convert_text_overlay(
         'y': placement.position_y +
         (1.2 * i * placement.text_size),  # Add new line to wrap text.
         'angle': placement.rotation_angle,
-        'text': word,
+        'text': line,
         'font': font_path,
         'font_color': placement.text_color,
         'font_size': placement.text_size,
@@ -366,7 +366,7 @@ def convert_text_overlay(
 
 
 def _wrap_text(text, characters_per_line):
-  words = []
+  lines = []
 
   if characters_per_line <= 0:
     return [text]
@@ -379,9 +379,9 @@ def _wrap_text(text, characters_per_line):
     # If the current word is too long to fit on its own line, split it.
     if len(word) > characters_per_line:
       while len(word) > characters_per_line:
-        words.append(word[:characters_per_line])
+        lines.append(word[:characters_per_line])
         word = word[characters_per_line:]
-      words.append(word)
+      lines.append(word)
       current_line = []
       current_line_length = 0
       continue
@@ -390,7 +390,7 @@ def _wrap_text(text, characters_per_line):
     if current_line_length + len(word) + (
         len(current_line) > 0
     ) > characters_per_line:
-      words.append(" ".join(current_line))
+      lines.append(" ".join(current_line))
       current_line = []
       current_line_length = 0
 
@@ -399,9 +399,9 @@ def _wrap_text(text, characters_per_line):
 
   # Add the last line (if any words were left).
   if current_line:
-    words.append(' '.join(current_line))
+    lines.append(' '.join(current_line))
 
-  return words
+  return lines
 
 
 def convert_image_overlay(
