@@ -206,7 +206,7 @@ All columns need to have values, except _Text Font_ and those referring to a dif
 - _Image Width_ and _Image Height_: dimensions into which the image should be scaled – Its aspect ratio will be retained, so one of the resulting dimensions may be smaller.
 - _Text Font_ (optional): font filename (including its extension)
 - _Text Size_: vertical size in pixels
-- _Text Width_: maximum width after which the text should be wrapped using a line break
+- _Text Width_: maximum characters after which the text should be wrapped using a line break
 - _Text Alignment_: alignment inside the available width, either `left`, `center` or `right`
 - _Text Color_: color as a hexadecimal value with a leading `#`
 
