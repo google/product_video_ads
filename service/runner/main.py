@@ -410,12 +410,12 @@ def _wrap_text(text, characters_per_line):
   return lines
 
 
-def remove_background(input_path):
-  input_image = Image.open(input_path)
-  output_image = remove(input_image)
-  output_path = f"{input_path}.png"
-  output_image.save(output_path)
-  return output_path
+# def remove_background(input_path):
+#   input_image = Image.open(input_path)
+#   output_image = remove(input_image)
+#   output_path = f"{input_path}.png"
+#   output_image.save(output_path)
+#   return output_path
 
 
 def convert_image_overlay(
@@ -432,7 +432,7 @@ def convert_image_overlay(
 
   if placement.remove_background == 'Yes':
     logging.debug('Removing background from image %s...', placement.image_url)
-    tmp_file_name = remove_background(tmp_file_name)
+    # tmp_file_name = remove_background(tmp_file_name)
 
   # Find out file's extension
   extension = imghdr.what(tmp_file_name) or 'tmp'
