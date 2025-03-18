@@ -38,6 +38,9 @@ import storage as StorageService
 from cloudevents.http import CloudEvent
 from google.cloud import logging as cloudlogging
 
+from rembg import remove
+from PIL import Image
+
 
 class PvaLiteRenderMessagePlacement:
   """Represents a placement in PVA Lite.
@@ -121,6 +124,7 @@ class PvaLiteRenderMessageImagePlacement(PvaLiteRenderMessagePlacement):
         image_height: Optional height of the image.
         keep_ratio: Optional keep ratio of the image.
         rotation_angle: Optional rotation angle of the image element.
+        remove_background: Optional, if 'Yes' then remove background before placing
       """
   position_x: float
   position_y: float
@@ -128,6 +132,7 @@ class PvaLiteRenderMessageImagePlacement(PvaLiteRenderMessagePlacement):
   image_width: Optional[float] = 0
   image_height: Optional[float] = 0
   rotation_angle: float = 0
+  remove_background: Optional[str] = 'No'
   keep_ratio: Optional[bool] = True
 
   def __init__(self, **kwargs):
@@ -143,6 +148,7 @@ class PvaLiteRenderMessageImagePlacement(PvaLiteRenderMessagePlacement):
         f'image_width={self.image_width}, '
         f'image_height={self.image_height}, '
         f'keep_ratio={self.keep_ratio})'
+        f'remove_background={self.remove_background}'
     )
 
 
@@ -404,6 +410,12 @@ def _wrap_text(text, characters_per_line):
   return lines
 
 
+# def remove_background(input_path, output_path):
+#   input_image = Image.open(input_path)
+#   output_image = remove(input_image)
+#   output_image.save(output_path)
+
+
 def convert_image_overlay(
     output_dir: str,
     offset: float,
@@ -415,6 +427,10 @@ def convert_image_overlay(
 
   # Download image from url to local temp file
   tmp_file_name = _download_image_to_file(output_dir, placement.image_url)
+
+  if placement.remove_background == 'Yes':
+    logging.debug('Removing background from image %s...', placement.image_url)
+    # remove_background(tmp_file_name, tmp_file_name)
 
   # Find out file's extension
   extension = imghdr.what(tmp_file_name) or 'tmp'
@@ -454,7 +470,8 @@ def _download_image_to_file(output_dir, url):
     )
   # Downloads image from https/https urls
   else:
-    tmp_file_name = f'{output_dir}/img_{datetime.datetime.now().timestamp()}.tmp'
+    img_extension = url.split('.')[-1]
+    tmp_file_name = f'{output_dir}/img_{datetime.datetime.now().timestamp()}.{img_extension}'
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) '
         'Chrome/90.0.4430.72 Safari/537.36 '

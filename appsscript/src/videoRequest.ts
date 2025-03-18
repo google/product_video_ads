@@ -84,6 +84,8 @@ function getPlacement(
       placement[Util.deriveFieldKey(ColumnName.imageHeight)] = parseFloat(
         placementRecord[ColumnName.imageHeight]
       );
+      placement[Util.deriveFieldKey(ColumnName.removeBackground)] =
+        placementRecord[ColumnName.removeBackground];
       break;
     default:
       // Should have been caught by the 'syntax' check already.
