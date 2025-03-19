@@ -432,7 +432,7 @@ def convert_image_overlay(
 
   if placement.remove_background == 'Yes':
     logging.debug('Removing background from image %s...', placement.image_url)
-    # tmp_file_name = remove_background(tmp_file_name)
+    tmp_file_name = remove_background(tmp_file_name)
 
   # Find out file's extension
   extension = imghdr.what(tmp_file_name) or 'tmp'
