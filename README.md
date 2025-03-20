@@ -194,6 +194,11 @@ The columns:
 
 ### Placement
 
+#### 🚨 NEW: Placements Helper UI
+
+> Introducing a new lightweight Placements helper UI, which allows users to visually drag and drop
+> elements on a video frame, in order to determine the positioning, width and height values for PVA configuration. To learn more, check out the [docs](https://github.com/google/product_video_ads/tree/main/positioning_helper#pva-positioning-helper), or get started [here](https://google.github.io/product_video_ads/positioning_helper/index.html).
+
 This defines those visual arrangements, defining textual and image elements along with their position, size and similar properties, but also the field in the product feed that provides the actual text or image to use.
 
 All columns need to have values, except _Text Font_ and those referring to a different element type, like _Text Color_ for images:
