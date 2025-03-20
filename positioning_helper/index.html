@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PVA Positioning Helper</title>
+    <style>
+      :root {
+        --md-primary: #0061a4;
+        --md-primary-container: #d1e4ff;
+        --md-on-primary: #ffffff;
+        --md-on-primary-container: #001d36;
+        --md-secondary: #535f70;
+        --md-surface: #f8fdff;
+        --md-surface-container: #eef3ff;
+        --md-outline: #73777f;
+        --md-elevation-1: 0 1px 3px rgba(0, 0, 0, 0.12),
+          0 1px 2px rgba(0, 0, 0, 0.14);
+        --md-elevation-2: 0 3px 6px rgba(0, 0, 0, 0.15),
+          0 2px 4px rgba(0, 0, 0, 0.12);
+      }
+
+      body {
+        font-family: "Roboto", sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px;
+        background-color: var(--md-surface);
+        line-height: 1.5;
+      }
+
+      .container {
+        background-color: white;
+        padding: 24px;
+        border-radius: 28px;
+        box-shadow: var(--md-elevation-1);
+      }
+
+      h1 {
+        font-size: 2rem;
+        font-weight: 400;
+        letter-spacing: 0.0025em;
+        color: var(--md-on-primary-container);
+        text-align: center;
+      }
+
+      .video-section {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .file-input-wrapper {
+        margin-bottom: 20px;
+      }
+
+      #videoFile {
+        display: none;
+      }
+
+      .file-input-label {
+        background-color: var(--md-primary);
+        color: var(--md-on-primary);
+        padding: 10px 24px;
+        border-radius: 20px;
+        font-weight: 500;
+        letter-spacing: 0.1px;
+        text-transform: uppercase;
+        box-shadow: var(--md-elevation-1);
+      }
+
+      .file-input-label:hover {
+        box-shadow: var(--md-elevation-2);
+        background-color: var(--md-primary);
+        filter: brightness(1.1);
+      }
+
+      #video-container {
+        position: relative;
+        margin: 20px auto;
+        border: 1px solid var(--md-outline);
+        border-radius: 16px;
+        overflow: hidden;
+        background-color: #000;
+        min-height: 300px; /* Add minimum height */
+      }
+
+      .controls-section {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 30px;
+        padding: 24px;
+        background-color: var(--md-surface-container);
+        border-radius: 16px;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #555;
+      }
+
+      select,
+      input[type="text"] {
+        width: 200px;
+        padding: 8px 16px;
+        border: 1px solid var(--md-outline);
+        border-radius: 4px;
+        font-size: 1rem;
+        line-height: 1.5;
+        transition: border-color 0.2s;
+        background-color: var(--md-surface);
+      }
+
+      select:focus,
+      input[type="text"]:focus {
+        border-color: var(--md-primary);
+        outline: none;
+      }
+
+      #addRectangle {
+        background-color: var(--md-primary);
+        color: var(--md-on-primary);
+        border: none;
+        padding: 10px 24px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0.1px;
+        text-transform: uppercase;
+        box-shadow: var(--md-elevation-1);
+        transition: background-color 0.3s;
+      }
+
+      #addRectangle:hover {
+        box-shadow: var(--md-elevation-2);
+        filter: brightness(1.1);
+      }
+
+      #coordinates-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .coords {
+        background-color: var(--md-surface);
+        padding: 16px;
+        border-radius: 16px;
+        box-shadow: var(--md-elevation-1);
+        border: 1px solid var(--md-outline);
+        position: relative;
+      }
+
+      .coords-content {
+        margin-top: 8px;
+        line-height: 1.5;
+      }
+
+      .draggable {
+        position: absolute;
+        cursor: grab;
+        user-select: none;
+        transform-origin: top left;
+        z-index: 1000;
+        border-radius: 8px;
+      }
+
+      .image {
+        border: 2px solid var(--md-primary);
+        background-color: rgba(0, 97, 164, 0.1);
+      }
+
+      .text {
+        border: 2px solid var(--md-secondary);
+        background-color: rgba(83, 95, 112, 0.1);
+      }
+
+      .delete-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 50%;
+        color: var(--md-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .delete-btn:hover {
+        background-color: var(--md-surface-container);
+        color: #d32f2f;
+      }
+
+      .material-icons {
+        font-size: 20px;
+      }
+    </style>
+    <!-- Add Roboto font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Add Material Icons -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>PVA Positioning Helper</h1>
+
+      <div class="video-section">
+        <div class="file-input-wrapper">
+          <label class="file-input-label" for="videoFile">
+            Choose Video File
+          </label>
+          <input type="file" id="videoFile" accept="video/*" />
+        </div>
+        <div id="video-container">
+          <video id="myVideo" width="100%" controls>
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+
+      <div class="controls-section">
+        <div class="form-group">
+          <label for="rectangleName">Field Name:</label>
+          <input type="text" id="rectangleName" placeholder="e.g. Price" />
+        </div>
+        <div class="form-group">
+          <label for="rectangleType">Type:</label>
+          <select id="rectangleType">
+            <option value="Text">Text</option>
+            <option value="Image">Image</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>&nbsp;</label>
+          <button id="addRectangle">Add Placeholder</button>
+        </div>
+      </div>
+
+      <div id="coordinates-container"></div>
+    </div>
+    <script src="video-placements.js"></script>
+  </body>
+</html>
