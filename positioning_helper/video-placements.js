@@ -79,7 +79,7 @@ var VideoPlacements = /** @class */ (function () {
   };
   VideoPlacements.prototype.createRectangleElement = function (name, color, type) {
       var rect = document.createElement('div');
-      rect.id = name.replace(/\s+/g, '-').toLowerCase();
+      rect.id = name.replace(/\s+/g, '-').toLowerCase() + '-' + Date.now();  // Unique ID
       rect.classList.add('draggable');
       rect.classList.add(type.toLowerCase());
       rect.style.backgroundColor = color;
