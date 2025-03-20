@@ -101,9 +101,11 @@ var VideoPlacements = /** @class */ (function () {
       var coordDiv = document.createElement('div');
       coordDiv.classList.add('coords');
 
-      // Create title text
-      var titleText = document.createTextNode(`${name} (${type}):`);
-      coordDiv.appendChild(titleText);
+      // Create title text with bold styling
+      var titleSpan = document.createElement('span');
+      titleSpan.className = 'coords-title';
+      titleSpan.textContent = `${name} (${type})`;
+      coordDiv.appendChild(titleSpan);
 
       // Create delete button
       var deleteBtn = document.createElement('button');
