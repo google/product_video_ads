@@ -19,9 +19,27 @@ var VideoPlacements = /** @class */ (function () {
   };
   VideoPlacements.prototype.handleVideoFileChange = function (e) {
       var file = e.target.files[0];
-      var fileUrl = URL.createObjectURL(file);
-      this.myVideo.src = fileUrl;
-      this.myVideo.load();
+
+      // Validate file type
+      if (!file || !file.type.startsWith('video/')) {
+          console.error('Invalid file type. Please select a video file.');
+          return;
+      }
+
+      // Validate file size (e.g., max 100MB)
+      if (file.size > 100 * 1024 * 1024) {
+          console.error('File too large. Please select a smaller video file.');
+          return;
+      }
+
+      try {
+          var fileUrl = URL.createObjectURL(file);
+          this.myVideo.setAttribute('src', fileUrl);
+          this.myVideo.load();
+      } catch (error) {
+          console.error('Error loading video:', error);
+          this.myVideo.setAttribute('src', '');
+      }
   };
   VideoPlacements.prototype.handleVideoMetadata = function () {
       this.videoWidth = this.myVideo.videoWidth;
@@ -82,18 +100,59 @@ var VideoPlacements = /** @class */ (function () {
   VideoPlacements.prototype.createCoordinateDisplay = function (element, name, type) {
       var coordDiv = document.createElement('div');
       coordDiv.classList.add('coords');
-      coordDiv.innerHTML = `${name} (${type}):
-          <button class="delete-btn" title="Delete rectangle">
-              <span class="material-icons">delete</span>
-          </button>
-          X: <span id="${element.id}-x">0</span>
-          Y: <span id="${element.id}-y">0</span>
-          Width: <span id="${element.id}-width">80</span>
-          Height: <span id="${element.id}-height">40</span>`;
 
-      var deleteBtn = coordDiv.querySelector('.delete-btn');
+      // Create title text
+      var titleText = document.createTextNode(`${name} (${type}):`);
+      coordDiv.appendChild(titleText);
+
+      // Create delete button
+      var deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.title = 'Delete rectangle';
+      var deleteIcon = document.createElement('span');
+      deleteIcon.className = 'material-icons';
+      deleteIcon.textContent = 'delete';
+      deleteBtn.appendChild(deleteIcon);
+      coordDiv.appendChild(deleteBtn);
+
+      // Create coordinates display
+      var coordsContent = document.createElement('div');
+      coordsContent.className = 'coords-content';
+
+      // X coordinate
+      coordsContent.appendChild(document.createTextNode('X: '));
+      var xSpan = document.createElement('span');
+      xSpan.id = `${element.id}-x`;
+      xSpan.textContent = '0';
+      coordsContent.appendChild(xSpan);
+      coordsContent.appendChild(document.createElement('br'));
+
+      // Y coordinate
+      coordsContent.appendChild(document.createTextNode('Y: '));
+      var ySpan = document.createElement('span');
+      ySpan.id = `${element.id}-y`;
+      ySpan.textContent = '0';
+      coordsContent.appendChild(ySpan);
+      coordsContent.appendChild(document.createElement('br'));
+
+      // Width
+      coordsContent.appendChild(document.createTextNode('Width: '));
+      var widthSpan = document.createElement('span');
+      widthSpan.id = `${element.id}-width`;
+      widthSpan.textContent = '80';
+      coordsContent.appendChild(widthSpan);
+      coordsContent.appendChild(document.createElement('br'));
+
+      // Height
+      coordsContent.appendChild(document.createTextNode('Height: '));
+      var heightSpan = document.createElement('span');
+      heightSpan.id = `${element.id}-height`;
+      heightSpan.textContent = '40';
+      coordsContent.appendChild(heightSpan);
+
+      coordDiv.appendChild(coordsContent);
+
       deleteBtn.addEventListener('click', () => this.deleteRectangle(element.id));
-
       this.coordinatesContainer.appendChild(coordDiv);
   };
 
