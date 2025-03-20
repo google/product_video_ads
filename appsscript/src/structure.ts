@@ -48,6 +48,7 @@ export enum ColumnName {
   longHeadline = 'Long Headline',
   imageWidth = 'Image Width',
   imageHeight = 'Image Height',
+  removeBackground = 'Remove Background',
   offerId = 'Offer ID',
   offsetS = 'Offset [s]',
   outputVideoId = 'Output Video ID',
@@ -196,6 +197,7 @@ export const tableStructure: Partial<Record<SheetName, ColumnName[]>> = {
     ColumnName.textWidth,
     ColumnName.textAlignment,
     ColumnName.textColor,
+    ColumnName.removeBackground,
   ],
   [SheetName.offers]: [ColumnName.offerId],
   [SheetName.offersToAdGroups]: [ColumnName.offerId, ColumnName.adGroup],
@@ -266,6 +268,10 @@ export class ValueRestrictions {
     [ColumnName.dataField]: [
       ValueRestrictionType.columnNames,
       SheetName.offers,
+    ],
+    [ColumnName.removeBackground]: [
+      ValueRestrictionType.enum,
+      ['Yes', 'No', ''],
     ],
   };
 
