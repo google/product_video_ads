@@ -234,6 +234,15 @@ class VideoPlacements {
     heightSpan.id = `${element.id}-height`;
     heightSpan.textContent = '40';
     coordsContent.appendChild(heightSpan);
+    coordsContent.appendChild(document.createElement('br'));
+
+    // Font Size (for text rectangles)
+    if (type === 'Text') {
+      coordsContent.appendChild(document.createTextNode('Font Size: '));
+      const fontSizeSpan = document.createElement('span');
+      fontSizeSpan.textContent = `${element.dataset.fontSize}px`;
+      coordsContent.appendChild(fontSizeSpan);
+    }
 
     coordDiv.appendChild(coordsContent);
 
