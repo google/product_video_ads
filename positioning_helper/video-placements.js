@@ -341,21 +341,6 @@ class VideoPlacements {
       }
     });
   }
-
-  /**
-   * @method generateDistinctColors
-   * @description Generates an array of distinct colors.
-   * @param {number} numColors - The number of colors to generate.
-   * @returns {string[]} An array of distinct colors in HSL format.
-   */
-  generateDistinctColors(numColors) {
-    const colors = [];
-    for (let i = 0; i < numColors; i++) {
-      const hue = (i / numColors) * 360;
-      colors.push(`hsl(${hue}, 100%, 50%)`);
-    }
-    return colors;
-  }
 }
 
 const videoPlacements = new VideoPlacements();
