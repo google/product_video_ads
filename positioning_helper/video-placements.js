@@ -18,6 +18,7 @@ class VideoPlacements {
     this.rectangleType = document.getElementById('rectangleType');
     this.rectangleName = document.getElementById('rectangleName');
     this.addRectangleButton = document.getElementById('addRectangle');
+    this.loremText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
     this.addEventListeners();
   }
 
@@ -81,7 +82,8 @@ class VideoPlacements {
   handleAddRectangle() {
     const type = this.rectangleType.value;
     const name = this.rectangleName.value || `Unnamed ${type}`;
-    this.createRectangle(type, name);
+    const fontSize = parseInt(document.getElementById('fontSize').value) || 16;
+    this.createRectangle(type, name, fontSize);
   }
 
   /**
@@ -89,10 +91,11 @@ class VideoPlacements {
    * @description Creates a new rectangle element and adds it to the video container.
    * @param {string} type - The type of the rectangle ('Image' or 'Text').
    * @param {string} name - The name of the rectangle.
+   * @param {number} fontSize - The font size for text rectangles.
    */
-  createRectangle(type, name) {
+  createRectangle(type, name, fontSize) {
     const color = type === 'Image' ? 'rgba(0, 255, 0, 0.5)' : 'rgba(255, 0, 0, 0.5)';
-    const rectangle = this.createRectangleElement(name, color, type);
+    const rectangle = this.createRectangleElement(name, color, type, fontSize);
 
     // Set initial position
     rectangle.style.left = '0px';
@@ -112,6 +115,13 @@ class VideoPlacements {
     this.videoContainer.appendChild(rectangle);
     this.makeDraggable(rectangle);
     this.createCoordinateDisplay(rectangle, name, type);
+
+    // Trigger initial coordinate update
+    const containerRect = this.videoContainer.getBoundingClientRect();
+    const elementRect = rectangle.getBoundingClientRect();
+    const scaleX = this.videoWidth / containerRect.width;
+    const scaleY = this.videoHeight / containerRect.height;
+    this.updateCoordinates(rectangle, rectData, containerRect, elementRect, scaleX, scaleY);
   }
 
   /**
@@ -120,25 +130,42 @@ class VideoPlacements {
    * @param {string} name - The name of the rectangle.
    * @param {string} color - The background color of the rectangle.
    * @param {string} type - The type of the rectangle ('Image' or 'Text').
+   * @param {number} fontSize - The font size for text rectangles.
    * @returns {HTMLElement} The created rectangle element.
    */
-  createRectangleElement(name, color, type) {
+  createRectangleElement(name, color, type, fontSize = 16) {
     const rect = document.createElement('div');
-    rect.id = `${name.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}`; // Unique ID
+    rect.id = `${name.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}`;
     rect.classList.add('draggable');
     rect.classList.add(type.toLowerCase());
     rect.style.backgroundColor = color;
-    rect.style.width = "80px";
-    rect.style.height = "40px";
 
+    // Add label with fixed styling
     const label = document.createElement('div');
-    label.style.position = 'absolute';
-    label.style.top = '-20px';
-    label.style.width = '100%';
-    label.style.textAlign = 'center';
-    label.style.color = 'black';
+    label.className = 'box-label';
     label.textContent = name;
     rect.appendChild(label);
+
+    if (type === 'Text') {
+      rect.style.fontSize = `${fontSize}px`;
+      rect.style.fontFamily = 'Roboto Mono, monospace';
+      rect.dataset.fontSize = fontSize;
+
+      // Create preview text
+      const preview = document.createElement('span');
+      preview.className = 'preview-text';
+      preview.textContent = this.loremText;
+      preview.style.pointerEvents = 'none';
+      rect.appendChild(preview);
+
+      // Calculate initial width based on default characters
+      const charWidth = fontSize * 0.6;
+      rect.style.width = `${charWidth * 10}px`;
+      rect.style.height = `${fontSize * 1.2}px`;
+    } else {
+      rect.style.width = "80px";
+      rect.style.height = "40px";
+    }
 
     return rect;
   }
@@ -249,33 +276,12 @@ class VideoPlacements {
       const rect = this.rectangles.find((r) => r.element.id === rectId);
 
       if (rect) {
-        // Calculate relative position to video container
-        const relativeX = elementRect.left - containerRect.left;
-        const relativeY = elementRect.top - containerRect.top;
-
-        if (rect.type === 'Image') {
-          // For images, calculate center point
-          rect.x = Math.round((relativeX + elementRect.width/2) * scaleX);
-          rect.y = Math.round((relativeY + elementRect.height/2) * scaleY);
-        } else {
-          // For text, keep top-left position
-          rect.x = Math.round(relativeX * scaleX);
-          rect.y = Math.round(relativeY * scaleY);
-        }
-
-        rect.width = Math.round(elementRect.width * scaleX);
-        rect.height = Math.round(elementRect.height * scaleY);
-
-        // Update display
-        document.getElementById(`${rectId}-x`).textContent = rect.x.toString();
-        document.getElementById(`${rectId}-y`).textContent = rect.y.toString();
-        document.getElementById(`${rectId}-width`).textContent = rect.width.toString();
-        document.getElementById(`${rectId}-height`).textContent = rect.height.toString();
+        this.updateCoordinates(element, rect, containerRect, elementRect, scaleX, scaleY);
       }
     };
 
     element.addEventListener('mousedown', (e) => {
-      if (e.target !== element) return;
+      if (!element.contains(e.target)) return;
 
       const rect = element.getBoundingClientRect();
       const resizeHandleSize = 10;
@@ -283,8 +289,10 @@ class VideoPlacements {
       if (e.clientX > rect.right - resizeHandleSize &&
           e.clientY > rect.bottom - resizeHandleSize) {
         isResizing = true;
+        isDragging = false;
       } else {
         isDragging = true;
+        isResizing = false;
         initialX = e.clientX - element.offsetLeft;
         initialY = e.clientY - element.offsetTop;
         element.style.cursor = 'grabbing';
@@ -340,6 +348,52 @@ class VideoPlacements {
         element.style.cursor = 'grab';
       }
     });
+  }
+
+  /**
+   * @method updateCoordinates
+   * @description Updates the coordinates display for a rectangle.
+   */
+  updateCoordinates(element, rect, containerRect, elementRect, scaleX, scaleY) {
+    // Calculate relative position
+    const relativeX = elementRect.left - containerRect.left;
+    const relativeY = elementRect.top - containerRect.top;
+
+    if (rect.type === 'Image') {
+      rect.x = Math.round((relativeX + elementRect.width/2) * scaleX);
+      rect.y = Math.round((relativeY + elementRect.height/2) * scaleY);
+      rect.width = Math.round(elementRect.width * scaleX);
+      rect.height = Math.round(elementRect.height * scaleY);
+    } else {
+      // For text boxes
+      rect.x = Math.round(relativeX * scaleX);
+      rect.y = Math.round(relativeY * scaleY);
+
+      const fontSize = parseInt(element.dataset.fontSize);
+      const charWidth = fontSize * 0.6; // Monospace character width approximation
+      const lineHeight = fontSize * 1.2;
+      const numChars = Math.floor(elementRect.width / charWidth);
+      const numLines = Math.floor(elementRect.height / lineHeight);
+
+      // Create a single line of text that fits the width
+      const singleLine = this.loremText.slice(0, numChars);
+
+      // Repeat the line for as many lines as can fit in the height
+      const preview = element.querySelector('.preview-text');
+      if (preview) {
+        preview.textContent = Array(numLines).fill(singleLine).join('\n');
+      }
+
+      rect.width = numChars; // Store character count instead of pixels
+      rect.height = Math.round(elementRect.height * scaleY);
+    }
+
+    // Update coordinate display
+    const rectId = element.id;
+    document.getElementById(`${rectId}-x`).textContent = rect.x.toString();
+    document.getElementById(`${rectId}-y`).textContent = rect.y.toString();
+    document.getElementById(`${rectId}-width`).textContent = rect.width.toString();
+    document.getElementById(`${rectId}-height`).textContent = rect.height.toString();
   }
 }
 
