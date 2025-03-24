@@ -19,6 +19,7 @@ class VideoPlacements {
     this.rectangleName = document.getElementById('rectangleName');
     this.addRectangleButton = document.getElementById('addRectangle');
     this.loremText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+    this.addRectangleButton.disabled = true; // Ensure button starts disabled
     this.addEventListeners();
   }
 
@@ -39,6 +40,7 @@ class VideoPlacements {
    */
   handleVideoFileChange(e) {
     const file = e.target.files[0];
+    this.addRectangleButton.disabled = true; // Disable when changing video
 
     // Validate file type
     if (!file || !file.type.startsWith('video/')) {
@@ -72,6 +74,7 @@ class VideoPlacements {
     // Set video container dimensions
     this.videoContainer.style.width = '100%';
     this.videoContainer.style.height = `${this.myVideo.offsetHeight}px`;
+    this.addRectangleButton.disabled = false; // Enable button once video is ready
     console.log('Video Dimensions:', this.videoWidth, this.videoHeight);
   }
 
