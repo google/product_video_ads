@@ -103,7 +103,7 @@
       }
 
       select,
-      input[type="text"] {
+      input {
         width: 200px;
         padding: 8px 16px;
         border: 1px solid var(--md-outline);
@@ -115,7 +115,7 @@
       }
 
       select:focus,
-      input[type="text"]:focus {
+      input:focus {
         border-color: var(--md-primary);
         outline: none;
       }
@@ -183,6 +183,13 @@
       .text {
         border: 2px solid var(--md-secondary);
         background-color: rgba(83, 95, 112, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 4px;
+        font-family: "Roboto Mono", monospace;
+        overflow: visible; /* Changed from hidden to show label */
       }
 
       .delete-btn {
@@ -242,6 +249,25 @@
         border-left: 4px solid var(--md-primary-container);
         color: var(--md-secondary);
       }
+
+      .preview-text {
+        white-space: pre;
+        line-height: 1.2;
+        overflow: hidden;
+      }
+
+      .box-label {
+        position: absolute;
+        top: -20px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        color: black;
+        pointer-events: none;
+        font-size: 14px;
+        font-family: "Roboto", sans-serif;
+        z-index: 1; /* Ensure label is above the box */
+      }
     </style>
     <!-- Add Roboto font -->
     <link
@@ -251,6 +277,11 @@
     <!-- Add Material Icons -->
     <link
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <!-- Add Roboto Mono font for consistent character width -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap"
       rel="stylesheet"
     />
   </head>
@@ -309,6 +340,10 @@
           <input type="text" id="rectangleName" placeholder="e.g. Price" />
         </div>
         <div class="form-group">
+          <label for="fontSize">Font Size (px):</label>
+          <input type="number" id="fontSize" value="16" />
+        </div>
+        <div class="form-group">
           <label for="rectangleType">Type:</label>
           <select id="rectangleType">
             <option value="Text">Text</option>
@@ -317,7 +352,7 @@
         </div>
         <div class="form-group">
           <label>&nbsp;</label>
-          <button id="addRectangle">Add Placeholder</button>
+          <button id="addRectangle" disabled>Add Placeholder</button>
         </div>
       </div>
 
