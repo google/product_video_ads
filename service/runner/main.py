@@ -413,7 +413,7 @@ def _wrap_text(text, characters_per_line):
 def remove_background(input_path):
   input_image = Image.open(input_path)
   output_image = remove(input_image)
-  output_path = f"{input_path}.png"
+  output_path = f'{input_path}.png'
   output_image.save(output_path)
   return output_path
 
