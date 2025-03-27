@@ -37,9 +37,8 @@ import requests
 import storage as StorageService
 from cloudevents.http import CloudEvent
 from google.cloud import logging as cloudlogging
-
-from rembg import remove
 from PIL import Image
+from rembg import remove
 
 
 class PvaLiteRenderMessagePlacement:
@@ -462,8 +461,9 @@ def convert_image_overlay(
 def _download_image_to_file(output_dir, url):
   # Special case to download from Google Cloud Storage
   if url.startswith('gs://'):
-    first_slash_index = url.replace('gs://').index('/')
-    file_path = url[first_slash_index + 1:]
+    modified_url = url.replace('gs://', '')
+    first_slash_index = modified_url.index('/')
+    file_path = modified_url[first_slash_index + 1:]
 
     tmp_file_name = StorageService.download_gcs_file(
         filepath=file_path,
@@ -486,4 +486,4 @@ def _download_image_to_file(output_dir, url):
     with open(tmp_file_name, 'wb') as f:
       shutil.copyfileobj(r.raw, f)
 
-    return tmp_file_name
+  return tmp_file_name
