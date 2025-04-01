@@ -24,11 +24,13 @@ import datetime
 import imghdr
 import json
 import logging
+import mimetypes
 import os
 import pathlib
 import shutil
 import tempfile
 from typing import Optional, Sequence, Union
+from urllib.parse import urlparse
 
 import config as ConfigService
 import functions_framework
@@ -461,29 +463,55 @@ def convert_image_overlay(
 def _download_image_to_file(output_dir, url):
   # Special case to download from Google Cloud Storage
   if url.startswith('gs://'):
-    modified_url = url.replace('gs://', '')
-    first_slash_index = modified_url.index('/')
-    file_path = modified_url[first_slash_index + 1:]
-
+    parsed_url = urlparse(url)
+    file_path = parsed_url.path.lstrip('/')  # Remove leading slash.
     tmp_file_name = StorageService.download_gcs_file(
         filepath=file_path,
         bucket_name=ConfigService.GCS_BUCKET,
         output_dir=output_dir,
     )
   # Downloads image from https/https urls
-  else:
-    img_extension = url.split('.')[-1]
-    tmp_file_name = f'{output_dir}/img_{datetime.datetime.now().timestamp()}.{img_extension}'
+  elif url.startswith('http://') or url.startswith('https://'):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) '
         'Chrome/90.0.4430.72 Safari/537.36 '
     }
 
-    r = requests.get(url, stream=True, headers=headers, timeout=20)
-    r.raw.decode_content = True
+    try:
+      r = requests.get(url, stream=True, headers=headers, timeout=30)
+      r.raise_for_status()
 
-    # Open a local file with wb ( write binary ) permission.
-    with open(tmp_file_name, 'wb') as f:
-      shutil.copyfileobj(r.raw, f)
+      # Get content type and guess extension
+      content_type = r.headers.get('content-type')
+      extension = mimetypes.guess_extension(
+          content_type
+      ) if content_type else '.img'  # Default extension if type unknown
+
+      # If guessed extension is None or odd
+      if extension is None:
+        extension = '.img'  # Use default extension
+      elif extension == '.jpe':
+        extension = '.jpg'
+
+      if not extension.startswith('.'):
+        extension = '.' + extension
+
+      # Construct a safe filename
+      timestamp = datetime.datetime.now().timestamp()
+      base_filename = f'img_{timestamp}{extension}'
+      tmp_file_name = os.path.join(output_dir, base_filename)
+
+      r.raw.decode_content = True
+      with open(tmp_file_name, 'wb') as f:
+        shutil.copyfileobj(r.raw, f)
+
+    except requests.exceptions.RequestException as e:
+      print(f'Error downloading image from {url}: {e}')
+      raise
+
+  else:
+    raise ValueError(
+        f"Unsupported URL: {url}. Only 'gs://', 'http://', 'https://' are supported."
+    )
 
   return tmp_file_name
