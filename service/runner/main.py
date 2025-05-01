@@ -246,7 +246,8 @@ def subscribe(cloud_event: CloudEvent):
 
 def generate_video(message: PvaLiteRenderMessage):
   output_dir = tempfile.mkdtemp()
-  os.mkdir(f'{output_dir}/{message.ad_group}')
+  # No need to create ad_group subdir if output_video_path includes it
+  # os.mkdir(f'{output_dir}/{message.ad_group}')
   input_video_path = StorageService.download_gcs_file(
       filepath=message.template_video,
       bucket_name=ConfigService.GCS_BUCKET,
@@ -257,11 +258,12 @@ def generate_video(message: PvaLiteRenderMessage):
         f'Template {message.template_video} does not exist in '
         f'bucket {ConfigService.GCS_BUCKET}'
     )
+  # Ensure the parent directory exists for the output path
+  output_video_filename = f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.mp4"
   output_video_path = pathlib.Path(
-      output_dir,
-      message.ad_group,
-      f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.mp4",
+      output_dir, message.ad_group, output_video_filename
   )
+  output_video_path.parent.mkdir(parents=True, exist_ok=True)
 
   return process_video(
       message.content, output_dir, input_video_path, str(output_video_path)
