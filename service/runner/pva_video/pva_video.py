@@ -218,10 +218,13 @@ def video_filter(
   logging.debug(img)
 
   if angle and str(angle) != '0':
+    # Rotate the already scaled image (resize_str) with expanded canvas
     img += '%s rotate=%s*PI/180:' % (resize_str, angle)
-    img += 'ow=ih:'
-    img += 'oh=iw:'
-    img += 'c=none'
+    # Make it large enough to display the entire rotated image
+    img += 'ow=rotw(%s*PI/180):' % angle  # Use rotw() to calculate required width
+    img += 'oh=roth(%s*PI/180):' % angle  # Use roth() to calculate required height
+    img += 'c=none:'  # Use transparent background
+    img += 'fillcolor=none'  # Fill empty space with transparency
     img += ' %s;' % rotate_str
   else:
     rotate_str = resize_str
