@@ -44,7 +44,7 @@ def filter_strings(images_and_videos, text_lines):
   # loops concatenating other overlays to the first
   for i, ovr in enumerate(overlays):
     output_stream = f'vidout{i}'
-    use_cropped_text_fix = False  # TODO(): FIX ME ovr.get('useCroppedTextFix', False)
+    use_cropped_text_fix = True  # Enable the fix for text rotation/cropping issues. # ovr.get('useCroppedTextFix', False)
 
     # if it is an image overlay, renames it to 'vidX'
     if 'image' in ovr:
@@ -305,7 +305,7 @@ def write_temp_image(
 
   if use_cropped_text_fix:
     if angle and str(angle) != '0':
-      args += ['-distort', 'SRT', angle]
+      args += ['-distort', 'SRT', str(angle)]
     args += ['-trim']
 
   args += [escape_path(temp_file_name)]
