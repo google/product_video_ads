@@ -44,7 +44,7 @@ def filter_strings(images_and_videos, text_lines):
   # loops concatenating other overlays to the first
   for i, ovr in enumerate(overlays):
     output_stream = f'vidout{i}'
-    use_cropped_text_fix = False  # TODO(): FIX ME ovr.get('useCroppedTextFix', False)
+    use_cropped_text_fix = True  # Enable the pre-rotation fix for text (handled in write_temp_image)
 
     # if it is an image overlay, renames it to 'vidX'
     if 'image' in ovr:
@@ -218,10 +218,13 @@ def video_filter(
   logging.debug(img)
 
   if angle and str(angle) != '0':
+    # Rotate the already scaled image (resize_str) with expanded canvas
     img += '%s rotate=%s*PI/180:' % (resize_str, angle)
-    img += 'ow=ih:'
-    img += 'oh=iw:'
-    img += 'c=none'
+    # Make it large enough to display the entire rotated image
+    img += 'ow=rotw(%s*PI/180):' % angle  # Use rotw() to calculate required width
+    img += 'oh=roth(%s*PI/180):' % angle  # Use roth() to calculate required height
+    img += 'c=none:'  # Use transparent background
+    img += 'fillcolor=none'  # Fill empty space with transparency
     img += ' %s;' % rotate_str
   else:
     rotate_str = resize_str
@@ -305,13 +308,15 @@ def write_temp_image(
 
   if use_cropped_text_fix:
     if angle and str(angle) != '0':
-      args += ['-distort', 'SRT', angle]
+      args += ['-distort', 'SRT', str(angle)]
     args += ['-trim']
 
   args += [escape_path(temp_file_name)]
 
   logging.debug('Running imagemagick with args:')
-  logging.debug(' '.join(args))
+  logging.debug(
+      ' '.join([str(arg) for arg in args])
+  )  # Ensure all args are strings for logging
 
   # constucts image
   try:
@@ -319,7 +324,7 @@ def write_temp_image(
     if output:
       raise FFMpegExecutionError(' '.join(args), output)
   except subprocess.CalledProcessError as e:
-    raise FFMpegExecutionError(' '.join(args), e.output)
+    raise FFMpegExecutionError(args, e.output) from e  # Pass args as list
 
   # return generated file name
   return temp_file_name
@@ -371,10 +376,11 @@ def image_and_video_inputs(images_and_videos, text_tmp_images):
     # Resize all images to avoid FFMPEG to run with unecessary large images
     if (filename not in resized_images) and filename.endswith('png'):
       resize_images(
-          filename, filename, ovl['width'], ovl['height'], ovl['keep_ratio']
+          filename, filename, ovl.get('width', -1), ovl.get('height', -1),
+          ovl.get('keep_ratio', True)
       )
 
-      resized_images.add(filename)
+      resized_images.add(filename)  # Add the potentially new filename
 
     include_cmd += include_args + ['%s'%filename]
 
@@ -404,7 +410,7 @@ def resize_images(
 
   args = [
       executable, input_file, '-resize',
-      '%dx%d>%s' % (width, height, '' if keep_ratio else '!'), '-quality', '95',
+      '%dx%d%s' % (width, height, '>' if keep_ratio else '!'), '-quality', '95',
       '-depth', '8', output_file
   ]
 
@@ -415,7 +421,7 @@ def resize_images(
   try:
     return subprocess.check_output(args, stderr=subprocess.STDOUT)
   except subprocess.CalledProcessError as e:
-    raise FFMpegExecutionError(' '.join(args), e.output)
+    raise FFMpegExecutionError(args, e.output) from e
 
 
 def run_ffmpeg(
@@ -462,7 +468,7 @@ def run_ffmpeg(
   try:
     return subprocess.check_output(args, stderr=subprocess.STDOUT)
   except subprocess.CalledProcessError as e:
-    raise FFMpegExecutionError(' '.join(args), e.output)
+    raise FFMpegExecutionError(' '.join(args), e.output) from e
 
 
 class FFMpegExecutionError(Exception):
