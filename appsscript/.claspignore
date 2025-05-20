@@ -1,1 +1,12 @@
+# Ignore all files by default
+**/**
 
+# Except the following filetypes
+!appsscript.json
+!**/*.gs
+!**/*.js
+!**/*.ts
+!**/*.html
+.git/**
+node_modules/**
+.venv/**
