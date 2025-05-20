@@ -76,11 +76,23 @@ Before being able to use PVA, the following steps are required:
 
 ### A. Prepare your deployment environment
 
+You have two options for the deployment environment:
+
+#### OPTION 1: Deploying from your local machine and terminal (preferred!)
+
 1. Make sure your system has an up-to-date installation of [Node.js, npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and `git`.
 2. Install [clasp](https://github.com/google/clasp) by running `npm install @google/clasp@2.4.2 -g`, then log in via `clasp login`.
 3. In the [Apps Script settings](https://script.google.com/home/usersettings), ensure that the Apps Script API is enabled.
 4. In your GCP project, ensure [OAuth consent](https://console.cloud.google.com/apis/credentials/consent) is [configured](https://developers.google.com/workspace/guides/configure-oauth-consent). (If possible, choose the "Internal" type to avoid the need for approval.)
 5. Make sure your system has an up-to-date installation of the [gcloud CLI](https://cloud.google.com/sdk/docs/install), then log in via `gcloud auth login`.
+
+#### OPTION 2: Deploying from Google Cloud Shell (if unable to install npm / clasp / gcloud on your machine)
+
+1. On your Google Cloud Shell, login to [clasp](https://github.com/google/clasp) by running `clasp login --no-localhost`.
+2. Copy the url from your web browser (it might show that the page is not reachable. This is okay.) and paste into the Cloud Shell as instructed.
+3. In the [Apps Script settings](https://script.google.com/home/usersettings), ensure that the Apps Script API is enabled.
+4. In your GCP project, ensure [OAuth consent](https://console.cloud.google.com/apis/credentials/consent) is [configured](https://developers.google.com/workspace/guides/configure-oauth-consent). (If possible, choose the "Internal" type to avoid the need for approval.)
+   `
 
 ### B. Check out the code
 

@@ -18,47 +18,86 @@ const prompts = require("prompts");
 
 import {
   AppsScriptDeploymentHandler,
-  DEFAULT_GCP_REGION,
-  DEFAULT_GCS_LOCATION,
-  DEFAULT_PUBSUB_TOPIC,
   GcpDeploymentHandler,
   UserConfigManager,
 } from "./common.js";
 
 (async () => {
-  const config = UserConfigManager.getCurrentConfig()
-  const response = await prompts([
-    {
-      type: "text",
-      name: "gcpProjectId",
-      message: `Enter your GCP Project ID [${config.gcpProjectId || "None"}]:`,
-      initial: config.gcpProjectId || null,
-      validate: (value: string) => (!value ? "Required" : true),
-    },
-    {
-      type: "text",
-      name: "gcpRegion",
-      message: `Enter a GCP region for the 'pva-lite' service to run in [${config.gcpRegion}]'):`,
-      initial: config.gcpRegion,
-    },
-    {
-      type: "text",
-      name: "gcsLocation",
-      message: `Enter a GCS location to store videos in (can be multi-region like 'us' or 'eu' or single region like 'us-central1' or 'europe-west4') [${config.gcsLocation}]):`,
-      initial: config.gcsLocation,
-    },
-    {
-      type: "text",
-      name: "pubsubTopic",
-      message: `Enter a Pub/Sub Topic name [${config.pubsubTopic}]:`,
-      initial: config.pubsubTopic,
-    },
-  ]);
-  UserConfigManager.setUserConfig(response);
+  const config = UserConfigManager.getCurrentConfig();
 
-  await GcpDeploymentHandler.checkGcloudAuth();
-  GcpDeploymentHandler.deployGcpComponents();
-  await AppsScriptDeploymentHandler.createScriptProject();
-  AppsScriptDeploymentHandler.deployAppsScript();
-  AppsScriptDeploymentHandler.printProjectLinks();
+  const deploymentChoicePrompt = {
+    type: "select" as const, // Important for type inference with prompts library
+    name: "deploymentOption",
+    message: "What components would you like to deploy?",
+    choices: [
+      {
+        title: "Cloud Run backend + Apps Script frontend (default)",
+        value: "all",
+      },
+      { title: "Cloud Run backend only", value: "backend" },
+      { title: "Apps Script frontend only", value: "frontend" },
+    ],
+    initial: 0,
+  };
+
+  const deploymentResponse = await prompts(deploymentChoicePrompt);
+
+  if (!deploymentResponse.deploymentOption) {
+    console.log("Deployment option selection cancelled. Exiting.");
+    return;
+  }
+
+  const deploymentOption = deploymentResponse.deploymentOption;
+
+  // Configure and deploy GCP components if 'all' or 'backend' is chosen
+  if (deploymentOption === "all" || deploymentOption === "backend") {
+    const gcpPrompts = [
+      {
+        type: "text" as const,
+        name: "gcpProjectId",
+        message: `Enter your GCP Project ID [${
+          config.gcpProjectId || "None"
+        }]:`,
+        initial: config.gcpProjectId || undefined, // prompts expects undefined for no initial, not null
+        validate: (value: string) => (!value ? "Required" : true),
+      },
+      {
+        type: "text" as const,
+        name: "gcpRegion",
+        message: `Enter a GCP region for the 'pva-lite' service to run in [${config.gcpRegion}]:`,
+        initial: config.gcpRegion,
+      },
+      {
+        type: "text" as const,
+        name: "gcsLocation",
+        message: `Enter a GCS location to store videos in (can be multi-region like 'us' or 'eu' or single region like 'us-central1' or 'europe-west4') [${config.gcsLocation}]:`,
+        initial: config.gcsLocation,
+      },
+      {
+        type: "text" as const,
+        name: "pubsubTopic",
+        message: `Enter a Pub/Sub Topic name [${config.pubsubTopic}]:`,
+        initial: config.pubsubTopic,
+      },
+    ];
+
+    const gcpConfigResponse = await prompts(gcpPrompts);
+
+    // Check if user cancelled GCP prompts (gcpProjectId is required)
+    if (!gcpConfigResponse.gcpProjectId) {
+      console.log("GCP configuration cancelled. Exiting.");
+      return;
+    }
+
+    UserConfigManager.setUserConfig(gcpConfigResponse);
+    await GcpDeploymentHandler.checkGcloudAuth();
+    GcpDeploymentHandler.deployGcpComponents();
+  }
+
+  // Create and deploy Apps Script project if 'all' or 'frontend' is chosen
+  if (deploymentOption === "all" || deploymentOption === "frontend") {
+    await AppsScriptDeploymentHandler.createScriptProject();
+    AppsScriptDeploymentHandler.deployAppsScript();
+    AppsScriptDeploymentHandler.printProjectLinks();
+  }
 })();

@@ -12,14 +12,14 @@
     "build": "npm run clean && npm run bundle && ncp appsscript.json dist/appsscript.json",
     "license": "license-check-and-add add -f license-config.json",
     "test": "jest test/ --passWithNoTests --detectOpenHandles",
-    "deploy": "npm run lint && npm run test && npm run build && ncp .clasp-dev.json .clasp.json && clasp push -f",
+    "deploy": "npm run lint && npm run test && npm run build && npx ncp .clasp-dev.json .clasp.json && clasp push -f",
     "deploy:prod": "npm run lint && npm run test && npm run build && ncp .clasp-prod.json .clasp.json && clasp push"
   },
   "engines": {
     "node": ">=12"
   },
   "dependencies": {
-    "@google/clasp": "2.4.2",
+    "@google/clasp": "^2.4.2",
     "@types/google-apps-script": "^1.0.83",
     "@types/jest": "^29.5.12",
     "@typescript-eslint/eslint-plugin": "^8.4.0",
