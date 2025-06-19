@@ -48,7 +48,7 @@ class ClaspManager {
 
     if (!loggedIn) {
       console.log("Logging in via clasp...");
-      spawn.sync("clasp", ["login"], { stdio: "inherit" });
+      spawn.sync("clasp", ["login", "--no-localhost"], { stdio: "inherit" });
     }
   }
 
@@ -94,7 +94,7 @@ class ClaspManager {
     const res = spawn.sync(
       "clasp",
       [
-        "create",
+        "create-script",
         "--type",
         "sheets",
         "--rootDir",
@@ -105,13 +105,11 @@ class ClaspManager {
       { encoding: "utf-8" }
     );
     if (res.status !== 0) {
-      throw res.error;
+      let errorMessage = `Clasp 'create' command failed with status: ${res.status} and error: ${res.error.message}.`;
+      throw new Error(errorMessage);
     }
 
-    await fs.move(
-      path.join(scriptRootDir, ".clasp.json"),
-      path.join(filesRootDir, ".clasp-dev.json")
-    );
+    await fs.move(".clasp.json", path.join(filesRootDir, ".clasp-dev.json"));
     await fs.copyFile(
       path.join(filesRootDir, ".clasp-dev.json"),
       path.join(filesRootDir, ".clasp-prod.json")
