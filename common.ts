@@ -39,16 +39,29 @@ export interface PromptsResponse {
 }
 
 class ClaspManager {
+  private static getClaspPath() {
+    // Assumes the script is run from the project root, and this file is
+    // compiled into the `dist` directory.
+    return path.join(
+      __dirname,
+      "..",
+      "appsscript",
+      "node_modules",
+      ".bin",
+      "clasp"
+    );
+  }
   private static async isLoggedIn() {
     return await fs.exists(path.join(os.homedir(), ".clasprc.json"));
   }
 
   static async login() {
     const loggedIn = await this.isLoggedIn();
-
     if (!loggedIn) {
       console.log("Logging in via clasp...");
-      spawn.sync("clasp", ["login", "--no-localhost"], { stdio: "inherit" });
+      spawn.sync(this.getClaspPath(), ["login", "--no-localhost"], {
+        stdio: "inherit",
+      });
     }
   }
 
@@ -92,7 +105,7 @@ class ClaspManager {
   ) {
     fs.ensureDirSync(path.join(filesRootDir, scriptRootDir));
     const res = spawn.sync(
-      "clasp",
+      this.getClaspPath(),
       [
         "create-script",
         "--type",
@@ -105,7 +118,13 @@ class ClaspManager {
       { encoding: "utf-8" }
     );
     if (res.status !== 0) {
-      let errorMessage = `Clasp 'create' command failed with status: ${res.status} and error: ${res.error.message}.`;
+      let errorMessage = `Clasp 'create' command failed with status ${res.status}.`;
+      if (res.stderr && res.stderr.toString().trim()) {
+        errorMessage += `\nStderr: ${res.stderr.toString().trim()}`;
+      }
+      if (res.stdout && res.stdout.toString().trim()) {
+        errorMessage += `\nStdout: ${res.stdout.toString().trim()}`;
+      }
       throw new Error(errorMessage);
     }
 
