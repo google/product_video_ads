@@ -295,11 +295,66 @@ def _get_text_dimensions(
       placement.rotation_angle,
       use_cropped_text_fix=True,
   )
-  args = ['identify', '-format', '%w %h', temp_image_name]
+  # The height returned by measuring the actual text can be inconsistent.
+  # We only reliably use the width from this measurement.
+  args = ['convert', temp_image_name, '-trim', '-format', '%w', 'info:']
   output = subprocess.check_output(args,
                                    stderr=subprocess.STDOUT).decode('utf-8')
-  width, height = map(float, output.split())
+  width = float(output.split()[0])
   os.remove(temp_image_name)
+
+  # To get a consistent and accurate height, we query ImageMagick for font
+  # metrics. This is more reliable than rendering text to an image and
+  # measuring it, which can include unwanted vertical padding (leading).
+  args_metric = [
+      'convert',
+      'xc:none',
+      '-font',
+      font_path,
+      '-pointsize',
+      str(placement.text_size),
+      '-debug',
+      'annotate',
+      'label:A',  # A simple character to trigger font metric calculation.
+      'null:',
+  ]
+  proc = subprocess.run(
+      args_metric, capture_output=True, text=True, check=False
+  )
+  stderr_output = proc.stderr
+
+  # Parse the stderr output to find ascender and descender.
+  ascender = None
+  descender = None
+  for line in stderr_output.splitlines():
+    line = line.strip()
+    if line.startswith('ascender:'):
+      try:
+        ascender = float(line.split(':')[1].strip())
+      except (ValueError, IndexError):
+        pass
+    elif line.startswith('descender:'):
+      try:
+        descender = float(line.split(':')[1].strip())
+      except (ValueError, IndexError):
+        pass
+
+  if ascender is not None and descender is not None:
+    single_line_height = ascender - descender  # Descender is negative.
+  else:
+    # Fallback to a raw estimate if metrics can't be parsed.
+    logging.warning('Could not parse font metrics. Falling back to text_size.')
+    single_line_height = placement.text_size
+
+  # Calculate the total height based on the number of lines and the line
+  # spacing logic used in `convert_text_overlay`.
+  num_lines = len(wrapped_lines)
+  if num_lines > 1:
+    line_spacing = 1.2 * placement.text_size
+    height = (num_lines-1) * line_spacing + single_line_height
+  else:
+    height = single_line_height
+
   return width, height, wrapped_lines
 
 
@@ -377,15 +432,15 @@ def _calculate_absolute_positions(
 
       # Calculate anchor offsets for the relative element
       relative_anchor_x = 0
-      if relative_to.placement.relative_horizontal_anchor == 'center':
+      if element.placement.relative_horizontal_anchor == 'center':
         relative_anchor_x = relative_to.width / 2
-      elif relative_to.placement.relative_horizontal_anchor == 'right':
+      elif element.placement.relative_horizontal_anchor == 'right':
         relative_anchor_x = relative_to.width
 
       relative_anchor_y = 0
-      if relative_to.placement.relative_vertical_anchor == 'center':
+      if element.placement.relative_vertical_anchor == 'center':
         relative_anchor_y = relative_to.height / 2
-      elif relative_to.placement.relative_vertical_anchor == 'bottom':
+      elif element.placement.relative_vertical_anchor == 'bottom':
         relative_anchor_y = relative_to.height
 
       # Calculate anchor offsets for the current element
