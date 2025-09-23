@@ -220,7 +220,8 @@ All columns need to have values, except _Text Font_ and those referring to a dif
 - _Data Field_: name of the field in the sheet _Offers_ that has the text or (the URL of the) image to be shown
 - _Position X_ and _Position Y_: horizontal/vertical coordinate on the base video at which to place the content – For images, this is their center, for text it is the upper left corner.
 - _Rotation Angle_: angle (in degrees) at which to rotate the content, positive values meaning clockwise rotation
-- _Image Width_ and _Image Height_: dimensions into which the image should be scaled – Its aspect ratio will be retained, so one of the resulting dimensions may be smaller.
+- _Image Width_ and _Image Height_: dimensions into which the image should be scaled
+  _Keep Image Ratio_: If yes, the aspect ratio will be retained, otherwise image will be scaled to provided width and height.
 - _Text Font_ (optional): font filename (including its extension)
 - _Text Size_: vertical size in pixels
 - _Text Width_: maximum characters after which the text should be wrapped using a line break

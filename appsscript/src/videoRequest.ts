@@ -48,7 +48,7 @@ const elementPropertyConfig = {
     },
   },
   [ElementType.image]: {
-    stringProps: [ColumnName.removeBackground],
+    stringProps: [ColumnName.removeBackground, ColumnName.keepRatio],
     floatProps: [ColumnName.imageWidth, ColumnName.imageHeight],
     specialValue: {
       key: JsonFieldName.imageUrl,

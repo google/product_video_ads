@@ -156,7 +156,8 @@ class PvaLiteRenderMessageImagePlacement(PvaLiteRenderMessagePlacement):
         image_height: Optional height of the image.
         keep_ratio: Optional keep ratio of the image.
         rotation_angle: Optional rotation angle of the image element.
-        remove_background: Optional, if 'Yes' then remove background before placing
+        remove_background: Optional, if 'Yes' then remove background before placing.
+        keep_ratio: Optional, if 'No' then resize image to the provided width and height.
       """
   offset_x: float
   offset_y: float
@@ -171,9 +172,12 @@ class PvaLiteRenderMessageImagePlacement(PvaLiteRenderMessagePlacement):
   image_width: Optional[float] = 0
   image_height: Optional[float] = 0
   remove_background: Optional[str] = 'No'
-  keep_ratio: Optional[bool] = True
+  keep_ratio: Optional[bool] = False
 
   def __init__(self, **kwargs):
+    # Handle string value 'Yes'/'No' from the sheet for keep_ratio.
+    if 'keep_ratio' in kwargs and isinstance(kwargs['keep_ratio'], str):
+      kwargs['keep_ratio'] = kwargs['keep_ratio'].lower() == 'yes'
     field_names = set([f.name for f in dataclasses.fields(self)])
     for k, v in kwargs.items():
       if k in field_names:
@@ -728,13 +732,9 @@ def convert_image_overlay(
         f'Invalid image {placement.image_url} with extension {extension}'
     )
 
-  # Make x, y coordinates for the image to be the center of the provided image.
-  new_x = element.absolute_x - element.width / 2
-  new_y = element.absolute_y - element.height / 2
-
   return {
-      'x': new_x,
-      'y': new_y,
+      'x': element.absolute_x,
+      'y': element.absolute_y,
       'width': element.width,
       'height': element.height,
       'angle': placement.rotation_angle,
