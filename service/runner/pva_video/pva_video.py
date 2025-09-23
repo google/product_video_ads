@@ -190,12 +190,6 @@ def video_filter(
   fadein_str = '[vid%sfadedin]' % image_stream_index
   fadeout_str = '[vid%sfadedout]' % image_stream_index
 
-  if align == 'center':
-    x = f'{x}-overlay_w/2'
-
-  if align == 'right':
-    x = f'{x}-overlay_w'
-
   if not width:
     width = '-1'
   if not height:

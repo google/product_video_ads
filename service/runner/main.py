@@ -279,6 +279,10 @@ def _get_text_dimensions(
   Returns:
     A tuple containing the width, height, and wrapped lines of the text element.
   """
+  # If the text is empty or just whitespace, return 0 dimensions.
+  if not placement.text_value or not placement.text_value.strip():
+    return 0, 0, []
+
   font_path = None
   if placement.text_font:
     font_path = StorageService.download_gcs_file(
@@ -428,9 +432,23 @@ def _calculate_absolute_positions(
   # Calculate absolute positions
   for element_id in sorted_elements:
     element = elements[element_id]
+
+    # Calculate anchor offsets for the current element
+    element_anchor_x = 0
+    if element.placement.element_horizontal_anchor == 'center':
+      element_anchor_x = element.width / 2
+    elif element.placement.element_horizontal_anchor == 'right':
+      element_anchor_x = element.width
+
+    element_anchor_y = 0
+    if element.placement.element_vertical_anchor == 'center':
+      element_anchor_y = element.height / 2
+    elif element.placement.element_vertical_anchor == 'bottom':
+      element_anchor_y = element.height
+
     if not element.placement.relative_to:
-      element.absolute_x = element.placement.offset_x
-      element.absolute_y = element.placement.offset_y
+      element.absolute_x = element.placement.offset_x - element_anchor_x
+      element.absolute_y = element.placement.offset_y - element_anchor_y
     else:
       relative_to = elements[element.placement.relative_to]
 
@@ -446,20 +464,6 @@ def _calculate_absolute_positions(
         relative_anchor_y = relative_to.height / 2
       elif element.placement.relative_vertical_anchor == 'bottom':
         relative_anchor_y = relative_to.height
-
-      # Calculate anchor offsets for the current element
-      element_anchor_x = 0
-      if element.placement.element_horizontal_anchor == 'center':
-        element_anchor_x = element.width / 2
-      elif element.placement.element_horizontal_anchor == 'right':
-        element_anchor_x = element.width
-
-      element_anchor_y = 0
-      if element.placement.element_vertical_anchor == 'center':
-        element_anchor_y = element.height / 2
-      elif element.placement.element_vertical_anchor == 'bottom':
-        element_anchor_y = element.height
-
       element.absolute_x = (
           relative_to.absolute_x + relative_anchor_x - element_anchor_x
           + element.placement.offset_x
