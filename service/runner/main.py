@@ -305,11 +305,18 @@ def _get_text_dimensions(
   )
   # The height returned by measuring the actual text can be inconsistent.
   # We only reliably use the width from this measurement.
+  width = 0
   args = ['convert', temp_image_name, '-trim', '-format', '%w', 'info:']
-  output = subprocess.check_output(args,
-                                   stderr=subprocess.STDOUT).decode('utf-8')
-  width = float(output.split()[0])
-  os.remove(temp_image_name)
+  try:
+    output = subprocess.check_output(args,
+                                     stderr=subprocess.STDOUT).decode('utf-8')
+    if output.strip():
+      # We use cropped_text_fix, so we need to divide by 4 to get correct width.
+      width = float(output.split()[0]) / 4.0
+  except (subprocess.CalledProcessError, IndexError, ValueError) as e:
+    logging.warning('Could not determine text width: %s', e)
+  finally:
+    os.remove(temp_image_name)
 
   # To get a consistent and accurate height, we query ImageMagick for font
   # metrics. This is more reliable than rendering text to an image and
