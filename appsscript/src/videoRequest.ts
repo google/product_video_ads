@@ -33,6 +33,30 @@ import {
 } from './structure';
 import { Util } from './util';
 
+// Define property mappings for different element types to make getPlacement more declarative.
+const elementPropertyConfig = {
+  [ElementType.text]: {
+    stringProps: [
+      ColumnName.textFont,
+      ColumnName.textAlignment,
+      ColumnName.textColor,
+    ],
+    floatProps: [ColumnName.textSize, ColumnName.textWidth],
+    specialValue: {
+      key: JsonFieldName.textValue,
+      source: 'offer',
+    },
+  },
+  [ElementType.image]: {
+    stringProps: [ColumnName.removeBackground, ColumnName.keepRatio],
+    floatProps: [ColumnName.imageWidth, ColumnName.imageHeight],
+    specialValue: {
+      key: JsonFieldName.imageUrl,
+      source: 'offer',
+    },
+  },
+};
+
 /**
  * Collects the data belonging to a "Placement" in the config.
  * @param placementRecord
@@ -44,53 +68,52 @@ function getPlacement(
   offer: Record<string, string>
 ): [Record<string, string | number> | undefined, ErrorMessage | undefined] {
   const dataField = placementRecord[ColumnName.dataField];
-  const elementType = placementRecord[ColumnName.elementType];
+  const elementType = placementRecord[ColumnName.elementType] as ElementType;
+
   if (!offer[dataField]) {
     // Should have been caught by the 'syntax' check already.
     return [undefined, `Referenced field absent: "${dataField}"`];
   }
   const placement: Record<string, string | number> = {
-    [Util.deriveFieldKey(ColumnName.positionX)]: parseFloat(
-      placementRecord[ColumnName.positionX]
-    ),
-    [Util.deriveFieldKey(ColumnName.positionY)]: parseFloat(
-      placementRecord[ColumnName.positionY]
-    ),
-    [Util.deriveFieldKey(ColumnName.rotationAngle)]: parseFloat(
-      placementRecord[ColumnName.rotationAngle]
-    ),
+    [Util.deriveFieldKey(ColumnName.offsetX)]:
+      parseFloat(placementRecord[ColumnName.offsetX]) || 0,
+    [Util.deriveFieldKey(ColumnName.offsetY)]:
+      parseFloat(placementRecord[ColumnName.offsetY]) || 0,
+    [Util.deriveFieldKey(ColumnName.rotationAngle)]:
+      parseFloat(placementRecord[ColumnName.rotationAngle]) || 0,
+    [Util.deriveFieldKey(ColumnName.elementId)]:
+      placementRecord[ColumnName.elementId],
+    [Util.deriveFieldKey(ColumnName.relativeTo)]:
+      placementRecord[ColumnName.relativeTo],
+    [Util.deriveFieldKey(ColumnName.elementHorizontalAnchor)]:
+      placementRecord[ColumnName.elementHorizontalAnchor],
+    [Util.deriveFieldKey(ColumnName.elementVerticalAnchor)]:
+      placementRecord[ColumnName.elementVerticalAnchor],
+    [Util.deriveFieldKey(ColumnName.relativeHorizontalAnchor)]:
+      placementRecord[ColumnName.relativeHorizontalAnchor],
+    [Util.deriveFieldKey(ColumnName.relativeVerticalAnchor)]:
+      placementRecord[ColumnName.relativeVerticalAnchor],
   };
-  switch (elementType) {
-    case ElementType.text:
-      placement[JsonFieldName.textValue] = offer[dataField];
-      placement[Util.deriveFieldKey(ColumnName.textFont)] =
-        placementRecord[ColumnName.textFont];
-      placement[Util.deriveFieldKey(ColumnName.textSize)] = parseFloat(
-        placementRecord[ColumnName.textSize]
-      );
-      placement[Util.deriveFieldKey(ColumnName.textWidth)] = parseFloat(
-        placementRecord[ColumnName.textWidth]
-      );
-      placement[Util.deriveFieldKey(ColumnName.textAlignment)] =
-        placementRecord[ColumnName.textAlignment];
-      placement[Util.deriveFieldKey(ColumnName.textColor)] =
-        placementRecord[ColumnName.textColor];
-      break;
-    case ElementType.image:
-      placement[JsonFieldName.imageUrl] = offer[dataField];
-      placement[Util.deriveFieldKey(ColumnName.imageWidth)] = parseFloat(
-        placementRecord[ColumnName.imageWidth]
-      );
-      placement[Util.deriveFieldKey(ColumnName.imageHeight)] = parseFloat(
-        placementRecord[ColumnName.imageHeight]
-      );
-      placement[Util.deriveFieldKey(ColumnName.removeBackground)] =
-        placementRecord[ColumnName.removeBackground];
-      break;
-    default:
-      // Should have been caught by the 'syntax' check already.
-      return [undefined, `Unknown element type: "${elementType}"`];
+
+  const config = elementPropertyConfig[elementType];
+  if (!config) {
+    // Should have been caught by the 'syntax' check already.
+    return [undefined, `Unknown element type: "${elementType}"`];
   }
+
+  if (config.specialValue.source === 'offer') {
+    placement[config.specialValue.key] = offer[dataField];
+  }
+
+  for (const prop of config.stringProps) {
+    placement[Util.deriveFieldKey(prop)] = placementRecord[prop];
+  }
+
+  for (const prop of config.floatProps) {
+    placement[Util.deriveFieldKey(prop)] =
+      parseFloat(placementRecord[prop]) || 0;
+  }
+
   return [placement, undefined];
 }
 

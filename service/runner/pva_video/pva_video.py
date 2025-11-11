@@ -54,7 +54,8 @@ def filter_strings(images_and_videos, text_lines):
     else:
       f, text_img = text_filter((i + 1), ovr['text'], ovr['font'],
                                 ovr['font_size'], ovr['font_color'],
-                                ovr['align'], ovr['start_time'], ovr['end_time'],
+                                ovr['align'],
+                                ovr['start_time'], ovr['end_time'],
                                 ovr.get('angle', None), use_cropped_text_fix)
       text_imgs.append(text_img)
 
@@ -189,12 +190,6 @@ def video_filter(
   fadein_str = '[vid%sfadedin]' % image_stream_index
   fadeout_str = '[vid%sfadedout]' % image_stream_index
 
-  if align == 'center':
-    x = f'{x}-overlay_w/2'
-
-  if align == 'right':
-    x = f'{x}-overlay_w'
-
   if not width:
     width = '-1'
   if not height:
@@ -249,8 +244,9 @@ def video_filter(
   # place adds image to overall overlays
   start_at = t_start
   end_at = float(t_end)
-  img += '[%s]%s overlay=%s:%s:enable=\'between(t,%s,%s)\' %s'
-  img %= (input_stream, fadeout_str, x, y, start_at, end_at, out_str)
+  img += '[%s]%s overlay=%s:%s:enable=\'between(t,%s,%s)\' %s' % (
+      input_stream, fadeout_str, x, y, start_at, end_at, out_str
+  )
 
   # img += 'enable=\'between(t,%s,%s)\'' %(t_start, t_end)
 
@@ -284,41 +280,47 @@ def write_temp_image(
   # creates temp file
   temp_file_name = tempfile.mktemp(prefix='pva_lite_', suffix='.png')
 
-  # setup args to construct image
+  # If text is empty or just whitespace, create a 1x1 transparent png
+  # to avoid errors with imagemagick's label:.
+  if not text.strip():
+    args = [
+        'convert', '-size', '1x1', 'xc:transparent',
+        escape_path(temp_file_name)
+    ]
+  else:
+    # setup args to construct image
+    args = ['convert']
 
-  args = ['convert']
+    args += ['-background', 'transparent', '-colorspace', 'sRGB']
+    if t_font:
+      args += ['-font', t_font]
+    args += ['-pointsize', str(float(t_size) * 4)]
+    # The code below adds a thin border around the text. It was introduced as a
+    # workaround for a light border on dark text that used to appear in some
+    # projects. Since we're not seeing that issue anymore and some users are
+    # complaining about the border, I'm removing it.
+    # args += ['-stroke', t_color]
+    # args += ['-strokewidth', str(float(t_size) / 10)]
+    args += ['-fill', t_color]
 
-  args += ['-background', 'transparent', '-colorspace', 'sRGB']
-  if t_font:
-    args += ['-font', t_font]
-  args += ['-pointsize', str(float(t_size) * 4)]
-  # The code below adds a thin border around the text. It was introduced as a
-  # workaround for a light border on dark text that used to appear in some
-  # projects. Since we're not seeing that issue anymore and some users are
-  # complaining about the border, I'm removing it.
-  # args += ['-stroke', t_color]
-  # args += ['-strokewidth', str(float(t_size) / 10)]
-  args += ['-fill', t_color]
+    if use_cropped_text_fix:
+      args += ['-size', '8000x8000']
+      args += ['-gravity', 'center']
 
-  if use_cropped_text_fix:
-    args += ['-size', '8000x8000']
-    args += ['-gravity', 'center']
+    args += [('label:' + text)]  # label:@text_file_name
 
-  args += [('label:' + text)]  # label:@text_file_name
+    if use_cropped_text_fix:
+      if angle and str(angle) != '0':
+        args += ['-distort', 'SRT', str(angle)]
+      args += ['-trim']
 
-  if use_cropped_text_fix:
-    if angle and str(angle) != '0':
-      args += ['-distort', 'SRT', str(angle)]
-    args += ['-trim']
-
-  args += [escape_path(temp_file_name)]
+    args += [escape_path(temp_file_name)]
 
   logging.debug('Running imagemagick with args:')
   logging.debug(
       ' '.join([str(arg) for arg in args])
   )  # Ensure all args are strings for logging
 
-  # constucts image
   try:
     output = subprocess.check_output(args, stderr=subprocess.STDOUT)
     if output:
