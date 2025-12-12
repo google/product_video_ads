@@ -277,7 +277,7 @@ export class ValueRestrictions {
     [ColumnName.textColor]: [
       ValueRestrictionType.regex,
       /* eslint-disable-next-line no-useless-escape */
-      `^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})|rgb\(\d{1,3},\s*\d{1,3},\s*\d{1,3}\)|hsl\(\d{1,3},\s*\d{1,3}%,\s*\d{1,3}%\)|$`,
+      `^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})|rgb\\(\\d{1,3},\\s*\\d{1,3},\\s*\\d{1,3}\\)|hsl\\(\\d{1,3},\\s*\\d{1,3}%,\\s*\\d{1,3}%\\)|$`,
     ],
     [ColumnName.dataField]: [
       ValueRestrictionType.columnNames,
