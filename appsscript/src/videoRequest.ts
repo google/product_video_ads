@@ -70,7 +70,7 @@ function getPlacement(
   const dataField = placementRecord[ColumnName.dataField];
   const elementType = placementRecord[ColumnName.elementType] as ElementType;
 
-  if (!offer[dataField]) {
+  if (offer[dataField] === undefined) {
     // Should have been caught by the 'syntax' check already.
     return [undefined, `Referenced field absent: "${dataField}"`];
   }
@@ -161,6 +161,7 @@ function getConfigForUpload(
       e => e[ColumnName.adGroup] === adGroup
     ).map(e => e[ColumnName.offerId]);
     const templateVideo = adGroupRecord[ColumnName.templateVideo];
+    const templateAudio = adGroupRecord[ColumnName.templateAudio];
     const timingRecords = configTables[SheetName.timing]!.filter(
       e => e[ColumnName.templateVideo] === templateVideo
     );
@@ -210,6 +211,7 @@ function getConfigForUpload(
     const adGroupConfig = {
       [Util.deriveFieldKey(ColumnName.adGroup)]: adGroup,
       [Util.deriveFieldKey(ColumnName.templateVideo)]: templateVideo,
+      [Util.deriveFieldKey(ColumnName.templateAudio)]: templateAudio,
       [JsonFieldName.content]: timings,
     };
     const checksum = Util.getChecksum(adGroupConfig);

@@ -64,6 +64,7 @@ export enum ColumnName {
   relativeVerticalAnchor = 'Relative Vertical Anchor',
   targetLocation = 'Target Location',
   templateVideo = 'Template Video',
+  templateAudio = 'Audio',
   textAlignment = 'Text Alignment',
   rotationAngle = 'Rotation Angle',
   textColor = 'Text Color',
@@ -219,6 +220,7 @@ export const tableStructure: Partial<Record<SheetName, ColumnName[]>> = {
     // If changed, reflect in Ads Script!
     ColumnName.adGroup,
     ColumnName.templateVideo,
+    ColumnName.templateAudio,
     ColumnName.adGroupType,
     ColumnName.targetLocation,
     ColumnName.audienceName,
