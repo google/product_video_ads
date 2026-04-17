@@ -40,6 +40,7 @@ const elementPropertyConfig = {
       ColumnName.textFont,
       ColumnName.textAlignment,
       ColumnName.textColor,
+      ColumnName.hyphenationLanguage,
     ],
     floatProps: [ColumnName.textSize, ColumnName.textWidth],
     specialValue: {

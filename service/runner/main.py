@@ -128,6 +128,7 @@ class PvaLiteRenderMessageTextPlacement(PvaLiteRenderMessagePlacement):
   text_alignment: str
   text_font: Optional[str] = None
   text_width: Optional[str] = None
+  hyphenation_language: Optional[str] = None
 
   def __init__(self, **kwargs):
     field_names = set([f.name for f in dataclasses.fields(self)])
@@ -296,7 +297,11 @@ def _get_text_dimensions(
     )
 
   # Wrap the text first to get the correct dimensions for multi-line text.
-  wrapped_lines = _wrap_text(placement.text_value, placement.text_width or 0)
+  wrapped_lines = _wrap_text(
+      placement.text_value,
+      placement.text_width or 0,
+      placement.hyphenation_language,
+  )
   multi_line_text = '\n'.join(wrapped_lines)
 
   temp_image_name = VideoService.write_temp_image(
@@ -693,7 +698,7 @@ def convert_text_overlay(
   return texts
 
 
-def _wrap_text(text, characters_per_line):
+def _wrap_text(text, characters_per_line, hyphenation_language=None):
   """Wraps text to fit within a specified number of characters per line.
 
   This function splits text into lines based on character count. It uses
@@ -703,6 +708,7 @@ def _wrap_text(text, characters_per_line):
   Args:
     text: The input text to wrap.
     characters_per_line: The maximum number of characters allowed per line.
+    hyphenation_language: Optional language code for hyphenation (e.g., 'de').
 
   Returns:
     A list of strings, where each string is a wrapped line.
@@ -721,7 +727,13 @@ def _wrap_text(text, characters_per_line):
     all_words = line.split()
     current_line = []
     current_line_length = 0
-    dic = pyphen.Pyphen(lang='de')
+    
+    dic = None
+    if hyphenation_language:
+      try:
+        dic = pyphen.Pyphen(lang=hyphenation_language)
+      except Exception as e:
+        logging.warning('Could not initialize Pyphen for language %s: %s', hyphenation_language, e)
 
     for word in all_words:
       # Length of line if we add this word
@@ -733,7 +745,7 @@ def _wrap_text(text, characters_per_line):
       else:
         # Try to hyphenate
         while len(word) > characters_per_line:
-          syllables = dic.inserted(word).split('-')
+          syllables = dic.inserted(word).split('-') if dic else [word]
           if len(syllables) <= 1:
             # Cannot hyphenate further, hard split
             if current_line:

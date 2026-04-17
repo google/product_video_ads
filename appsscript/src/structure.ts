@@ -71,6 +71,7 @@ export enum ColumnName {
   textFont = 'Text Font',
   textSize = 'Text Size',
   textWidth = 'Text Width',
+  hyphenationLanguage = 'Hyphenation Language',
   url = 'URL',
   videoCreation = 'Video Creation',
 }
@@ -210,6 +211,7 @@ export const tableStructure: Partial<Record<SheetName, ColumnName[]>> = {
     ColumnName.textFont,
     ColumnName.textSize,
     ColumnName.textWidth,
+    ColumnName.hyphenationLanguage,
     ColumnName.textAlignment,
     ColumnName.textColor,
     ColumnName.removeBackground,
