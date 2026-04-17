@@ -224,7 +224,8 @@ All columns need to have values, except _Text Font_ and those referring to a dif
   _Keep Image Ratio_: If yes, the aspect ratio will be retained, otherwise image will be scaled to provided width and height.
 - _Text Font_ (optional): font filename (including its extension)
 - _Text Size_: vertical size in pixels
-- _Text Width_: maximum characters after which the text should be wrapped using a line break
+- _Text Width_: maximum characters after which the text should be wrapped using a line break (in addition to any pre-existing line breaks in the text)
+- _Hyphenation Language_: if set to a language code (like `fr` for French or `en_US` for U.S. English, pick from [these](https://github.com/Kozea/Pyphen/tree/main/pyphen/dictionaries)), will auto-hyphenate words in lines exceeding the text width
 - _Text Alignment_: alignment inside the available width, either `left`, `center` or `right`
 - _Text Color_: color as a hexadecimal value with a leading `#`
 
@@ -253,6 +254,7 @@ The columns:
 
 - _Output AdGroup_: name of the ad group to be generated/replaced
 - _Template Video_: name of the file (uploaded to the configured bucket on Cloud Storage) to be used for the videos in this ad group
+- _Audio_: name of the file (uploaded to the configured bucket on Cloud Storage) to use as the audio track of the videos in this ad group
 - _AdGroup Type_: type of the ad group – possible values are enumerated [here](https://developers.google.com/google-ads/api/rest/reference/rest/v18/AdGroupType)
 - _Target Location_ – currently ignored, to be implemented
 - _Audience Name_ – currently ignored, to be implemented
