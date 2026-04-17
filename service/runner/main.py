@@ -27,6 +27,7 @@ import logging
 import mimetypes
 import os
 import pathlib
+import pyphen
 import shutil
 import subprocess
 import tempfile
@@ -127,6 +128,7 @@ class PvaLiteRenderMessageTextPlacement(PvaLiteRenderMessagePlacement):
   text_alignment: str
   text_font: Optional[str] = None
   text_width: Optional[str] = None
+  hyphenation_language: Optional[str] = None
 
   def __init__(self, **kwargs):
     field_names = set([f.name for f in dataclasses.fields(self)])
@@ -240,12 +242,14 @@ class PvaLiteRenderMessage:
         output_path: The output path to use.
         ad_group: The ad group for this render message.
         template_video: The template video for this render message.
+        template_audio: The template audio for this render message.
         content: The content for this render message.
       """
 
   output_path: str
   ad_group: str
   template_video: str
+  template_audio: Optional[str] = None
   content: Sequence[PvaLiteRenderMessageContent]
 
   def __init__(self, **kwargs):
@@ -263,6 +267,7 @@ class PvaLiteRenderMessage:
         f'output_path={self.output_path}, '
         f'ad_group={self.ad_group}, '
         f'template_video={self.template_video}, '
+        f'template_audio={self.template_audio}, '
         f'content={self.content})'
     )
 
@@ -292,7 +297,11 @@ def _get_text_dimensions(
     )
 
   # Wrap the text first to get the correct dimensions for multi-line text.
-  wrapped_lines = _wrap_text(placement.text_value, placement.text_width or 0)
+  wrapped_lines = _wrap_text(
+      placement.text_value,
+      placement.text_width or 0,
+      placement.hyphenation_language,
+  )
   multi_line_text = '\n'.join(wrapped_lines)
 
   temp_image_name = VideoService.write_temp_image(
@@ -528,6 +537,15 @@ def generate_video(message: PvaLiteRenderMessage):
         f'Template {message.template_video} does not exist in '
         f'bucket {ConfigService.GCS_BUCKET}'
     )
+
+  input_audio_path = None
+  if message.template_audio:
+    input_audio_path = StorageService.download_gcs_file(
+        filepath=message.template_audio,
+        bucket_name=ConfigService.GCS_BUCKET,
+        output_dir=output_dir,
+    )
+
   # Ensure the parent directory exists for the output path
   output_video_filename = f"{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.mp4"
   output_video_path = pathlib.Path(
@@ -536,7 +554,11 @@ def generate_video(message: PvaLiteRenderMessage):
   output_video_path.parent.mkdir(parents=True, exist_ok=True)
 
   return process_video(
-      message.content, output_dir, input_video_path, str(output_video_path)
+      message.content,
+      output_dir,
+      input_video_path,
+      str(output_video_path),
+      input_audio_path,
   )
 
 
@@ -545,6 +567,7 @@ def process_video(
     output_dir: str,
     input_video_path: str,
     output_video_path: str,
+    input_audio_path: Optional[str] = None,
 ):
   image_or_videos_overlays = []
   text_overlays = []
@@ -609,12 +632,18 @@ def process_video(
   )
 
   # forces input audio to output
-  audio_args, audio_overlays = [], []
-  out_audio = '0:a?'
+  num_assets = len(image_or_videos_overlays) + len(text_imgs)
+  if input_audio_path:
+    audio_index = num_assets + 1
+    out_audio = f'{audio_index}:a'
+    audio_args = ['-i', input_audio_path]
+  else:
+    out_audio = '0:a?'
+    audio_args = []
 
   # assets_args
   assets_args = img_args + audio_args
-  filter_complex = img_overlays + audio_overlays
+  filter_complex = img_overlays
 
   # Group all args and runs ffmpeg
   ffmpeg_output = VideoService.run_ffmpeg(
@@ -669,46 +698,101 @@ def convert_text_overlay(
   return texts
 
 
-def _wrap_text(text, characters_per_line):
-  lines = []
+def _wrap_text(text, characters_per_line, hyphenation_language=None):
+  """Wraps text to fit within a specified number of characters per line.
 
+  This function splits text into lines based on character count. It uses
+  hyphenation (via Pyphen) to split words that exceed the character limit,
+  or hard splits them if they cannot be hyphenated further.
+
+  Args:
+    text: The input text to wrap.
+    characters_per_line: The maximum number of characters allowed per line.
+    hyphenation_language: Optional language code for hyphenation (e.g., 'de').
+
+  Returns:
+    A list of strings, where each string is a wrapped line.
+  """
   if characters_per_line <= 0:
     return [text]
 
-  all_words = text.split()
-  current_line = []
-  current_line_length = 0
+  input_lines = text.split('\n')
+  output_lines = []
 
-  for word in all_words:
-    # If the current word is too long to fit on its own line, split it.
-    if len(word) > characters_per_line:
-      while len(word) > characters_per_line:
-        lines.append(word[:characters_per_line])
-        word = word[characters_per_line:]
-      lines.append(word)
-      current_line = []
-      current_line_length = 0
+  for line in input_lines:
+    if not line.strip():
+      output_lines.append('')
       continue
 
-    # If adding the current word exceeds the line limit, start a new line.
-    if current_line_length + len(word) + (
-        len(current_line) > 0
-    ) > characters_per_line:
-      lines.append(" ".join(current_line))
-      current_line = []
-      current_line_length = 0
+    all_words = line.split()
+    current_line = []
+    current_line_length = 0
+    
+    dic = None
+    if hyphenation_language:
+      try:
+        dic = pyphen.Pyphen(lang=hyphenation_language)
+      except Exception as e:
+        logging.warning('Could not initialize Pyphen for language %s: %s', hyphenation_language, e)
 
-    current_line.append(word)
-    current_line_length += len(word)
+    for word in all_words:
+      # Length of line if we add this word
+      test_len = current_line_length + len(word) + (1 if current_line else 0)
+      
+      if test_len <= characters_per_line:
+        current_line.append(word)
+        current_line_length = test_len
+      else:
+        # Try to hyphenate
+        while len(word) > characters_per_line:
+          syllables = dic.inserted(word).split('-') if dic else [word]
+          if len(syllables) <= 1:
+            # Cannot hyphenate further, hard split
+            if current_line:
+              output_lines.append(' '.join(current_line))
+              current_line = []
+              current_line_length = 0
+              
+            output_lines.append(word[:characters_per_line])
+            word = word[characters_per_line:]
+          else:
+            fitted = False
+            for i in range(len(syllables) - 1, 0, -1):
+              part = ''.join(syllables[:i]) + '-'
+              test_len = current_line_length + len(part) + (1 if current_line else 0)
+              if test_len <= characters_per_line:
+                current_line.append(part)
+                output_lines.append(' '.join(current_line))
+                word = ''.join(syllables[i:])
+                current_line = []
+                current_line_length = 0
+                fitted = True
+                break
+                
+            if not fitted:
+              if current_line:
+                output_lines.append(' '.join(current_line))
+                current_line = []
+                current_line_length = 0
+              else:
+                # Word itself doesn't fit on an empty line and no part fits
+                output_lines.append(word[:characters_per_line])
+                word = word[characters_per_line:]
 
-  # Add the last line (if any words were left).
-  if current_line:
-    lines.append(' '.join(current_line))
+        # Word is now short enough to fit on a line (or empty)
+        if current_line:
+          output_lines.append(' '.join(current_line))
+        current_line = [word] if word else []
+        current_line_length = len(word)
 
-  if not lines and text:
+    # Add the last line of this paragraph.
+    if current_line:
+      output_lines.append(' '.join(current_line))
+
+  if not output_lines and text:
     return [text]
 
-  return lines
+  return output_lines
 
 
 def remove_background(input_path):

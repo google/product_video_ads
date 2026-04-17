@@ -307,7 +307,7 @@ def write_temp_image(
       args += ['-size', '8000x8000']
       args += ['-gravity', 'center']
 
-    args += [('label:' + text)]  # label:@text_file_name
+    args += ['label:' + text.replace('%', '%%')]  # label:@text_file_name
 
     if use_cropped_text_fix:
       if angle and str(angle) != '0':
