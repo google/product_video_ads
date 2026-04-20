@@ -170,20 +170,23 @@ export class Util {
    * @param field
    * @returns
    */
-  static getDeepValue<T>(obj: T, field: string): string {
-    let pointer: unknown = obj;
-    const keys = field.split('.');
+ static getDeepValue<T>(obj: T, field: string): string {
+    // Safety Patch: If the object is null/undefined, return empty string immediately
+    if (!obj) return ""; 
+    
+    let pointer: any = obj;
+    const keys = field.split(".");
+    
     for (const key of keys) {
-      if (typeof pointer !== 'object' || pointer === null) {
-        throw new Error(`Object has no key "${key}".`);
+      // Safety Patch: Check if the next step in the path exists
+      if (typeof pointer !== "object" || pointer === null || pointer[key] === undefined) {
+        return ""; 
       }
-      const narrowedPointer = pointer as Record<string, unknown>;
-      pointer = narrowedPointer[key as string];
-      if (typeof pointer === 'string') {
-        return pointer;
-      }
+      pointer = pointer[key];
     }
-    throw new Error(`Object has no string at key "${field}".`);
+    
+    // Safety Patch: Return the result or empty string
+    return pointer ? String(pointer) : "";
   }
 
   /**
